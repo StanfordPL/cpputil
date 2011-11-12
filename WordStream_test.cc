@@ -1,4 +1,7 @@
 #include <iostream>
+#include <list>
+#include <string>
+#include <vector>
 
 #include "WordStream.h"
 
@@ -21,6 +24,18 @@ int main()
     iws >> s;
     cout << "[" << s << "]" << endl;
   }
+
+  string as = "a a a a a a a a a a";
+
+  list<string> ls;
+  vector<string> vs;
+
+  words(as, ls);
+  words(as, vs);
+
+  // Should both print "[a.a.a.a.a.a.a.a.a.a]"
+  cout << "[" << unwords(ls.begin(), ls.end(), '.') << "]" << endl;
+  cout << "[" << unwords(vs.begin(), vs.end(), '.') << "]" << endl;
 
   return 0;
 }
