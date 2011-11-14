@@ -1,5 +1,6 @@
 #include <iostream>
 #include <list>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -9,31 +10,33 @@ using namespace std;
 
 int main()
 {
-  OWordStream ows;
+  ostringstream oss;
+  OWordStream ows(oss);
   ows << "Hello" << "World" << "foo";
 
   // Should print "[Hello World foo]"
-  cout << "[" << ows.str() << "]" << endl;
+  cout << "[" << oss.str() << "]" << endl;
 
-  IWordStream iws(ows.str());
+  istringstream iss(oss.str());
+  IWordStream iws(iss);
   string s;
 
   // Should print out "Hello", "World", "foo"
-  while ( !iws.eof() )
+  while ( !iss.eof() )
   {
     iws >> s;
     cout << "[" << s << "]" << endl;
   }
 
-  string as = "a a a a a a a a a a";
+  string as = "1 1 1 1 1 1 1 1 1 1";
 
-  list<string> ls;
-  vector<string> vs;
+  list<int> ls;
+  vector<int> vs;
 
-  words(as, ls);
-  words(as, vs);
+  words(as, ls, ' ');
+  words(as, vs, ' ');
 
-  // Should both print "[a.a.a.a.a.a.a.a.a.a]"
+  // Should both print "[1.1.1.1.1.1.1.1.1.1]"
   cout << "[" << unwords(ls.begin(), ls.end(), '.') << "]" << endl;
   cout << "[" << unwords(vs.begin(), vs.end(), '.') << "]" << endl;
 

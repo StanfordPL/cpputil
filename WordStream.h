@@ -1,105 +1,120 @@
 #ifndef WORD_STREAM_H
 #define WORD_STREAM_H
 
+#include <istream>
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <ostream>
 
 class IWordStream
 {
   public:
-    IWordStream(const std::string& s, char delim = ' ');
+    IWordStream(std::istream& is, char delim = ' ');
 
-    bool eof() const;
-    IWordStream& operator>>(std::string& s);  
+    template <class T>
+    friend IWordStream& operator>>(IWordStream& iws, T& t);
 
   private:
-    std::istringstream iss_;
+    std::istream& is_;
     char delim_;
 };
 
-template <class Container>
-void words(const std::string& s, Container& c, char delim = ' ');
+template <class T>
+IWordStream& operator>>(IWordStream& iws, T& t);
 
 class OWordStream
 {
   public:
-    OWordStream(char delim = ' '); 
+    OWordStream(std::ostream& os, char delim = ' '); 
 
-    std::string str() const;
-    OWordStream& operator<<(const std::string& s);
+    template <class T>
+    friend OWordStream& operator<<(OWordStream& ows, T& t);
 
   private:
-    std::ostringstream oss_;
+    std::ostream& os_;
     char delim_;
     bool empty_;
 };
 
+template <class T>
+OWordStream& operator<<(OWordStream& ows, T& t);
+
+template <class T, class Alloc, template <typename, typename> class Container>
+void words(const std::string& s, Container<T, Alloc>& c, char delim = ' ');
+
 template <class InputIterator>
 std::string unwords(InputIterator begin, InputIterator end, char delim = ' ');
 
-IWordStream::IWordStream(const std::string& s, char delim) :
-  iss_(s),
+IWordStream::IWordStream(std::istream& is, char delim) :
+  is_(is),
   delim_(delim)
 {
   // Does nothing.
 }
 
-inline bool IWordStream::eof() const
+template <class T>
+IWordStream& operator>>(IWordStream& iws, T& t)
 {
-  return iss_.eof();
+  std::string s;
+  std::getline(iws.is_, s, iws.delim_);
+
+  std::istringstream iss(s);
+  iss >> t;
+
+  return iws;
 }
 
-inline IWordStream& IWordStream::operator>>(std::string& s)
+template <>
+IWordStream& operator>>(IWordStream& iws, std::string& s)
 {
-  std::getline(iss_, s, delim_);
-  return *this;
+  std::getline(iws.is_, s, iws.delim_);
+  return iws;
 }
 
-template <class Container>
-void words(const std::string& s, Container& c, char delim)
-{
-  IWordStream iws(s, delim);
-  std::string word; 
-
-  for ( auto itr = back_inserter(c); !iws.eof(); ++itr )
-  {
-    iws >> word;
-    itr = word;
-  }
-}
-
-OWordStream::OWordStream(char delim) :
+OWordStream::OWordStream(std::ostream& os, char delim) :
+  os_(os),
   delim_(delim),
   empty_(true)
 {
   // Does nothing.
 }
 
-inline std::string OWordStream::str() const
+template <class T>
+OWordStream& operator<<(OWordStream& ows, T& t)
 {
-  return oss_.str();
+  if ( !ows.empty_ )
+    ows.os_ << ows.delim_;
+  ows.os_ << t;
+
+  ows.empty_ = false;
+  return ows;
 }
 
-inline OWordStream& OWordStream::operator<<(const std::string& s)
+template <class T, class Alloc, template <typename, typename> class Container>
+void words(const std::string& s, Container<T, Alloc>& c, char delim)
 {
-  if ( empty_ )
-    empty_ = false;
-  else
-    oss_ << delim_;
-  oss_ << s;
+  std::istringstream iss(s);
+  IWordStream iws(iss, delim);
 
-  return *this;
+  T t;
+  for ( auto itr = back_inserter(c); !iss.eof(); ++itr )
+  {
+    iws >> t;
+    itr = t;
+  }
 }
 
 template <class InputIterator>
 std::string unwords(InputIterator begin, InputIterator end, char delim)
 {
-  OWordStream ows(delim);
+  std::ostringstream oss;
+  OWordStream ows(oss, delim);
+
   for ( ; begin != end; ++begin )
     ows << *begin;
 
-  return ows.str();
+  return oss.str();
 }
 
 #endif
