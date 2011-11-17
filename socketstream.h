@@ -137,8 +137,9 @@ void basic_socketbuf<Char, Traits>::open(const char* host, unsigned int port)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
 
-  okay_ = (inet_pton(AF_INET, host, &addr.sin_addr) == 1) &&
+  okay_ = (inet_pton(AF_INET, host, &addr.sin_addr) != -1) &&
           (errno != EAFNOSUPPORT) &&
+          (socket_ = socket(AF_INET, SOCK_STREAM, 0)) != -1 &&
           (::connect(socket_, (sockaddr*) &addr, sizeof(addr)) != -1);
 
   setg(&getArea_[0], 0, &getArea_[0]);
@@ -246,7 +247,7 @@ int basic_socketbuf<Char, Traits>::underflow()
   if ( !okay_ )
     return -1;
 
-  setg(&getArea_[0], 0, &getArea_[total]);
+  setg(&getArea_[0], &getArea_[0], &getArea_[total]);
   return getArea_[0];
 }
 
@@ -343,9 +344,7 @@ basic_socketstreamserver<Char, Traits>::basic_socketstreamserver(unsigned int po
   okay_ = (socket_ = socket(AF_INET, SOCK_STREAM, 0)) != -1;
   okay_ = okay_ && setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (const char*) &on, sizeof(on)) != -1;
   okay_ = okay_ && bind(socket_, (sockaddr*) &addr_, sizeof(addr_)) != -1;
-  std::cout << okay_ << " " << errno << std::endl;
   okay_ = okay_ && listen(socket_, maxConnections) != -1;
-  std::cout << okay_ << std::endl;
 }
 
 template <class Char, class Traits>
@@ -361,12 +360,12 @@ void basic_socketstreamserver<Char, Traits>::accept(basic_socketstream<Char, Tra
   if ( okay_ )
   {
     int sizeofaddr = sizeof(addr_);
-    int socket = -1;
-    okay_ = (socket = ::accept(socket_, (sockaddr*) &addr_, (socklen_t*) &sizeofaddr)) != -1;
-  }
+    int sock = -1;
 
-  if ( okay_ )
-    ss.open(socket);
+    okay_ = (sock = ::accept(socket_, (sockaddr*) &addr_, (socklen_t*) &sizeofaddr)) != -1;
+    if ( okay_ )
+      ss.open(sock);
+  }
 }
 
 template <class Char, class Traits>
