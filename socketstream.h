@@ -125,7 +125,7 @@ void basic_socketbuf<Char, Traits>::open(int socket)
   socket_ = socket;
   okay_ = true;
   
-  setg(&getArea_[0], 0, &getArea_[0]);
+  setg(&getArea_[0], &getArea_[0], &getArea_[0]);
   setp(&putArea_[0], &putArea_[512]);
 }
 
@@ -142,7 +142,7 @@ void basic_socketbuf<Char, Traits>::open(const char* host, unsigned int port)
           (socket_ = socket(AF_INET, SOCK_STREAM, 0)) != -1 &&
           (::connect(socket_, (sockaddr*) &addr, sizeof(addr)) != -1);
 
-  setg(&getArea_[0], 0, &getArea_[0]);
+  setg(&getArea_[0], &getArea_[0], &getArea_[0]);
   setp(&putArea_[0], &putArea_[512]);
 }
 
@@ -191,14 +191,14 @@ std::streampos basic_socketbuf<Char, Traits>::seekpos(std::streampos sp, std::io
 template <class Char, class Traits>
 int basic_socketbuf<Char, Traits>::sync()
 {
-  if ( okay_ )
+  if ( !okay_ )
     return -1;
 
   int sent = 0;
-  unsigned int total = 0;        
-  unsigned int remaining = std::basic_streambuf<Char, Traits>::pptr() - std::basic_streambuf<Char, Traits>::pbase();
+  int total = 0;        
+  int remaining = std::basic_streambuf<Char, Traits>::pptr() - std::basic_streambuf<Char, Traits>::pbase();
 
-  okay_ = send(socket_, &remaining, 1, 0) == 1;
+  okay_ = send(socket_, &remaining, sizeof(unsigned int), 0) == sizeof(unsigned int);
   while ( okay_ && remaining > 0 )
   {
     okay_ = (sent = send(socket_, std::basic_streambuf<Char, Traits>::pbase() + total, remaining, 0)) > 0;
@@ -233,10 +233,10 @@ int basic_socketbuf<Char, Traits>::underflow()
     return -1;
 
   int got = 0;
-  unsigned int total = 0;
-  unsigned int remaining = 0;
+  int total = 0;
+  int remaining = 0;
 
-  okay_ = recv(socket_, &remaining, 1, 0) == 1;
+  okay_ = recv(socket_, &remaining, sizeof(unsigned int), 0) == sizeof(unsigned int);
   while ( okay_ && remaining > 0 )
   {
     okay_ = (got = recv(socket_, &getArea_[total], remaining, 0)) > 0;
