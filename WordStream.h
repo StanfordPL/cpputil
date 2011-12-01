@@ -1,11 +1,10 @@
 #ifndef WORD_STREAM_H
 #define WORD_STREAM_H
 
-#include <istream>
+#include <iostream>
 #include <iterator>
 #include <sstream>
 #include <string>
-#include <ostream>
 
 class IWordStream
 {
