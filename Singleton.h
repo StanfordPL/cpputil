@@ -1,0 +1,27 @@
+#ifndef SINGLETON_H
+#define SINGLETON_H
+
+namespace cpputil
+{
+
+template <class T>
+class Singleton
+{
+  public:
+    Singleton() = delete;
+    Singleton(const Singleton& s) = delete;
+    Singleton& operator=(const Singleton& s) = delete;
+
+    static T& get();
+};
+
+template <class T>
+T& Singleton<T>::get()
+{
+  static T instance;
+  return instance;
+}
+
+}
+
+#endif
