@@ -5,14 +5,13 @@ namespace cpputil
 {
 
 template <class T>
-class Singleton
+struct Singleton
 {
-  public:
-    Singleton() = delete;
-    Singleton(const Singleton& s) = delete;
-    Singleton& operator=(const Singleton& s) = delete;
+  Singleton() = delete;
+  Singleton(const Singleton& s) = delete;
+  Singleton& operator=(const Singleton& s) = delete;
 
-    static T& get();
+  static T& get();
 };
 
 template <class T>
