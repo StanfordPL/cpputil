@@ -1,7 +1,13 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
-#include "BiMap.h"
+#include <cassert>
+
+#include <map>
+#include <vector>
+
+namespace cpputil
+{
 
 template <class T>
 class Tokenizer
@@ -9,42 +15,62 @@ class Tokenizer
   public:
     typedef unsigned int Token;
 
-    unsigned int size() const;
-
     void clear();
 
+    bool contains(const T& t) const;
+
+    unsigned int size() const;
+
     Token tokenize(const T& t);
-    T untokenize(Token token) const;
+    const T& untokenize(Token token) const;
 
   private:
-    BiMap<T, Token> contents_;
+    std::map<const T, Token> valToToken_;
+    std::vector<const T*> tokenToVal_;
 };
-
-template <class T>
-unsigned int Tokenizer<T>::size() const
-{
-  return contents_.size();
-}
 
 template <class T>
 void Tokenizer<T>::clear()
 {
-  contents_.clear();
+  valToToken_.clear();
+  tokenToVal_.clear();
+}
+
+template <class T>
+bool Tokenizer<T>::contains(const T& t) const
+{
+  return valToToken_.find(t) != valToToken_.end();
+}
+
+template <class T>
+unsigned int Tokenizer<T>::size() const
+{
+  return valToToken_.size();
 }
 
 template <class T>
 typename Tokenizer<T>::Token Tokenizer<T>::tokenize(const T& t)
 {
-  if ( !contents_.containsKey(t) )
-    contents_.insert(t, contents_.size());
+  if ( ! contains(t) )
+  {
+    Token token = size();
+    valToToken_[t] = token;
 
-  return contents_.getVal(t);
+    auto itr = valToToken_.find(t);
+    tokenToVal_.push_back(&itr->first);
+  }
+
+  return valToToken_[t];
 }
 
 template <class T>
-T Tokenizer<T>::untokenize(Token token) const
+const T& Tokenizer<T>::untokenize(Token token) const
 {
-  return contents_.getKey(token);
+  assert(token < tokenToVal_.size() && "Unrecognized token!");
+
+  return *tokenToVal_[token];
+}
+
 }
 
 #endif

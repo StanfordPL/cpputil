@@ -3,6 +3,7 @@
 
 #include "Tokenizer.h"
 
+using namespace cpputil;
 using namespace std;
 
 int main()
@@ -16,6 +17,10 @@ int main()
   cout << t.tokenize("Hello") << " ";
   cout << t.tokenize("World") << " ";
   cout << t.tokenize("foo")   << endl;
+
+  // Should print true false
+  cout << t.contains("Hello") << " ";
+  cout << t.contains("baz")   << endl;
 
   // Should print "Hello World foo"
   cout << t.untokenize(0) << " ";
