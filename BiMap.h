@@ -1,7 +1,12 @@
 #ifndef BI_MAP_H
 #define BI_MAP_H
 
+#include <cassert>
+
 #include <map>
+
+namespace cpputil
+{
 
 template <class Key, class Val>
 class BiMap
@@ -56,6 +61,9 @@ void BiMap<Key, Val>::clear()
 template <class Key, class Val>
 void BiMap<Key, Val>::insert(const Key& key, const Val& val)
 {
+  assert(!containsKey(key) && "Duplicate key!");
+  assert(!containsVal(val) && "Duplicate val!");
+
   keyToVal_[key] = val;
   valToKey_[val] = key;
 }
@@ -63,14 +71,18 @@ void BiMap<Key, Val>::insert(const Key& key, const Val& val)
 template <class Key, class Val>
 Val BiMap<Key, Val>::getVal(const Key& key) const
 {
-  typename std::map<Key, Val>::const_iterator itr = keyToVal_.find(key);
+  assert(containsKey(key) && "Unrecognized key!");
+
+  auto itr = keyToVal_.find(key);
   return (*itr).second;
 }
 
 template <class Key, class Val>
 Key BiMap<Key, Val>::getKey(const Val& val) const
 {
-  typename std::map<Val, Key>::const_iterator itr = valToKey_.find(val);
+  assert(containsVal(val) && "Unrecognized val!");
+
+  auto itr = valToKey_.find(val);
   return (*itr).second;
 }
 
@@ -84,6 +96,8 @@ template <class Key, class Val>
 inline typename BiMap<Key, Val>::const_iterator BiMap<Key, Val>::end() const
 {
   return keyToVal_.end();
+}
+
 }
 
 #endif
