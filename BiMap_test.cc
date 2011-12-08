@@ -41,15 +41,17 @@ int main()
     bm.insert(s, i);
   }
 
-  // Should print "a", 0 ... "j", 9
-  for ( auto i = bm.begin(), ie = bm.end(); i != ie; ++i )
-    cout << (*i).first << " " << (*i).second << endl;
-
   // Should print 2
   cout << bm.getVal("abc") << endl;
 
   // Should print "abcdefghij"
   cout << bm.getKey(9) << endl;
+
+  // Should print false, false
+  bm.eraseKey("abc");
+  bm.eraseVal(3);
+  cout << bm.containsKey("abc") << " " << bm.containsVal(2) << endl;
+  cout << bm.containsKey("abcd") << " " << bm.containsVal(3) << endl;
 
   return 0;
 }
