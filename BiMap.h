@@ -9,7 +9,7 @@ namespace cpputil
 {
 
 template <class Key, class Val>
-class BiMap
+class bimap
 {
   public:
     bool containsKey(const Key& key) const;
@@ -35,32 +35,32 @@ class BiMap
 };
 
 template <class Key, class Val>
-void BiMap<Key, Val>::clear()
+void bimap<Key, Val>::clear()
 {
   keyToVal_.clear();
   valToKey_.clear();
 }
 
 template <class Key, class Val>
-bool BiMap<Key, Val>::containsKey(const Key& key) const
+bool bimap<Key, Val>::containsKey(const Key& key) const
 {
   return keyToVal_.find(key) != keyToVal_.end();
 }
 
 template <class Key, class Val>
-bool BiMap<Key, Val>::containsVal(const Val& val) const
+bool bimap<Key, Val>::containsVal(const Val& val) const
 {
   return valToKey_.find(val) != valToKey_.end();
 }
 
 template <class Key, class Val>
-bool BiMap<Key, Val>::empty() const
+bool bimap<Key, Val>::empty() const
 {
   return size() == 0;
 }
 
 template <class Key, class Val>
-void BiMap<Key, Val>::eraseKey(const Key& key)
+void bimap<Key, Val>::eraseKey(const Key& key)
 {
   assert(containsKey(key) && "Unrecognized key!");
 
@@ -69,7 +69,7 @@ void BiMap<Key, Val>::eraseKey(const Key& key)
 }
 
 template <class Key, class Val>
-void BiMap<Key, Val>::eraseVal(const Val& val) 
+void bimap<Key, Val>::eraseVal(const Val& val) 
 {
   assert(containsVal(val) && "Unrecognized val!");
 
@@ -78,7 +78,7 @@ void BiMap<Key, Val>::eraseVal(const Val& val)
 }
 
 template <class Key, class Val>
-const Val& BiMap<Key, Val>::getVal(const Key& key) const
+const Val& bimap<Key, Val>::getVal(const Key& key) const
 {
   assert(containsKey(key) && "Unrecognized key!");
 
@@ -87,7 +87,7 @@ const Val& BiMap<Key, Val>::getVal(const Key& key) const
 }
 
 template <class Key, class Val>
-const Key& BiMap<Key, Val>::getKey(const Val& val) const
+const Key& bimap<Key, Val>::getKey(const Val& val) const
 {
   assert(containsVal(val) && "Unrecognized val!");
 
@@ -96,7 +96,7 @@ const Key& BiMap<Key, Val>::getKey(const Val& val) const
 }
 
 template <class Key, class Val>
-void BiMap<Key, Val>::insert(const Key& key, const Val& val)
+void bimap<Key, Val>::insert(const Key& key, const Val& val)
 {
   assert(!containsKey(key) && "Duplicate key!");
   assert(!containsVal(val) && "Duplicate val!");
@@ -112,7 +112,7 @@ void BiMap<Key, Val>::insert(const Key& key, const Val& val)
 }
 
 template <class Key, class Val>
-unsigned int BiMap<Key, Val>::size() const
+unsigned int bimap<Key, Val>::size() const
 {
   return keyToVal_.size();
 }

@@ -1,14 +1,14 @@
 #include <iostream>
 #include <string>
 
-#include "BiMap.h"
+#include "bimap.h"
 
 using namespace cpputil;
 using namespace std;
 
 int main()
 {
-  BiMap<string, int> bm;
+  bimap<string, int> bm;
   
   // Should print zero
   cout << bm.size() << endl;
