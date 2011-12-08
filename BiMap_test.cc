@@ -3,6 +3,7 @@
 
 #include "BiMap.h"
 
+using namespace cpputil;
 using namespace std;
 
 int main()
