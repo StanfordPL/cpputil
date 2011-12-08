@@ -22,8 +22,8 @@ class bimap
     void eraseKey(const Key& key);
     void eraseVal(const Val& val);
 
-    const Val& getVal(const Key& key) const;
     const Key& getKey(const Val& val) const;
+    const Val& getVal(const Key& key) const;
 
     void insert(const Key& key, const Val& val);
 
@@ -78,20 +78,20 @@ void bimap<Key, Val>::eraseVal(const Val& val)
 }
 
 template <class Key, class Val>
-const Val& bimap<Key, Val>::getVal(const Key& key) const
-{
-  assert(containsKey(key) && "Unrecognized key!");
-
-  auto itr = keyToVal_.find(key);
-  return *(itr->second);
-}
-
-template <class Key, class Val>
 const Key& bimap<Key, Val>::getKey(const Val& val) const
 {
   assert(containsVal(val) && "Unrecognized val!");
 
   auto itr = valToKey_.find(val);
+  return *(itr->second);
+}
+
+template <class Key, class Val>
+const Val& bimap<Key, Val>::getVal(const Key& key) const
+{
+  assert(containsKey(key) && "Unrecognized key!");
+
+  auto itr = keyToVal_.find(key);
   return *(itr->second);
 }
 
