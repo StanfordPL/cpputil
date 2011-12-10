@@ -16,5 +16,9 @@ int main()
   for ( auto i = x.begin(), ie = x.end(); i != ie; ++i )
     cout << *i << endl;
 
+  // Should print 9 .. 0
+  for ( auto i = x.rbegin(), ie = x.rend(); i != ie; ++i )
+    cout << *i << endl;
+
   return 0;
 }
