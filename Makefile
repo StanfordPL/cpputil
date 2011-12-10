@@ -2,7 +2,8 @@ CXX=g++
 OPT=-std=c++0x
 INC=-I./include
 
-TEST=test/bimap.o \
+TEST=test/array.o \
+		 test/bimap.o \
 		 test/Singleton.o \
 		 test/socketstream.o \
 		 test/Sqlite.o \
