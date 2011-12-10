@@ -1,9 +1,21 @@
-TEST=test/Singleton.o
+CXX=g++
+OPT=-std=c++0x
+INC=-I./include
+
+TEST=test/bimap.o \
+		 test/Singleton.o \
+		 test/socketstream.o \
+		 test/Sqlite.o \
+		 test/Tokenizer.o \
+		 test/WordStream.o
 
 test: $(TEST)
 
 .cc.o:
-	g++ -Iinclude -std=c++0x $< -o $@
+	$(CXX) $(OPT) $(INC) $< -o $@
+
+test/Sqlite.o: test/Sqlite.cc
+	$(CXX) $(OPT) $(INC) $< -o $@ -lsqlite3
 
 clean:
 	rm -f test/*.o
