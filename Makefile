@@ -4,6 +4,7 @@ INC=-I./include
 
 TEST=test/array.o \
 		 test/bimap.o \
+		 test/forwardingstream.o \
 		 test/Singleton.o \
 		 test/socketstream.o \
 		 test/Sqlite.o \
