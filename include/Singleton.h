@@ -11,15 +11,12 @@ struct Singleton
   Singleton(const Singleton& s) = delete;
   Singleton& operator=(const Singleton& s) = delete;
 
-  static T& get();
+  static T& get()
+  {
+    static T instance;
+    return instance;
+  }
 };
-
-template <class T>
-T& Singleton<T>::get()
-{
-  static T instance;
-  return instance;
-}
 
 }
 
