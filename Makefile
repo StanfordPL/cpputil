@@ -1,8 +1,16 @@
+all: doc test
+
+clean:
+	rm -rf test/*.o documentation
+
+doc: doxyfile
+	doxygen doxyfile
+
 CXX=g++
 OPT=-std=c++0x
 INC=-I./include
 
-TEST=test/array.o \
+test: test/array.o \
 		 test/bimap.o \
 		 test/forwardingstream.o \
 		 test/logstream.o \
@@ -12,13 +20,9 @@ TEST=test/array.o \
 		 test/Tokenizer.o \
 		 test/WordStream.o
 
-test: $(TEST)
-
 .cc.o:
 	$(CXX) $(OPT) $(INC) $< -o $@
 
 test/Sqlite.o: test/Sqlite.cc
 	$(CXX) $(OPT) $(INC) $< -o $@ -lsqlite3
 
-clean:
-	rm -f test/*.o
