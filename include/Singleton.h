@@ -4,7 +4,7 @@
 namespace cpputil
 {
 
-template <class T>
+template <typename T>
 struct Singleton
 {
   Singleton() = delete;
