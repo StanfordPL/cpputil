@@ -2,6 +2,8 @@
 #define LOGSTREAM_H
 
 #include <cassert>
+#include <ctime>
+#include <iomanip>
 #include <ostream>
 
 #include "forwardingstream.h"
@@ -40,34 +42,41 @@ class basic_logstream : public std::basic_ostream<_CharT, _Traits>
       if ( level <= level_ && level != OFF)
       {
         fbuf_.setActive(true);
+
+        time_t now;
+        time(&now);
+        tm* current = localtime(&now);
+
+        *this  << "[" << current->tm_hour << ":" << current->tm_min << ":" << current->tm_sec << " ";
         switch ( level )
         {
           case SEVERE: 
-            *this << "SEVERE:  ";
+            *this << "SEVERE ";
             break;
           case WARNING: 
-            *this << "WARNING: ";
+            *this << "WARNING";
             break;
           case INFO: 
-            *this << "INFO:    ";
+            *this << "INFO   ";
             break;
           case CONFIG: 
-            *this << "CONFIG:  ";
+            *this << "CONFIG ";
             break;
           case FINE: 
-            *this << "FINE:    ";
+            *this << "FINE   ";
             break;
           case FINER: 
-            *this << "FINER:   ";
+            *this << "FINER  ";
             break;
           case FINEST:
-            *this << "FINEST:  ";
+            *this << "FINEST ";
             break;
          
           default:
             assert(false && "Control should never reach here!");
             break;
         }
+        *this << "] ";
       }
       else
         fbuf_.setActive(false);
