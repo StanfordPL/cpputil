@@ -16,7 +16,7 @@ test: test/array.o \
 		 test/logstream.o \
 		 test/Singleton.o \
 		 test/socketstream.o \
-		 test/Sqlite.o \
+		 test/teestream.o \
 		 test/Tokenizer.o \
 		 test/WordStream.o
 
