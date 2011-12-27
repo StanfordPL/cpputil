@@ -5,55 +5,50 @@
 #include <sstream>
 #include <string>
 
+namespace 
+{
+
+template <typename T>
+inline std::string ttoa(const T& t)
+{
+  std::ostringstream oss;
+  oss << t;
+  return oss.str();
+}
+
+}
+
 namespace cpputil
 {
 
-template <class T, class Alloc, template <typename, typename> class Container>
-void split(const std::string& s, Container<T, Alloc>& c, char delim);
-
-template <class T, class Alloc, template <typename, typename> class Container>
-void words(const std::string& s, Container<T, Alloc>& c);
-
-template <class T, class Alloc, template <typename, typename> class Container>
-void lines(const std::string& s, Container<T, Alloc>& c);
-
-template <class InputIterator>
-std::string unsplit(InputIterator begin, InputIterator end, char delim);
-
-template <class InputIterator>
-std::string unwords(InputIterator begin, InputIterator end);
-
-template <class InputIterator>
-std::string unlines(InputIterator begin, InputIterator end);
-
-template <class T, class Alloc, template <typename, typename> class Container>
+template <typename T, typename Alloc, template <typename, typename> class Container>
 void split(const std::string& s, Container<T, Alloc>& c, char delim)
 {
   std::istringstream iss(s);
-  for ( auto i = back_inserter(c), !iss.eof(); ++i )
+  for ( auto i = back_inserter(c); !iss.eof(); ++i )
   {
     T t;
     iss >> t;
-    itr = t;
+    i = t;
   }
 }
 
 template <class T, class Alloc, template <typename, typename> class Container>
-void words(const std::string& s, Container<T, Alloc>& c)
+inline void words(const std::string& s, Container<T, Alloc>& c)
 {
   return split(s, c, ' ');
 }
 
-template <class T, class Alloc, template <typename, typename> class Container>
-void lines(const std::string& s, Container<T, Alloc>& c)
+template <typename T, typename Alloc, template <typename, typename> class Container>
+inline void lines(const std::string& s, Container<T, Alloc>& c)
 {
   return split(s, c, '\n');
 }
 
-template <class InputIterator>
+template <typename InputIterator>
 std::string unsplit(InputIterator begin, InputIterator end, char delim)
 {
-  ostringstream oss;
+  std::ostringstream oss;
   for ( ; begin != end; ++begin )
   {
     if ( ! oss.str().empty() )
@@ -64,16 +59,26 @@ std::string unsplit(InputIterator begin, InputIterator end, char delim)
   return oss.str();
 }
 
-template <class InputIterator>
-std::string unwords(InputIterator begin, InputIterator end)
+template <typename InputIterator>
+inline std::string unwords(InputIterator begin, InputIterator end)
 {
   return unsplit(begin, end, ' ');
 }
 
-template <class InputIterator>
-std::string unlines(InputIterator begin, InputIterator end)
+template <typename InputIterator>
+inline std::string unlines(InputIterator begin, InputIterator end)
 {
   return unsplit(begin, end, '\n');
+}
+
+inline std::string itoa(int x) 
+{
+  return ttoa(x);
+}
+
+inline std::string utoa(unsigned int x)
+{
+  return ttoa(x);
 }
 
 }

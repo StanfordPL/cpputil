@@ -16,6 +16,7 @@ test: test/array.o \
 		 test/logstream.o \
 		 test/Singleton.o \
 		 test/socketstream.o \
+		 test/stringutil.o \
 		 test/teestream.o \
 		 test/Tokenizer.o \
 		 test/WordStream.o
