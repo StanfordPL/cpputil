@@ -11,9 +11,9 @@ template <typename _CharT, typename _Traits>
 class basic_forwardingbuf : public std::basic_streambuf<_CharT, _Traits>
 {
   public:
-    typedef _CharT char_type;
-    typedef _Traits traits_type;
-    typedef typename traits_type::int_type int_type;
+    typedef          _CharT            char_type;
+    typedef          _Traits           traits_type;
+    typedef typename _Traits::int_type int_type;
 
     basic_forwardingbuf(std::basic_streambuf<char_type, traits_type>* buf) :
       buf_(buf),
@@ -37,7 +37,8 @@ class basic_forwardingbuf : public std::basic_streambuf<_CharT, _Traits>
       if ( ! isActive_ )
         return c;
 
-      const int_type result = buf_->sputc(traits_type::to_char_type(c));
+      const char_type ch = traits_type::to_char_type(c);
+      const int_type result = buf_->sputc(ch);
 
       return traits_type::eq_int_type(result, eof) ? eof : c;
     }

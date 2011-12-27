@@ -11,9 +11,9 @@ template <typename _CharT, typename _Traits>
 class basic_teebuf : public std::basic_streambuf<_CharT, _Traits>
 {
   public:
-    typedef _CharT char_type;
-    typedef _Traits traits_type;
-    typedef typename traits_type::int_type int_type;
+    typedef          _CharT            char_type;
+    typedef          _Traits           traits_type;
+    typedef typename _Traits::int_type int_type;
 
     basic_teebuf(std::basic_streambuf<char_type, traits_type>* buf1, std::basic_streambuf<char_type, traits_type>* buf2) :
       buf1_(buf1),

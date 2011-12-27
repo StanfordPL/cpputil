@@ -9,67 +9,67 @@
 namespace cpputil
 {
 
-template <class T>
+template <typename _T, typename _Associative = std::map<const _T, unsigned int>, typename _Sequence = std::vector<const _T*> >
 class Tokenizer
 {
   public:
-    typedef unsigned int Token;
+    typedef          _T                   value_type;
+    typedef          _T&                  reference;
+    typedef          const _T&            const_reference;
+    typedef          unsigned int         token_type;
+    typedef          _Associative         associative_container_type;
+    typedef          _Sequence            sequence_container_type;
+    typedef typename _Sequence::size_type size_type;
 
-    void clear();
+    Tokenizer()
+    {
+      // Does nothing.
+    }
+    Tokenizer(const Tokenizer& rhs)
+    {
 
-    bool contains(const T& t) const;
+    }
+    Tokenizer& operator=(const Tokenizer& rhs)
+    {
 
-    unsigned int size() const;
+    }
 
-    Token tokenize(const T& t);
-    const T& untokenize(Token token) const;
+    bool empty() { return tokenToVal_.empty(); }
+    size_type size() const { return tokenToVal_.size(); }
+
+    void swap(const Tokenizer& rhs)
+    {
+      valToToken_.swap(rhs.valToToken_);
+      tokenToVal_.swap(rhs.tokenToVal_);
+    }
+    void clear()
+    {
+      valToToken_.clear();
+      tokenToVal_.clear();
+    }
+
+    token_type tokenize(const_reference& t)
+    {
+      if ( valToToken_.find(t) == valToToken_.end() )
+      {
+        token_type token = size();
+        auto res = valToToken_.insert(typename associative_container_type::value_type(t, token));
+        tokenToVal_.push_back(&(res.first->first));
+
+        return token;
+      }
+      return valToToken_[t];
+    }
+    const_reference untokenize(token_type token) const
+    {
+      assert(token < size() && "Unrecognized token!");
+      return *tokenToVal_[token];
+    }
 
   private:
-    std::map<const T, Token> valToToken_;
-    std::vector<const T*> tokenToVal_;
+    associative_container_type valToToken_;
+    sequence_container_type tokenToVal_;
 };
-
-template <class T>
-void Tokenizer<T>::clear()
-{
-  valToToken_.clear();
-  tokenToVal_.clear();
-}
-
-template <class T>
-bool Tokenizer<T>::contains(const T& t) const
-{
-  return valToToken_.find(t) != valToToken_.end();
-}
-
-template <class T>
-unsigned int Tokenizer<T>::size() const
-{
-  return valToToken_.size();
-}
-
-template <class T>
-typename Tokenizer<T>::Token Tokenizer<T>::tokenize(const T& t)
-{
-  if ( ! contains(t) )
-  {
-    Token token = size();
-    valToToken_[t] = token;
-
-    auto itr = valToToken_.find(t);
-    tokenToVal_.push_back(&itr->first);
-  }
-
-  return valToToken_[t];
-}
-
-template <class T>
-const T& Tokenizer<T>::untokenize(Token token) const
-{
-  assert(token < tokenToVal_.size() && "Unrecognized token!");
-
-  return *tokenToVal_[token];
-}
 
 }
 

@@ -18,8 +18,7 @@ test: test/array.o \
 		 test/socketstream.o \
 		 test/stringutil.o \
 		 test/teestream.o \
-		 test/Tokenizer.o \
-		 test/WordStream.o
+		 test/Tokenizer.o
 
 .cc.o:
 	$(CXX) $(OPT) $(INC) $< -o $@
