@@ -13,7 +13,9 @@ INC=-I./include
 test: test/bijection.o \
 		 test/forwardingstream.o \
 		 test/logstream.o \
+		 test/maputil.o \
 		 test/Singleton.o \
+		 test/Sqlite.o \
 		 test/socketstream.o \
 		 test/stringutil.o \
 		 test/teestream.o \
