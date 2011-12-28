@@ -4,12 +4,12 @@
 #include <cassert>
 
 #include <map>
-#include <vector>
+#include <deque>
 
 namespace cpputil
 {
 
-template <typename _T, typename _Associative = std::map<const _T, unsigned int>, typename _Sequence = std::vector<const _T*> >
+template <typename _T, typename _Associative = std::map<const _T, unsigned int>, typename _Sequence = std::deque<const _T*> >
 class Tokenizer
 {
   public:
@@ -27,11 +27,15 @@ class Tokenizer
     }
     Tokenizer(const Tokenizer& rhs)
     {
-
+      valToToken_ = rhs.valToToken_;
+      tokenToVal_.resize(valToToken_.size());
+      for ( typename associative_container_type::value_type& i : valToToken_ )
+        tokenToVal_[i.second] = &i.first;
     }
-    Tokenizer& operator=(const Tokenizer& rhs)
+    Tokenizer& operator=(const Tokenizer rhs)
     {
-
+      swap(rhs);
+      return *this;
     }
 
     bool empty() { return tokenToVal_.empty(); }
@@ -48,13 +52,14 @@ class Tokenizer
       tokenToVal_.clear();
     }
 
-    token_type tokenize(const_reference& t)
+    token_type tokenize(const_reference t)
     {
       if ( valToToken_.find(t) == valToToken_.end() )
       {
-        token_type token = size();
-        auto res = valToToken_.insert(typename associative_container_type::value_type(t, token));
-        tokenToVal_.push_back(&(res.first->first));
+        auto token = size();
+        auto entry = typename associative_container_type::value_type(t, token);
+        auto res = valToToken_.insert(entry);
+        tokenToVal_.emplace_back(&(res.first->first));
 
         return token;
       }

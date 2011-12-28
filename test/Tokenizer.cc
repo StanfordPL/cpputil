@@ -18,17 +18,19 @@ int main()
   cout << t.tokenize("World") << " ";
   cout << t.tokenize("foo")   << endl;
 
+  Tokenizer<string> t2 = t;
+
   // Should print "Hello World foo"
-  cout << t.untokenize(0) << " ";
-  cout << t.untokenize(1) << " ";
-  cout << t.untokenize(2) << endl;
+  cout << t2.untokenize(0) << " ";
+  cout << t2.untokenize(1) << " ";
+  cout << t2.untokenize(2) << endl;
 
   // Should print 0 3
-  cout << t.empty() << " " << t.size() << endl;
+  cout << t2.empty() << " " << t.size() << endl;
 
   // Should print 1 0
-  t.clear();
-  cout << t.empty() << " " << t.size() << endl;
+  t2.clear();
+  cout << t2.empty() << " " << t.size() << endl;
 
   return 0;
 }
