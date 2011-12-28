@@ -7,88 +7,61 @@
 
 #include "sqlite3.h"
 
-class Sqlite
+// This is a note which should move out to documentation
+// Table query:  query("SELECT name FROM sqlite_master WHERE type = 'table';");
+
+namespace cpputil
+{
+
+template <typename _Row = std::vector<std::string>, typename _Sequence = std::list<_Row> >
+class basic_Sqlite
 {
   public: 
-    typedef std::vector<std::string> Row;
+    typedef           int                      status_type;
+    typedef          _Row                      row_type;
+    typedef typename _Sequence::const_iterator const_iterator;
 
-    Sqlite(const char* path);
-    ~Sqlite();
+    basic_Sqlite() = delete;
+    basic_Sqlite(const char* path) { status_ = sqlite3_open(path, &db_); }
+    basic_Sqlite& operator=(basic_Sqlite& s) = delete;
+    ~basic_Sqlite() { status_ = sqlite3_close(db_); }
 
-    int status() const;
-    bool okay() const;
+    status_type status() const { return status_; }
+    bool okay() const { return status_ == SQLITE_OK; }
 
-    void query(const std::string& s);
-    void tableQuery();
+    void query(const char* query)
+    {
+      results_.clear();
+      status_ = sqlite3_exec(db_, query, callback, &results_, 0);
+    }
 
-    unsigned int resultSize() const;
-
-    typedef std::list<Row>::const_iterator const_result_iterator;
-    const_result_iterator begin() const;
-    const_result_iterator end() const; 
+    const_iterator begin() const { return results_.begin(); }
+    const_iterator cbegin() const { return results_.cbegin(); }
+    const_iterator end() const { return results_.end(); } 
+    const_iterator cend() const { return results_.cend(); } 
 
   private:
     sqlite3* db_;
-    int status_;
-    std::list<Row> rows_;
+    status_type status_;
+    _Sequence results_;
+
+    static status_type callback(void* arg, int nCols, char** vals, char** names)
+    {
+      row_type row;
+      row.reserve(nCols);
+
+      for ( int i = 0; i < nCols; ++i )
+        row.push_back(vals[i]);
+
+      auto rows = (_Sequence*) arg;
+      rows->push_back(row);
+
+      return SQLITE_OK;
+    }
 };
 
-inline Sqlite::Sqlite(const char* path)
-{
-  status_ = sqlite3_open(path, &db_); 
-}
+typedef basic_Sqlite<std::vector<std::string> > Sqlite;
 
-inline Sqlite::~Sqlite()
-{
-  status_ = sqlite3_close(db_);
-}
-
-inline int Sqlite::status() const
-{
-  return status_;
-}
-
-inline bool Sqlite::okay() const
-{
-  return status_ == SQLITE_OK;
-}
-
-static inline int callback(void* arg, int nCols, char** vals, char** names)
-{
-  Sqlite::Row row(nCols);
-  for ( int i = 0; i < nCols; ++i )
-    row[i] = vals[i];
-
-  auto rows = (std::list<Sqlite::Row>*) arg;
-  rows->push_back(row);
-
-  return SQLITE_OK;
-}
-
-inline void Sqlite::query(const std::string& s)
-{
-  rows_.clear();
-  status_ = sqlite3_exec(db_, s.c_str(), callback, &rows_, 0);
-}
-
-inline void Sqlite::tableQuery()
-{
-  query("SELECT name FROM sqlite_master WHERE type = 'table';");
-}
-
-inline unsigned int Sqlite::resultSize() const
-{
-  return rows_.size();
-}
-
-inline Sqlite::const_result_iterator Sqlite::begin() const
-{
-  return rows_.begin();
-}
-
-inline Sqlite::const_result_iterator Sqlite::end() const
-{
-  return rows_.end();
 }
 
 #endif
