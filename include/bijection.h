@@ -27,7 +27,9 @@ class bijection
     }
     bijection(const bijection& rhs)
     {
-        
+      clear();
+      for ( const typename _Associative1::value_type& i : rhs.domainToRange_ )        
+        insert(i.first, *i.second);
     }
     bijection& operator=(bijection rhs)
     {
@@ -39,19 +41,19 @@ class bijection
     domain_const_iterator cbeginDomain() const { return domainToRange_.cbegin(); }
     domain_const_iterator endDomain() const { return domainToRange_.end(); }
     domain_const_iterator cendDomain() const { return domainToRange_.cend(); }
-    domain_const_iterator rbeginDomain() const { return domainToRange_.rbegin(); }
-    domain_const_iterator crbeginDomain() const { return domainToRange_.crbegin(); }
-    domain_const_iterator rendDomain() const { return domainToRange_.rend(); }
-    domain_const_iterator crendDomain() const { return domainToRange_.crend(); }
+    domain_const_reverse_iterator rbeginDomain() const { return domainToRange_.rbegin(); }
+    domain_const_reverse_iterator crbeginDomain() const { return domainToRange_.crbegin(); }
+    domain_const_reverse_iterator rendDomain() const { return domainToRange_.rend(); }
+    domain_const_reverse_iterator crendDomain() const { return domainToRange_.crend(); }
 
     range_const_iterator beginRange() const { return rangeToDomain_.begin(); }
     range_const_iterator cbeginRange() const { return rangeToDomain_.cbegin(); }
     range_const_iterator endRange() const { return rangeToDomain_.end(); }
     range_const_iterator cendRange() const { return rangeToDomain_.cend(); }
-    range_const_iterator rbeginRange() const { return rangeToDomain_.rbegin(); }
-    range_const_iterator crbeginRange() const { return rangeToDomain_.crbegin(); }
-    range_const_iterator rendRange() const { return rangeToDomain_.rend(); }
-    range_const_iterator crendRange() const { return rangeToDomain_.crend(); }
+    range_const_reverse_iterator rbeginRange() const { return rangeToDomain_.rbegin(); }
+    range_const_reverse_iterator crbeginRange() const { return rangeToDomain_.crbegin(); }
+    range_const_reverse_iterator rendRange() const { return rangeToDomain_.rend(); }
+    range_const_reverse_iterator crendRange() const { return rangeToDomain_.crend(); }
 
     bool empty() const { return domainToRange_.empty(); }
     size_type size() const { return domainToRange_.size(); }
@@ -79,14 +81,14 @@ class bijection
     {
       assert(findDomain(d) != cendDomain() && "Unrecognized domain element!");
 
-      rangeToDomain_.erase(*(findDomain(d).second));
+      rangeToDomain_.erase(*(findDomain(d)->second));
       domainToRange_.erase(d);
     }
     void eraseRange(range_const_reference r)
     {
       assert(findRange(r) != cendRange() && "Unrecognized range element!");
 
-      domainToRange_.erase(*(findRange(r).second));
+      domainToRange_.erase(*(findRange(r)->second));
       rangeToDomain_.erase(r);
     }
     void swap(bijection& rhs)

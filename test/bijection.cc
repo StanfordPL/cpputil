@@ -29,14 +29,18 @@ int main()
 
   bijection<string, int> b2 = b;
 
-  // Should print the map in order, and then backwards
-  //for ( auto i = b2.beginDomain(), ie = b2.endDomain(); i != ie; ++i )
-  //  cout << i->first << " " << *(i->second) << endl;
-  //for ( auto i = b2.rbeginRange(), ie = b2.rendRange(); i != ie; ++i )
-  //  cout << i->first << " " << *(i->second) << endl;
+  // Should remove these two elements from future operations
+  b2.eraseDomain("a");
+  b2.eraseRange(7);
 
-  // Should print 
-  cout << *(b2.findDomain('a').second) << endl;
+  // Should print the bijection in order, and then backwards
+  for ( auto i = b2.beginDomain(), ie = b2.endDomain(); i != ie; ++i )
+    cout << i->first << " " << *(i->second) << endl;
+  for ( auto i = b2.rbeginRange(), ie = b2.rendRange(); i != ie; ++i )
+    cout << i->first << " " << *(i->second) << endl;
+
+  // Should print abc 2
+  cout << *(b2.findRange(2)->second) << " " << *(b2.findDomain("abc")->second) << endl;
    
 
   return 0;
