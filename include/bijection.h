@@ -4,6 +4,8 @@
 #include <cassert>
 #include <map>
 
+#include "maputil.h"
+
 namespace cpputil
 {
 
@@ -79,16 +81,12 @@ class bijection
     } 
     void eraseDomain(domain_const_reference d)
     {
-      assert(findDomain(d) != cendDomain() && "Unrecognized domain element!");
-
-      rangeToDomain_.erase(*(findDomain(d)->second));
+      rangeToDomain_.erase(*assert_at(domainToRange_, d));
       domainToRange_.erase(d);
     }
     void eraseRange(range_const_reference r)
     {
-      assert(findRange(r) != cendRange() && "Unrecognized range element!");
-
-      domainToRange_.erase(*(findRange(r)->second));
+      domainToRange_.erase(*assert_at(rangeToDomain_, r));
       rangeToDomain_.erase(r);
     }
     void swap(bijection& rhs)
