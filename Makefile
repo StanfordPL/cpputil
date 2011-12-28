@@ -11,7 +11,7 @@ OPT=-std=c++0x
 INC=-I./include
 
 test: test/array.o \
-		 test/bimap.o \
+		 test/bijection.o \
 		 test/forwardingstream.o \
 		 test/logstream.o \
 		 test/Singleton.o \
