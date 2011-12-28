@@ -9,7 +9,7 @@ namespace cpputil
 {
 
 template <typename _T, typename _Associative = std::map<const _T, unsigned int>, typename _Sequence = std::deque<const _T*> >
-class Tokenizer
+class tokenizer
 {
   public:
     typedef          _T                   value_type;
@@ -17,18 +17,18 @@ class Tokenizer
     typedef          unsigned int         token_type;
     typedef typename _Sequence::size_type size_type;
 
-    Tokenizer()
+    tokenizer()
     {
       // Does nothing.
     }
-    Tokenizer(const Tokenizer& rhs)
+    tokenizer(const tokenizer& rhs)
     {
       valToToken_ = rhs.valToToken_;
       tokenToVal_.resize(valToToken_.size());
       for ( typename _Associative::value_type& i : valToToken_ )
         tokenToVal_[i.second] = &i.first;
     }
-    Tokenizer& operator=(Tokenizer rhs)
+    tokenizer& operator=(tokenizer rhs)
     {
       swap(rhs);
       return *this;
@@ -37,7 +37,7 @@ class Tokenizer
     bool empty() const { return tokenToVal_.empty(); }
     size_type size() const { return tokenToVal_.size(); }
 
-    void swap(Tokenizer& rhs)
+    void swap(tokenizer& rhs)
     {
       valToToken_.swap(rhs.valToToken_);
       tokenToVal_.swap(rhs.tokenToVal_);
