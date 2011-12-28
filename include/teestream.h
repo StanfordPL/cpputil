@@ -7,15 +7,13 @@
 namespace cpputil
 {
 
-template <typename _CharT, typename _Traits>
-class basic_teebuf : public std::basic_streambuf<_CharT, _Traits>
+template <typename _Char, typename _Traits>
+class basic_teebuf : public std::basic_streambuf<_Char, _Traits>
 {
   public:
-    typedef          _CharT            char_type;
-    typedef          _Traits           traits_type;
     typedef typename _Traits::int_type int_type;
 
-    basic_teebuf(std::basic_streambuf<char_type, traits_type>* buf1, std::basic_streambuf<char_type, traits_type>* buf2) :
+    basic_teebuf(std::basic_streambuf<_Char, _Traits>* buf1, std::basic_streambuf<_Char, _Traits>* buf2) :
       buf1_(buf1),
       buf2_(buf2)
     {
@@ -31,38 +29,38 @@ class basic_teebuf : public std::basic_streambuf<_CharT, _Traits>
       return result1 == 0 && result2 == 0 ? 0 : -1;
     }
 
-    virtual int_type overflow(int_type c = traits_type::eof())
+    virtual int_type overflow(int_type c = _Traits::eof())
     {
-      const int_type eof = traits_type::eof();
+      const int_type eof = _Traits::eof();
       
-      if ( traits_type::eq_int_type(c, eof) )
-        return traits_type::not_eof(c);
+      if ( _Traits::eq_int_type(c, eof) )
+        return _Traits::not_eof(c);
 
-      const char_type ch = traits_type::to_char_type(c);
+      const _Char ch = _Traits::to_char_type(c);
       const int_type result1 = buf1_->sputc(ch);
       const int_type result2 = buf2_->sputc(ch);
 
-      return traits_type::eq_int_type(result1, eof) || traits_type::eq_int_type(result2, eof) ? eof : c;
+      return _Traits::eq_int_type(result1, eof) || _Traits::eq_int_type(result2, eof) ? eof : c;
     }
 
   private:
-    std::basic_streambuf<char_type, traits_type>* buf1_;
-    std::basic_streambuf<char_type, traits_type>* buf2_;
+    std::basic_streambuf<_Char, _Traits>* buf1_;
+    std::basic_streambuf<_Char, _Traits>* buf2_;
 };
 
-template <typename _CharT, typename _Traits>
-class basic_teestream : public std::basic_ostream<_CharT, _Traits>
+template <typename _Char, typename _Traits>
+class basic_teestream : public std::basic_ostream<_Char, _Traits>
 {
   public:
     basic_teestream(std::ostream& os1, std::ostream& os2) :
-      std::basic_ostream<_CharT, _Traits>(&tbuf_),
+      std::basic_ostream<_Char, _Traits>(&tbuf_),
       tbuf_(os1.rdbuf(), os2.rdbuf())
     {
       // Does nothing.
     }
 
   private:
-    basic_teebuf<_CharT, _Traits> tbuf_;
+    basic_teebuf<_Char, _Traits> tbuf_;
 };
 
 typedef basic_teestream<char, std::char_traits<char> > teestream;

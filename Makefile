@@ -1,7 +1,7 @@
 all: doc test
 
 clean:
-	rm -rf test/*.o documentation
+	rm -rf test/*.o 
 
 doc: doxyfile
 	doxygen doxyfile

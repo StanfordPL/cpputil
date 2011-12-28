@@ -2,9 +2,8 @@
 #define TOKENIZER_H
 
 #include <cassert>
-
-#include <map>
 #include <deque>
+#include <map>
 
 namespace cpputil
 {
@@ -14,11 +13,8 @@ class Tokenizer
 {
   public:
     typedef          _T                   value_type;
-    typedef          _T&                  reference;
     typedef          const _T&            const_reference;
     typedef          unsigned int         token_type;
-    typedef          _Associative         associative_container_type;
-    typedef          _Sequence            sequence_container_type;
     typedef typename _Sequence::size_type size_type;
 
     Tokenizer()
@@ -29,19 +25,19 @@ class Tokenizer
     {
       valToToken_ = rhs.valToToken_;
       tokenToVal_.resize(valToToken_.size());
-      for ( typename associative_container_type::value_type& i : valToToken_ )
+      for ( typename _Associative::value_type& i : valToToken_ )
         tokenToVal_[i.second] = &i.first;
     }
-    Tokenizer& operator=(const Tokenizer rhs)
+    Tokenizer& operator=(Tokenizer rhs)
     {
       swap(rhs);
       return *this;
     }
 
-    bool empty() { return tokenToVal_.empty(); }
+    bool empty() const { return tokenToVal_.empty(); }
     size_type size() const { return tokenToVal_.size(); }
 
-    void swap(const Tokenizer& rhs)
+    void swap(Tokenizer& rhs)
     {
       valToToken_.swap(rhs.valToToken_);
       tokenToVal_.swap(rhs.tokenToVal_);
@@ -57,7 +53,7 @@ class Tokenizer
       if ( valToToken_.find(t) == valToToken_.end() )
       {
         auto token = size();
-        auto entry = typename associative_container_type::value_type(t, token);
+        auto entry = typename _Associative::value_type(t, token);
         auto res = valToToken_.insert(entry);
         tokenToVal_.emplace_back(&(res.first->first));
 
@@ -72,8 +68,8 @@ class Tokenizer
     }
 
   private:
-    associative_container_type valToToken_;
-    sequence_container_type tokenToVal_;
+    _Associative valToToken_;
+    _Sequence tokenToVal_;
 };
 
 }

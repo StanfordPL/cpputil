@@ -8,50 +8,36 @@ using namespace std;
 
 int main()
 {
-  bimap<string, int> bm;
+  bijection<string, int> b;
   
-  // Should print zero
-  cout << bm.size() << endl;
-  
-  bm.insert("Hello", 1);
-  bm.insert("World", 2);
+  b.insert("Hello", 1);
+  b.insert("World", 2);
 
-  // Should print 2
-  cout << bm.size() << endl;
+  // Should print 0 2
+  cout << b.empty() << " " << b.size() << endl;
 
-  // Should print true,true,false
-  cout << bm.containsKey("Hello") << " " << bm.containsVal(1) << endl;
-  cout << bm.containsKey("World") << " " << bm.containsVal(2) << endl;
-  cout << bm.containsKey("foo")   << " " << bm.containsVal(3) << endl;
-
-  bm.clear();
-
-  // Should print 0
-  cout << bm.size() << endl;
-
-  // Should print false, false, false
-  cout << bm.containsKey("Hello") << " " << bm.containsVal(1) << endl;
-  cout << bm.containsKey("World") << " " << bm.containsVal(2) << endl;
-  cout << bm.containsKey("foo")   << " " << bm.containsVal(3) << endl;
+  // Should print 1 0
+  b.clear();
+  cout << b.empty() << " " << b.size() << endl;
 
   string s = "";
-  for ( int i = 0; i < 10; ++i )
+  for ( auto i = 0; i < 10; ++i )
   {
     s += ('a' + i);
-    bm.insert(s, i);
+    b.insert(s, i); 
   }
 
-  // Should print 2
-  cout << bm.getVal("abc") << endl;
+  bijection<string, int> b2 = b;
 
-  // Should print "abcdefghij"
-  cout << bm.getKey(9) << endl;
+  // Should print the map in order, and then backwards
+  //for ( auto i = b2.beginDomain(), ie = b2.endDomain(); i != ie; ++i )
+  //  cout << i->first << " " << *(i->second) << endl;
+  //for ( auto i = b2.rbeginRange(), ie = b2.rendRange(); i != ie; ++i )
+  //  cout << i->first << " " << *(i->second) << endl;
 
-  // Should print false, false
-  bm.eraseKey("abc");
-  bm.eraseVal(3);
-  cout << bm.containsKey("abc") << " " << bm.containsVal(2) << endl;
-  cout << bm.containsKey("abcd") << " " << bm.containsVal(3) << endl;
+  // Should print 
+  cout << *(b2.findDomain('a').second) << endl;
+   
 
   return 0;
 }

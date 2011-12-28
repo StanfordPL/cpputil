@@ -7,15 +7,13 @@
 namespace cpputil
 {
 
-template <typename _CharT, typename _Traits>
-class basic_forwardingbuf : public std::basic_streambuf<_CharT, _Traits>
+template <typename _Char, typename _Traits>
+class basic_forwardingbuf : public std::basic_streambuf<_Char, _Traits>
 {
   public:
-    typedef          _CharT            char_type;
-    typedef          _Traits           traits_type;
     typedef typename _Traits::int_type int_type;
 
-    basic_forwardingbuf(std::basic_streambuf<char_type, traits_type>* buf) :
+    basic_forwardingbuf(std::basic_streambuf<_Char, _Traits>* buf) :
       buf_(buf),
       isActive_(true)
     {
@@ -27,33 +25,33 @@ class basic_forwardingbuf : public std::basic_streambuf<_CharT, _Traits>
   protected:
     virtual int sync() { return buf_->pubsync(); }
 
-    virtual int_type overflow(int_type c = traits_type::eof())
+    virtual int_type overflow(int_type c = _Traits::eof())
     {
-      const int_type eof = traits_type::eof();
+      const int_type eof = _Traits::eof();
 
-      if ( traits_type::eq_int_type(c, eof) )
-        return traits_type::not_eof(c);
+      if ( _Traits::eq_int_type(c, eof) )
+        return _Traits::not_eof(c);
 
       if ( ! isActive_ )
         return c;
 
-      const char_type ch = traits_type::to_char_type(c);
+      const _Char ch = _Traits::to_char_type(c);
       const int_type result = buf_->sputc(ch);
 
-      return traits_type::eq_int_type(result, eof) ? eof : c;
+      return _Traits::eq_int_type(result, eof) ? eof : c;
     }
 
   private:
-    std::basic_streambuf<char_type, traits_type>* buf_;
+    std::basic_streambuf<_Char, _Traits>* buf_;
     bool isActive_;
 };
 
-template <typename _CharT, typename _Traits>
-class basic_forwardingstream : public std::basic_ostream<_CharT, _Traits>
+template <typename _Char, typename _Traits>
+class basic_forwardingstream : public std::basic_ostream<_Char, _Traits>
 {
   public:
     basic_forwardingstream(std::ostream& os) :
-      std::basic_ostream<_CharT, _Traits>(&fbuf_),
+      std::basic_ostream<_Char, _Traits>(&fbuf_),
       fbuf_(os.rdbuf())
     {
       // Does nothing.
@@ -62,7 +60,7 @@ class basic_forwardingstream : public std::basic_ostream<_CharT, _Traits>
     void setActive(bool active) { fbuf_.setActive(active); }
 
   private:
-    basic_forwardingbuf<_CharT, _Traits> fbuf_;
+    basic_forwardingbuf<_Char, _Traits> fbuf_;
 };
 
 typedef basic_forwardingstream<char, std::char_traits<char> > forwardingstream;
