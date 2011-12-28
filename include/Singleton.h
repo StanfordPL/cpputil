@@ -12,7 +12,7 @@ struct Singleton
 
   Singleton() = delete;
   Singleton(const Singleton& s) = delete;
-  Singleton& operator=(const Singleton& s) = delete;
+  Singleton& operator=(Singleton s) = delete;
 
   static reference get()
   {
