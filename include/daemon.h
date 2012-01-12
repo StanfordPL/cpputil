@@ -1,11 +1,11 @@
 #ifndef DAEMON_H
 #define DAEMON_H
 
-#include <cunistd>
 #include <cstdio>
 #include <cstdlib>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 namespace cpputil
 {
