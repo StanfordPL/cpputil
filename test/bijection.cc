@@ -41,7 +41,9 @@ int main()
 
   // Should print abc 2
   cout << *(b2.findRange(2)->second) << " " << *(b2.findDomain("abc")->second) << endl;
-   
+
+  // Should print abc 2
+  cout << b2.assert_atRange(2) << " " << b2.assert_atDomain("abc") << endl;  
 
   return 0;
 }

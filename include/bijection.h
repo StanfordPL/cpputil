@@ -98,6 +98,9 @@ class bijection
     domain_const_iterator findDomain(domain_const_reference d) const { return domainToRange_.find(d); }
     range_const_iterator findRange(range_const_reference r) const { return rangeToDomain_.find(r); }
 
+    range_const_reference assert_atDomain(domain_const_reference d) const { return *assert_at(domainToRange_, d); }
+    domain_const_reference assert_atRange(range_const_reference r) const { return *assert_at(rangeToDomain_, r); }
+
   private:
     _Associative1 domainToRange_;
     _Associative2 rangeToDomain_;
