@@ -20,6 +20,13 @@ inline const typename _Associative::value_type::second_type& assert_at(const _As
   return a.find(key)->second;
 }
 
+template <typename _Associative>
+inline typename _Associative::size_type erase_at(const _Associative& a, const typename _Associative::value_type::first_type& key)
+{
+  assert(a.find(key) != a.end() && "Unrecognized key!");
+  return a.erase(key);
+}
+
 }
 
 #endif
