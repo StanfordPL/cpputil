@@ -21,26 +21,27 @@ inline std::string ttoa(const T& t)
 namespace cpputil
 {
 
-template <typename T, typename Alloc, template <typename, typename> class Container>
-void split(const std::string& s, Container<T, Alloc>& c, char delim)
+template <typename Alloc, template <typename, typename> class Container>
+void split(const std::string& s, Container<std::string, Alloc>& c, char delim)
 {
   std::istringstream iss(s);
+  std::string ss;
+
   for ( auto i = back_inserter(c); !iss.eof(); ++i )
   {
-    T t;
-    iss >> t;
-    i = t;
+    getline(iss, ss, delim);
+    i = ss;
   }
 }
 
-template <class T, class Alloc, template <typename, typename> class Container>
-inline void words(const std::string& s, Container<T, Alloc>& c)
+template <class Alloc, template <typename, typename> class Container>
+inline void words(const std::string& s, Container<std::string, Alloc>& c)
 {
   return split(s, c, ' ');
 }
 
-template <typename T, typename Alloc, template <typename, typename> class Container>
-inline void lines(const std::string& s, Container<T, Alloc>& c)
+template <typename Alloc, template <typename, typename> class Container>
+inline void lines(const std::string& s, Container<std::string, Alloc>& c)
 {
   return split(s, c, '\n');
 }

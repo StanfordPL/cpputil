@@ -25,5 +25,15 @@ int main()
   cout << "[" << unwords(ls.begin(), ls.end()) << "]" << endl;
   cout << "[" << unlines(ls.begin(), ls.end()) << "]" << endl;
 
+  const char* s3 = "[ one ]#[ two ]#[ three ]";
+  list<string> ls2;
+
+  split(s3, ls2, '#');
+
+  for ( auto i : ls2 )
+    cout << i << endl;
+
+  cout << "[" << unsplit(ls2.begin(), ls2.end(), '#') << "]" << endl;
+
   return 0;
 }
