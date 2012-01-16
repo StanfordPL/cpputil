@@ -13,12 +13,12 @@ void tests(_Sequence& s)
     s.push_back(i);
   
   ostringstream oss;
-  oss << s;
+  serialize(oss, s);
 
   cout << "[" << oss.str() << "]" << endl;
 
   istringstream iss(oss.str());
-  iss >> s;
+  deserialize(iss, s);
 
   for ( auto v : s )
     cout << v << " ";
@@ -32,12 +32,12 @@ void testa(_Associative& a)
     a[i] = i;
 
   ostringstream oss;
-  oss << a;
+  serialize(oss, a);
 
   cout << "[" << oss.str() << "]" << endl;
 
   istringstream iss(oss.str());
-  iss >> a;
+  deserialize(iss, a);
 
   for ( auto v : a )
     cout << "(" << v.first << ", " << v.second << ") ";
@@ -47,16 +47,18 @@ void testa(_Associative& a)
 template <typename _T>
 void testt(tokenizer<_T>& t)
 {
-  for ( auto i = 0; i < 10; ++i )
-    t.tokenize(i);
+  const char* vals[3] = { "[element one]", "[element two]", "[element 3]" };
+
+  for ( auto i = 0; i < 3; ++i )
+    t.tokenize(vals[i]);
 
   ostringstream oss;
-  oss << t;
+  serialize(oss, t);
 
   cout << "[" << oss.str() << "]" << endl;
 
   istringstream iss(oss.str());
-  iss >> t;
+  deserialize(iss, t);
 
   for ( auto v : t )
     cout << v << " ";
@@ -67,7 +69,7 @@ int main()
 {
   map<int, int> m;
   vector<int> v;
-  tokenizer<int> t;
+  tokenizer<string> t;
 
   testa(m);
   tests(v);
