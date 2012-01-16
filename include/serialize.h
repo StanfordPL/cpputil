@@ -13,76 +13,57 @@ namespace cpputil
 {
 
 template <typename _T>
-void serialize(std::ostream& os, const _T& t)
-{
-  os << t;
-}
-
-template <typename _T>
-void serialize(std::ostream& os, const std::deque<_T>& ts)
+std::ostream& operator<<(std::ostream& os, const std::deque<_T>& ts)
 {
   os << ts.size() << " ";
   for ( auto t : ts )
-  {
-    serialize(os, t);
-    os << " ";
-  }
+    os << t << " ";
+
+  return os;
 }
 
 template <typename _T>
-void serialize(std::ostream& os, const std::list<_T>& ts)
+std::ostream& operator<<(std::ostream& os, const std::list<_T>& ts)
 {
   os << ts.size() << " ";
   for ( auto t : ts )
-  {
-    serialize(os, t);
-    os << " ";
-  }
+    os << t << " ";
+
+  return os;
 }
 
 template <typename _Key, typename _Val>
-void serialize(std::ostream& os, const std::map<_Key, _Val>& m)
+std::ostream& operator<<(std::ostream& os, const std::map<_Key, _Val>& m)
 {
   os << m.size() << " ";
   for ( auto p : m )
-  {
-    serialize(os, p.first);
-    os << " ";
-    serialize(os, p.second);
-    os << " ";
-  }
+    os << p.first << " " << p.second << " ";
+
+  return os;
 }
 
 template <typename _T>
-void serialize(std::ostream& os, const std::set<_T>& ts)
+std::ostream& operator<<(std::ostream& os, const std::set<_T>& ts)
 {
   os << ts.size() << " ";
   for ( auto t : ts )
-  {
-    serialize(os, t);
-    os << " ";
-  }
+    os << t << " ";
+
+  return os;
 }
 
 template <typename _T>
-void serialize(std::ostream& os, const std::vector<_T>& ts)
+std::ostream& operator<<(std::ostream& os, const std::vector<_T>& ts)
 {
   os << ts.size() << " ";
   for ( auto t : ts )
-  {
-    serialize(os, t);
-    os << " ";
-  }
+    os << t << " ";
+
+  return os;
 }
 
 template <typename _T>
-void deserialize(std::istream& is, _T& t)
-{
-  is >> t;
-}
-
-template <typename _T>
-void deserialize(std::istream& is, std::deque<_T>& ts)
+std::istream& operator>>(std::istream& is, std::deque<_T>& ts)
 {
   ts.clear();
 
@@ -92,13 +73,15 @@ void deserialize(std::istream& is, std::deque<_T>& ts)
   _T t;
   for ( auto i = 0; i < size; ++i )
   {
-    deserialize(is, t);
+    is >> t;
     ts.emplace_back(t);
   }
+
+  return is;
 }
 
 template <typename _T>
-void deserialize(std::istream& is, std::list<_T>& ts)
+std::istream& operator>>(std::istream& is, std::list<_T>& ts)
 {
   ts.clear();
 
@@ -108,13 +91,15 @@ void deserialize(std::istream& is, std::list<_T>& ts)
   _T t;
   for ( auto i = 0; i < size; ++i )
   {
-    deserialize(is, t);
+    is >> t;
     ts.emplace_back(t);
   }
+
+  return is;
 }
 
 template <typename _Key, typename _Val>
-void deserialize(std::istream& is, std::map<_Key, _Val>& m)
+std::istream& operator>>(std::istream& is, std::map<_Key, _Val>& m)
 {
   m.clear();
 
@@ -125,14 +110,15 @@ void deserialize(std::istream& is, std::map<_Key, _Val>& m)
   _Val val;
   for ( auto i = 0; i < size; ++i )
   {
-    deserialize(is, key);
-    deserialize(is, val);
+    is >> key >> val;
     m[key] = val;
   }
+
+  return is;
 }
 
 template <typename _T>
-void deserialize(std::istream& is, std::set<_T>& ts)
+std::istream& operator>>(std::istream& is, std::set<_T>& ts)
 {
   ts.clear();
 
@@ -142,13 +128,15 @@ void deserialize(std::istream& is, std::set<_T>& ts)
   _T t;
   for ( auto i = 0; i < size; ++i )
   {
-    deserialize(is, t);
+    is >> t;
     ts.insert(t);
   }
+
+  return is;
 }
 
 template <typename _T>
-void deserialize(std::istream& is, std::vector<_T>& ts)
+std::istream& operator>>(std::istream& is, std::vector<_T>& ts)
 {
   ts.clear();
 
@@ -159,9 +147,11 @@ void deserialize(std::istream& is, std::vector<_T>& ts)
   _T t;
   for ( auto i = 0; i < size; ++i )
   {
-    deserialize(is, t);
+    is >> t;
     ts.emplace_back(t);
   }
+
+  return is;
 }
 
 } 

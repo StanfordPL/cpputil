@@ -13,12 +13,12 @@ void tests(_Sequence s)
     s.push_back(i);
   
   ostringstream oss;
-  serialize(oss, s);
+  oss << s;
 
   cout << "[" << oss.str() << "]" << endl;
 
   istringstream iss(oss.str());
-  deserialize(iss, s);
+  iss >> s;
 
   for ( auto v : s )
     cout << v << " ";
@@ -32,12 +32,12 @@ void testa(_Associative a)
     a[i] = i;
 
   ostringstream oss;
-  serialize(oss, a);
+  oss << a;
 
   cout << "[" << oss.str() << "]" << endl;
 
   istringstream iss(oss.str());
-  deserialize(iss, a);
+  iss >> a;
 
   for ( auto v : a )
     cout << "(" << v.first << ", " << v.second << ") ";
