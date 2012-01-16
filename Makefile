@@ -14,6 +14,7 @@ test: test/bijection.o \
 		 test/forwardingstream.o \
 		 test/logstream.o \
 		 test/maputil.o \
+		 test/serialize.o \
 		 test/Singleton.o \
 		 test/Sqlite.o \
 		 test/socketstream.o \
