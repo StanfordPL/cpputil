@@ -7,7 +7,7 @@ using namespace cpputil;
 using namespace std;
 
 template <typename _Sequence>
-void tests(_Sequence s)
+void tests(_Sequence& s)
 {
   for ( auto i = 0; i < 10; ++i )
     s.push_back(i);
@@ -26,7 +26,7 @@ void tests(_Sequence s)
 }
 
 template <typename _Associative>
-void testa(_Associative a)
+void testa(_Associative& a)
 {
   for ( auto i = 0; i < 10; ++i )
     a[i] = i;
@@ -44,13 +44,34 @@ void testa(_Associative a)
   cout << endl;
 }
 
+template <typename _T>
+void testt(tokenizer<_T>& t)
+{
+  for ( auto i = 0; i < 10; ++i )
+    t.tokenize(i);
+
+  ostringstream oss;
+  oss << t;
+
+  cout << "[" << oss.str() << "]" << endl;
+
+  istringstream iss(oss.str());
+  iss >> t;
+
+  for ( auto v : t )
+    cout << v << " ";
+  cout << endl;
+}
+
 int main()
 {
   map<int, int> m;
   vector<int> v;
+  tokenizer<int> t;
 
   testa(m);
   tests(v);
+  testt(t);
 
   return 0;
 }

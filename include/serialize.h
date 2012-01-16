@@ -9,6 +9,8 @@
 #include <set>
 #include <vector>
 
+#include "tokenizer.h"
+
 namespace cpputil
 {
 
@@ -44,6 +46,16 @@ std::ostream& operator<<(std::ostream& os, const std::map<_Key, _Val>& m)
 
 template <typename _T>
 std::ostream& operator<<(std::ostream& os, const std::set<_T>& ts)
+{
+  os << ts.size() << " ";
+  for ( auto t : ts )
+    os << t << " ";
+
+  return os;
+}
+
+template <typename _T>
+std::ostream& operator<<(std::ostream& os, const tokenizer<_T>& ts)
 {
   os << ts.size() << " ";
   for ( auto t : ts )
@@ -130,6 +142,24 @@ std::istream& operator>>(std::istream& is, std::set<_T>& ts)
   {
     is >> t;
     ts.insert(t);
+  }
+
+  return is;
+}
+
+template <typename _T>
+std::istream& operator>>(std::istream& is, tokenizer<_T>& ts)
+{
+  ts.clear();
+
+  typename tokenizer<_T>::size_type size;
+  is >> size;
+  
+  _T t;
+  for ( auto i = 0; i < size; ++i )
+  {
+    is >> t;
+    ts.tokenize(t);
   }
 
   return is;
