@@ -5,6 +5,8 @@
 #include <deque>
 #include <map>
 
+#include "maputil.h"
+
 namespace cpputil
 {
 
@@ -12,10 +14,11 @@ template <typename _T, typename _Associative = std::map<const _T, unsigned int>,
 class tokenizer
 {
   public:
-    typedef          _T                   value_type;
-    typedef          const _T&            const_reference;
-    typedef          unsigned int         token_type;
-    typedef typename _Sequence::size_type size_type;
+    typedef          _T                               value_type;
+    typedef          const _T&                        const_reference;
+    typedef          unsigned int                     token_type;
+    typedef typename _Sequence::size_type             size_type;
+    typedef          const_key_iterator<_Associative> const_token_iterator;
 
     tokenizer()
     {
@@ -33,6 +36,11 @@ class tokenizer
       swap(rhs);
       return *this;
     }
+
+    const_token_iterator begin() const { return const_key_iterator<_Associative>(valToToken_.begin()); }
+    const_token_iterator cbegin() const { return const_key_iterator<_Associative>(valToToken_.begin()); }
+    const_token_iterator end() const { return const_key_iterator<_Associative>(valToToken_.end()); }
+    const_token_iterator cend() const { return const_key_iterator<_Associative>(valToToken_.end()); } 
 
     bool empty() const { return tokenToVal_.empty(); }
     size_type size() const { return tokenToVal_.size(); }

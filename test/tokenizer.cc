@@ -25,6 +25,11 @@ int main()
   cout << t2.untokenize(1) << " ";
   cout << t2.untokenize(2) << endl;
 
+  // Should print "Hello World foo"
+  for ( auto i = t2.begin(), ie = t2.end(); i != ie; ++i )
+    cout << *i << " ";
+  cout << endl;
+
   // Should print 0 3
   cout << t2.empty() << " " << t.size() << endl;
 
