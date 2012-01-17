@@ -60,20 +60,6 @@ struct Serializer<std::list<_T>>
   }
 };
 
-template <typename _T>
-struct Serializer<std::set<_T>>
-{
-  static void serialize(std::ostream& os, const std::set<_T>& ts, char delim = '"')
-  {
-    os << ts.size() << " ";
-    for ( auto t : ts )
-    {
-      Serializer<_T>::serialize(os, t, delim);
-      os << " ";
-    }
-  }
-};
-
 template <typename _Key, typename _Val>
 struct Serializer<std::map<_Key, _Val>>
 {
@@ -85,6 +71,20 @@ struct Serializer<std::map<_Key, _Val>>
       Serializer<_Key>::serialize(os, p.first, delim);
       os << " ";
       Serializer<_Val>::serialize(os, p.second, delim);
+      os << " ";
+    }
+  }
+};
+
+template <typename _T>
+struct Serializer<std::set<_T>>
+{
+  static void serialize(std::ostream& os, const std::set<_T>& ts, char delim = '"')
+  {
+    os << ts.size() << " ";
+    for ( auto t : ts )
+    {
+      Serializer<_T>::serialize(os, t, delim);
       os << " ";
     }
   }
@@ -215,7 +215,7 @@ struct Deserializer<std::set<_T>>
     _T t;
     for ( auto i = 0; i < size; ++i )
     {
-      Deserializer<_T>::deserialize(t);
+      Deserializer<_T>::deserialize(is, t, delim);
       ts.insert(t);
     }
   }
