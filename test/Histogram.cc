@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "Histogram.h"
@@ -40,6 +41,18 @@ int main()
 
   // Should print hello 33, world 66, foo 99, baz 88
   for ( auto itr : h3 )
+    cout << itr.first << " " << itr.second << " ";
+  cout << endl;
+
+  ostringstream oss;
+  serialize(oss, h3);
+  istringstream iss(oss.str());
+
+  Histogram<string> h4;
+  deserialize(iss, h4);
+    
+  // Should print the same
+  for ( auto itr : h4 )
     cout << itr.first << " " << itr.second << " ";
   cout << endl;
 

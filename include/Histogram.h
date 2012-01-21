@@ -9,9 +9,13 @@
 namespace cpputil
 {
 
-template <typename _T, typename _Associative = std::map<const _T, unsigned int>>
+template <typename _T, typename _Associative = std::map<_T, unsigned int>>
 class Histogram
 {
+  // Friends
+  friend class Serializer<Histogram>;
+  friend class Deserializer<Histogram>;
+
   public:
 
     // Member types
@@ -57,41 +61,21 @@ class Histogram
     _Associative histogram_;
 };
 
-template <typename _T>
-struct Serializer<Histogram<_T>>
+template <typename _T, typename _Associative>
+struct Serializer<Histogram<_T, _Associative>>
 {
-  static void serialize(std::ostream& os, const Histogram<_T>& h, char delim = '"')
+  static void serialize(std::ostream& os, const Histogram<_T, _Associative>& h, char delim = '"')
   {
-    os << h.size() << " ";
-    for ( auto itr : h )
-    {
-      Serializer<typename Histogram<_T>::value_type>::serialize(os, itr.first, delim);
-      os << " ";
-      Serializer<typename Histogram<_T>::mass_type>::serialize(os, itr.second, delim);
-      os << " ";
-    }
+    Serializer<_Associative>::serialize(os, h.histogram_, delim);
   }
 };
 
-template <typename _T>
-struct Deserializer<Histogram<_T>>
+template <typename _T, typename _Associative>
+struct Deserializer<Histogram<_T, _Associative>>
 {
-  static void deserialize(std::istream& is, Histogram<_T>& h, char delim = '"')
+  static void deserialize(std::istream& is, Histogram<_T, _Associative>& h, char delim = '"')
   {
-    h.clear();
-
-    typename Histogram<_T>::size_type size;
-    is >> size;
-
-    typename Histogram<_T>::value_type val;
-    typename Histogram<_T>::mass_type mass;
-    for ( auto i = 0; i < size; ++i )
-    {
-      Deserializer<typename Histogram<_T>::value_type>::deserialize(is, val, delim);
-      Deserializer<typename Histogram<_T>::mass_type>::deserialize(is, mass, delim);
-
-      h.insert(val, mass);
-    }
+    Deserializer<_Associative>::deserialize(is, h.histogram_, delim);    
   }
 };
 

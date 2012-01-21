@@ -9,7 +9,7 @@
 namespace cpputil
 {
 
-template <typename _Domain, typename _Range, typename _Associative1 = std::map<const _Domain, const _Range*>, typename _Associative2 = std::map<const _Range, const _Domain*> >
+template <typename _Domain, typename _Range, typename _Associative1 = std::map<_Domain, const _Range*>, typename _Associative2 = std::map<_Range, const _Domain*> >
 class bijection
 {
   public:

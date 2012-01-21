@@ -12,7 +12,7 @@
 namespace cpputil
 {
 
-template <typename _T, typename _Associative = std::map<const _T, unsigned int>, typename _Sequence = std::deque<const _T*> >
+template <typename _T, typename _Associative = std::map<_T, unsigned int>, typename _Sequence = std::deque<const _T*> >
 class tokenizer
 {
   public:

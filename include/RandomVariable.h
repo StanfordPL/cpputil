@@ -1,17 +1,23 @@
-#ifndef DISTRIBUTION_H
-#define DISTRIBUTION_H
+#ifndef RANDOM_VARIABLE_H
+#define RANDOM_VARIABLE_H
 
 #include <cassert>
 #include <cstdlib>
+#include <iostream>
 
 #include "Histogram.h"
+#include "serialize.h"
 
 namespace cpputil
 {
 
-template <typename _T, typename _Associative = std::map<const _T, unsigned int>>
+template <typename _T, typename _Associative = std::map<_T, unsigned int>>
 class RandomVariable
 {
+  // Friends
+  friend class Serializer<RandomVariable>;
+  friend class Deserializer<RandomVariable>;
+
   public:
 
     // Member types
@@ -54,6 +60,28 @@ class RandomVariable
     mass_type mass_;
     Histogram<_T, _Associative> vals_;
 };
+
+template <typename _T, typename _Associative>
+struct Serializer<RandomVariable<_T, _Associative>>
+{
+  static void serialize(std::ostream& os, const RandomVariable<_T, _Associative>& rv, char delim = '"')
+  {
+    Serializer<typename RandomVariable<_T, _Associative>::mass_type>::serialize(os, rv.mass_, delim);
+    Serializer<Histogram<_T, _Associative>>::serialize(os, rv.vals_, delim);
+  }
+};
+
+template <typename _T, typename _Associative>
+struct Deserializer<RandomVariable<_T, _Associative>>
+{
+  static void deserialize(std::istream& is, RandomVariable<_T, _Associative>& rv, char delim = '"')
+  {
+    Deserializer<typename RandomVariable<_T, _Associative>::mass_type>::deserialize(is, rv.mass_, delim);
+    Deserializer<Histogram<_T, _Associative>>::deserialize(is, rv.vals_, delim);
+  }
+};
+
+
 
 }
 
