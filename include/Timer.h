@@ -7,15 +7,19 @@ namespace cpputil
 class Timer
 {
   public:
+
+    // Member types
     typedef time_t time_type;  
 
-    void clear() { elapsed_ = 0; }
+    // Modifiers
     void start() { began_ = time(0); }
     time_type stop() { elapsed_ += time(0) - began_; }
     void wind(time_type timeup) { timeup_ = timeup; }     
+    void clear() { elapsed_ = 0; }
 
+    // State functions
     time_type elapsed() const { return elapsed_; }
-    bool timeup const { return elapsed_ > timeup_; }
+    bool timeup const { return elapsed_ >= timeup_; }
 
   private:
     time_type began_;

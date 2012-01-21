@@ -32,14 +32,17 @@ class value_iterator
 {
   public:
     value_iterator() = delete;
-
     value_iterator(const typename _Associative::iterator& itr) : itr_(itr) {}
 
-    void operator++() { itr_++; }
+    value_iterator& operator++() 
+    { 
+      itr_++; 
+      return *this; 
+    }
     typename _Associative::mapped_type& operator*() const { return itr_->second; }
 
     bool operator==(const value_iterator& rhs) { return itr_ == rhs.itr_; }
-    bool operator!=(const value_iterator& rhs) { return itr_ != rhs.itr_; }
+    bool operator!=(const value_iterator& rhs) { return !(*this == rhs); }
 
   private:
     typename _Associative::iterator itr_; 
@@ -50,14 +53,17 @@ class const_key_iterator
 {
   public:
     const_key_iterator() = delete;
-
     const_key_iterator(const typename _Associative::const_iterator& itr) : itr_(itr) {}
 
-    void operator++() { itr_++; }
+    const_key_iterator& operator++() 
+    { 
+      itr_++; 
+      return *this;
+    }
     const typename _Associative::key_type& operator*() const { return itr_->first; }
 
     bool operator==(const const_key_iterator& rhs) { return itr_ == rhs.itr_; }
-    bool operator!=(const const_key_iterator& rhs) { return itr_ != rhs.itr_; }
+    bool operator!=(const const_key_iterator& rhs) { return !(*this == rhs); }
 
   private:
     typename _Associative::const_iterator itr_; 
@@ -68,14 +74,17 @@ class const_value_iterator
 {
   public:
     const_value_iterator() = delete;
-
     const_value_iterator(const typename _Associative::const_iterator& itr) : itr_(itr) {}
 
-    void operator++() { itr_++; }
+    const_value_iterator& operator++() 
+    { 
+      itr_++; 
+      return *this;
+    }
     const typename _Associative::mapped_type& operator*() const { return itr_->second; }
 
     bool operator==(const const_value_iterator& rhs) { return itr_ == rhs.itr_; }
-    bool operator!=(const const_value_iterator& rhs) { return itr_ != rhs.itr_; }
+    bool operator!=(const const_value_iterator& rhs) { return !(*this == rhs); }
 
   private:
     typename _Associative::const_iterator itr_; 
@@ -86,14 +95,17 @@ class reverse_value_iterator
 {
   public:
     reverse_value_iterator() = delete;
-
     reverse_value_iterator(const typename _Associative::reverse_iterator& itr) : itr_(itr) {}
 
-    void operator++() { itr_++; }
+    reverse_value_iterator& operator++() 
+    { 
+      itr_++; 
+      return *this;
+    }
     typename _Associative::mapped_type& operator*() const { return itr_->second; }
 
     bool operator==(const reverse_value_iterator& rhs) { return itr_ == rhs.itr_; }
-    bool operator!=(const reverse_value_iterator& rhs) { return itr_ != rhs.itr_; }
+    bool operator!=(const reverse_value_iterator& rhs) { return !(*this == rhs); }
 
   private:
     typename _Associative::reverse_iterator itr_; 
@@ -104,14 +116,17 @@ class const_reverse_key_iterator
 {
   public:
     const_reverse_key_iterator() = delete;
-
     const_reverse_key_iterator(const typename _Associative::const_reverse_iterator& itr) : itr_(itr) {}
 
-    void operator++() { itr_++; }
+    const_reverse_key_iterator& operator++() 
+    { 
+      itr_++; 
+      return *this;
+    }
     const typename _Associative::key_type& operator*() const { return itr_->first; }
 
     bool operator==(const const_reverse_key_iterator& rhs) { return itr_ == rhs.itr_; }
-    bool operator!=(const const_reverse_key_iterator& rhs) { return itr_ != rhs.itr_; }
+    bool operator!=(const const_reverse_key_iterator& rhs) { return !(*this == rhs); }
 
   private:
     typename _Associative::const_reverse_iterator itr_; 
@@ -122,14 +137,17 @@ class const_reverse_value_iterator
 {
   public:
     const_reverse_value_iterator() = delete;
-
     const_reverse_value_iterator(const typename _Associative::const_reverse_iterator& itr) : itr_(itr) {}
 
-    void operator++() { itr_++; }
+    const_reverse_value_iterator& operator++() 
+    { 
+      itr_++; 
+      return *this;
+    }
     const typename _Associative::mapped_type& operator*() const { return itr_->second; }
 
     bool operator==(const const_reverse_value_iterator& rhs) { return itr_ == rhs.itr_; }
-    bool operator!=(const const_reverse_value_iterator& rhs) { return itr_ != rhs.itr_; }
+    bool operator!=(const const_reverse_value_iterator& rhs) { return !(*this == rhs); }
 
   private:
     typename _Associative::const_reverse_iterator itr_; 

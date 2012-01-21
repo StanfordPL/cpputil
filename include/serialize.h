@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-#include "tokenizer.h"
-
 namespace cpputil
 {
 
@@ -80,20 +78,6 @@ template <typename _T>
 struct Serializer<std::set<_T>>
 {
   static void serialize(std::ostream& os, const std::set<_T>& ts, char delim = '"')
-  {
-    os << ts.size() << " ";
-    for ( auto t : ts )
-    {
-      Serializer<_T>::serialize(os, t, delim);
-      os << " ";
-    }
-  }
-};
-
-template <typename _T>
-struct Serializer<tokenizer<_T>>
-{
-  static void serialize(std::ostream& os, const tokenizer<_T>& ts, char delim = '"')
   {
     os << ts.size() << " ";
     for ( auto t : ts )
@@ -217,25 +201,6 @@ struct Deserializer<std::set<_T>>
     {
       Deserializer<_T>::deserialize(is, t, delim);
       ts.insert(t);
-    }
-  }
-};
-
-template <typename _T>
-struct Deserializer<tokenizer<_T>>
-{
-  static void deserialize(std::istream& is, tokenizer<_T>& ts, char delim = '"')
-  {
-    ts.clear();
-
-    typename tokenizer<_T>::size_type size;
-    is >> size;
-
-    _T t;
-    for ( auto i = 0; i < size; ++i )
-    {
-      Deserializer<_T>::deserialize(is, t, delim);
-      ts.tokenize(t);
     }
   }
 };

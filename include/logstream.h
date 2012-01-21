@@ -2,7 +2,6 @@
 #define LOGSTREAM_H
 
 #include <cassert>
-#include <ctime>
 #include <iomanip>
 #include <ostream>
 
@@ -43,11 +42,7 @@ class basic_logstream : public std::basic_ostream<_CharT, _Traits>
       {
         fbuf_.setActive(true);
 
-        time_t now;
-        time(&now);
-        tm* current = localtime(&now);
-
-        *this  << "[" << current->tm_hour << ":" << current->tm_min << ":" << current->tm_sec << " ";
+        *this << "[";
         switch ( level )
         {
           case SEVERE: 

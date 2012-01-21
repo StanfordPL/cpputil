@@ -44,36 +44,13 @@ void testa(_Associative& a)
   cout << endl;
 }
 
-template <typename _T>
-void testt(tokenizer<_T>& t)
-{
-  const char* vals[3] = { "[element one]", "[element two]", "[element 3]" };
-
-  for ( auto i = 0; i < 3; ++i )
-    t.tokenize(vals[i]);
-
-  ostringstream oss;
-  serialize(oss, t);
-
-  cout << "[" << oss.str() << "]" << endl;
-
-  istringstream iss(oss.str());
-  deserialize(iss, t);
-
-  for ( auto v : t )
-    cout << v << " ";
-  cout << endl;
-}
-
 int main()
 {
   map<int, int> m;
   vector<int> v;
-  tokenizer<string> t;
 
   testa(m);
   tests(v);
-  testt(t);
 
   set<string> ss;
   ss.insert("[Hello]");

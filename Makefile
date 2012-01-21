@@ -10,8 +10,8 @@ CXX=g++
 OPT=-std=c++0x
 INC=-I./include
 
-test: test/bijection.o \
-		 test/forwardingstream.o \
+test: test/forwardingstream.o \
+		 test/Histogram.o \
 		 test/logstream.o \
 		 test/maputil.o \
 		 test/serialize.o \
@@ -21,6 +21,7 @@ test: test/bijection.o \
 		 test/stringutil.o \
 		 test/teestream.o \
 		 test/tokenizer.o
+#test/bijection.o \
 
 .cc.o:
 	$(CXX) $(OPT) $(INC) $< -o $@

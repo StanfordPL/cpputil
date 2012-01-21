@@ -8,8 +8,8 @@
 namespace 
 {
 
-template <typename T>
-inline std::string ttoa(const T& t)
+template <typename _T>
+inline std::string ttoa(const _T& t)
 {
   std::ostringstream oss;
   oss << t;
@@ -21,8 +21,8 @@ inline std::string ttoa(const T& t)
 namespace cpputil
 {
 
-template <typename Alloc, template <typename, typename> class Container>
-void split(const std::string& s, Container<std::string, Alloc>& c, char delim)
+template <typename _Alloc, template <typename, typename> class _Container>
+void split(const std::string& s, _Container<std::string, _Alloc>& c, char delim)
 {
   std::istringstream iss(s);
   std::string ss;
@@ -34,14 +34,14 @@ void split(const std::string& s, Container<std::string, Alloc>& c, char delim)
   }
 }
 
-template <class Alloc, template <typename, typename> class Container>
-inline void words(const std::string& s, Container<std::string, Alloc>& c)
+template <class _Alloc, template <typename, typename> class _Container>
+inline void words(const std::string& s, _Container<std::string, _Alloc>& c)
 {
   return split(s, c, ' ');
 }
 
-template <typename Alloc, template <typename, typename> class Container>
-inline void lines(const std::string& s, Container<std::string, Alloc>& c)
+template <typename _Alloc, template <typename, typename> class _Container>
+inline void lines(const std::string& s, _Container<std::string, _Alloc>& c)
 {
   return split(s, c, '\n');
 }

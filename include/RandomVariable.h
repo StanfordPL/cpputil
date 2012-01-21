@@ -3,56 +3,56 @@
 
 #include <cassert>
 #include <cstdlib>
-#include <utility>
+
+#include "Histogram.h"
 
 namespace cpputil
 {
 
-template <typename _T, typename _Sequence = std::deque<const T> >
+template <typename _T, typename _Associative = std::map<const _T, unsigned int>>
 class RandomVariable
 {
   public:
-    typedef unsigned int mass_type;
-    typedef _T           value_type;
-    typedef const _T&    const_reference;
 
-    RandomVariable() : 
-      mass_(0) 
-    {
-      // Does nothing.
-    }
+    // Member types
+    typedef typename Histogram<_T, _Associative>::value_type      value_type;
+    typedef typename Histogram<_T, _Associative>::const_reference const_reference;
+    typedef typename Histogram<_T, _Associative>::mass_type       mass_type;
 
-    void clear()
-    {
-      mass_ = 0;
-      vals_.clear();
-    }
+    // Constructors
+    RandomVariable() : mass_(0) {}
 
-    void insert(mass_type mass, const_reference val)
-    {
-      assert(find(vals_.begin(), vals_.end(), val) == vals_.end() && "Cannot insert duplicate value!");
-      assert(mass > 0 && "Unable to insert element with zero mass!");
-
-      mass_ += mass;
-      vals_.push_back(std::pair<mass_type, T>(mass_, val));
-    }
-
+    // Element access
     const_reference sample() const
     {
       assert(mass_ > 0 && "Cannot sample from a zero mass distribution!");
 
       mass_type p = rand() % mass_;
-      for ( auto i = vals_.begin(), ie = vals_.end(); i != ie; ++i )
-        if ( p < i->first )
-          return i->second;
+      for ( auto itr : vals_ )
+        if ( p < itr.second )
+          return itr.first;
+        else
+          p -= itr.second;
 
       assert(false && "Control should never reach here!");
       return T();
     }
 
+    // Modifiers
+    void clear()
+    {
+      mass_ = 0;
+      vals_.clear();
+    }
+    void insert(const_reference val, mass_type mass)
+    {
+      mass_ += mass;
+      vals_.count(val, mass);
+    }
+
   private:
     mass_type mass_;
-    _Sequence<std::pair<mass_type, _T> > vals_;
+    Histogram<_T, _Associative> vals_;
 };
 
 }
