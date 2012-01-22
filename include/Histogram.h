@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 
+#include "maputil.h"
 #include "serialize.h"
 
 namespace cpputil
@@ -21,12 +22,14 @@ class Histogram
   public:
 
     // Member types
-    typedef          _T                                   value_type;
-    typedef          const _T&                            const_reference;
-    typedef          _Mass                                mass_type;
-    typedef typename _Associative::const_iterator         const_iterator;
-    typedef typename _Associative::const_reverse_iterator const_reverse_iterator;
-    typedef typename _Associative::size_type              size_type;
+    typedef          _T                                       value_type;
+    typedef          const _T&                                const_reference;
+    typedef          _Mass                                    mass_type;
+    typedef typename _Associative::const_iterator             const_iterator;
+    typedef typename _Associative::const_reverse_iterator     const_reverse_iterator;
+    typedef          const_key_iterator<_Associative>         const_value_iterator;
+    typedef          const_reverse_key_iterator<_Associative> const_reverse_value_iterator;
+    typedef typename _Associative::size_type                  size_type;
 
     // Iterators
     const_iterator begin() const { return histogram_.begin(); }
@@ -38,6 +41,16 @@ class Histogram
     const_reverse_iterator crbegin() const { return rbegin(); }
     const_reverse_iterator rend() const { return histogram_.rend(); }
     const_reverse_iterator crend() const { return rend(); }
+
+    const_value_iterator value_begin() const { return const_value_iterator(histogram_.begin()); }
+    const_value_iterator value_cbegin() const { return value_begin(); }
+    const_value_iterator value_end() const { return const_value_iterator(histogram_.end()); }
+    const_value_iterator value_cend() const { return value_end(); }
+
+    const_reverse_value_iterator value_rbegin() const { return const_reverse_value_iterator(histogram_.rbegin()); }
+    const_reverse_value_iterator value_crbegin() const { return value_rbegin(); }
+    const_reverse_value_iterator value_rend() const { return const_reverse_value_iterator(histogram_.rend()); }
+    const_reverse_value_iterator value_crend() const { return value_rend(); }
 
     // Capacity
     bool empty() const { return histogram_.empty(); }
