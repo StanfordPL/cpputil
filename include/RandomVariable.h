@@ -56,6 +56,11 @@ class RandomVariable
       mass_ += mass;
       vals_.count(val, mass);
     }
+    void swap(RandomVariable& rhs)
+    {
+      swap(mass_, rhs.mass);
+      vals_.swap(rhs.vals_);
+    }
 
   private:
     mass_type mass_;

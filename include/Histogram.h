@@ -52,6 +52,7 @@ class Histogram
       else
         itr->second += mass;
     }
+    void swap(Histogram& rhs) { histogram_.swap(rhs.histogram_); }
     Histogram& operator+=(const Histogram& rhs)
     {
       for ( auto itr : rhs )
