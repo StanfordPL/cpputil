@@ -12,7 +12,7 @@ namespace cpputil
 {
 
 template <typename _T, 
-          typename _Associative = std::map<_T, unsigned int>>
+          typename _Histogram = Histogram<_T>>
 class RandomVariable
 {
   // Friends
@@ -22,9 +22,9 @@ class RandomVariable
   public:
 
     // Member types
-    typedef typename Histogram<_T, _Associative>::value_type      value_type;
-    typedef typename Histogram<_T, _Associative>::const_reference const_reference;
-    typedef typename Histogram<_T, _Associative>::mass_type       mass_type;
+    typedef typename _Histogram::value_type      value_type;
+    typedef typename _Histogram::const_reference const_reference;
+    typedef typename _Histogram::mass_type       mass_type;
 
     // Constructors
     RandomVariable() : mass_(0) {}
@@ -54,7 +54,7 @@ class RandomVariable
     void insert(const_reference val, mass_type mass)
     {
       mass_ += mass;
-      vals_.count(val, mass);
+      vals_.insert(val, mass);
     }
     void swap(RandomVariable& rhs)
     {
@@ -64,26 +64,26 @@ class RandomVariable
 
   private:
     mass_type mass_;
-    Histogram<_T, _Associative> vals_;
+    Histogram_ vals_;
 };
 
-template <typename _T, typename _Associative>
-struct Serializer<RandomVariable<_T, _Associative>>
+template <typename _T, typename _Histogram>
+struct Serializer<RandomVariable<_T, _Histogram>>
 {
-  static void serialize(std::ostream& os, const RandomVariable<_T, _Associative>& rv, char delim = '"')
+  static void serialize(std::ostream& os, const RandomVariable<_T, _Histogram>& rv, char delim = '"')
   {
-    Serializer<typename RandomVariable<_T, _Associative>::mass_type>::serialize(os, rv.mass_, delim);
-    Serializer<Histogram<_T, _Associative>>::serialize(os, rv.vals_, delim);
+    Serializer<RandomVariable<_T, _Histogram>::mass_type>::serialize(os, rv.mass_, delim);
+    Serializer<Histogram_>::serialize(os, rv.vals_, delim);
   }
 };
 
-template <typename _T, typename _Associative>
-struct Deserializer<RandomVariable<_T, _Associative>>
+template <typename _T, typename _Histogram>
+struct Deserializer<RandomVariable<_T, _Histogram>>
 {
-  static void deserialize(std::istream& is, RandomVariable<_T, _Associative>& rv, char delim = '"')
+  static void deserialize(std::istream& is, RandomVariable<_T, _Histogram>& rv, char delim = '"')
   {
-    Deserializer<typename RandomVariable<_T, _Associative>::mass_type>::deserialize(is, rv.mass_, delim);
-    Deserializer<Histogram<_T, _Associative>>::deserialize(is, rv.vals_, delim);
+    Deserializer<typename RandomVariable<_T, _Histogram>::mass_type>::deserialize(is, rv.mass_, delim);
+    Deserializer<Histogram_>::deserialize(is, rv.vals_, delim);
   }
 };
 

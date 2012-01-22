@@ -26,7 +26,7 @@ int main()
   cout << t2.untokenize(2) << endl;
 
   // Should print "Hello World foo"
-  for ( auto i = t2.begin(), ie = t2.end(); i != ie; ++i )
+  for ( auto i = t2.value_begin(), ie = t2.value_end(); i != ie; ++i )
     cout << *i << " ";
   cout << endl;
 
@@ -35,7 +35,7 @@ int main()
 
   // Should print 1 0
   t2.clear();
-  cout << t2.empty() << " " << t.size() << endl;
+  cout << t2.empty() << " " << t2.size() << endl;
 
   return 0;
 }

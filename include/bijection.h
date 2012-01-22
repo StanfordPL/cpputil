@@ -2,162 +2,147 @@
 #define BIJECTION_H
 
 #include <cassert>
+#include <iostream>
 #include <map>
 
 #include "maputil.h"
+#include "serialize.h"
 
 namespace cpputil
 {
 
-template <typename _Domain, typename _Range, typename _Associative1 = std::map<_Domain, const _Range*>, typename _Associative2 = std::map<_Range, const _Domain*> >
+template <typename _Domain, typename _Range, 
+          typename _Associative1 = std::map<_Domain, _Range>,
+          typename _Associative2 = std::map<_Range, _Domain>>
 class bijection
 {
+  // Friends
+  friend class Serializer<bijection>;
+  friend class Deserializer<bijection>;
+
   public:
 
     // Member types
+    typedef          _Domain                                   domain_type;
     typedef          const _Domain&                            const_domain_reference;
     typedef          const_key_iterator<_Associative1>         const_domain_iterator;
     typedef          const_reverse_key_iterator<_Associative1> const_reverse_domain_iterator;
+    typedef          _Range                                    range_type;
     typedef          const _Range&                             const_range_reference;
     typedef          const_key_iterator<_Associative2>         const_range_iterator;
     typedef          const_reverse_key_iterator<_Associative2> const_reverse_range_iterator;
+    typedef typename _Associative1::const_iterator             const_iterator;
+    typedef typename _Associative1::const_reverse_iterator     const_reverse_iterator;
     typedef typename _Associative1::size_type                  size_type;
 
-    class const_iterator
-    {
-      public:
-        const_iterator() = delete;
-        const_iterator(const typename _Associative1::const_iterator& itr) : itr_(itr) {}
-
-        const_iterator& operator++() 
-        { 
-          itr_++; 
-          return *this;
-        }
-        std::pair<const _Domain&, const _Range&> operator*() const { return std::make_pair(itr_->first, *itr_->second); }
-
-        bool operator==(const const_iterator& rhs) const { return itr_ == rhs.itr_; }
-        bool operator!=(const const_iterator& rhs) const { return !*this == rhs; }
-
-      private:
-        typename _Associative1::const_iterator itr_;  
-    };
-
-    class const_reverse_iterator
-    {
-      public:
-        const_reverse_iterator() = delete;
-        const_reverse_iterator(const typename _Associative1::const_reverse_iterator& itr) : itr_(itr) {}
-
-        const_reverse_iterator& operator++() 
-        { 
-          itr_++; 
-          return *this;
-        }
-        std::pair<const _Domain&, const _Range&> operator*() const { return std::make_pair(itr_->first, *itr_->second); }
-
-        bool operator==(const const_reverse_iterator& rhs) const { return itr_ == rhs.itr_; }
-        bool operator!=(const const_reverse_iterator& rhs) const { return !*this == rhs; }
-
-      private:
-        typename _Associative1::const_reverse_iterator itr_;
-    };
-
-    // Constructors
-    bijection() {}
-    bijection(const bijection& rhs)
-    {
-      clear();
-      for ( auto itr : rhs.domainToRange_ )
-        insert(itr.first, *itr.second);
-    }
-    bijection& operator=(bijection rhs)
-    {
-      swap(rhs);
-      return *this;
-    }
-
     // Iterators
-    const_iterator begin() const { return const_iterator(domainToRange_.begin()); }
+    const_iterator begin() const { return domain_.begin(); }
     const_iterator cbegin() const { return begin(); }
-    const_iterator end() const { return const_iterator(domainToRange_.end()); }
+    const_iterator end() const { return domain_.end(); }
     const_iterator cend() const { return end(); }
 
-    const_reverse_iterator rbegin() const { return const_reverse_iterator(domainToRange_.rbegin()); }
+    const_reverse_iterator rbegin() const { return domain_.rbegin(); }
     const_reverse_iterator crbegin() const { return rbegin(); }
-    const_reverse_iterator rend() const { return const_reverse_iterator(domainToRange_.rend()); }
+    const_reverse_iterator rend() const { return domain_.rend(); }
     const_reverse_iterator crend() const { return rend(); }
 
-    const_domain_iterator domain_begin() const { return const_domain_iterator(domainToRange_.begin()); }
+    const_domain_iterator domain_begin() const { return const_domain_iterator(domain_.begin()); }
     const_domain_iterator domain_cbegin() const { return domain_begin(); }
-    const_domain_iterator domain_end() const { return const_domain_iterator(domainToRange_.end()); }
+    const_domain_iterator domain_end() const { return const_domain_iterator(domain_.end()); }
     const_domain_iterator domain_cend() const { return domain_end(); }
 
-    const_reverse_domain_iterator domain_rbegin() const { return const_reverse_domain_iterator(domainToRange_.rbegin()); }
+    const_reverse_domain_iterator domain_rbegin() const { return const_reverse_domain_iterator(domain_.rbegin()); }
     const_reverse_domain_iterator domain_crbegin() const { return domain_crbegin(); }
-    const_reverse_domain_iterator domain_rend() const { return const_reverse_domain_iterator(domainToRange_.rend()); }
+    const_reverse_domain_iterator domain_rend() const { return const_reverse_domain_iterator(domain_.rend()); }
     const_reverse_domain_iterator domain_crend() const { return domain_crend(); }
 
-    const_range_iterator range_begin() const { return const_range_iterator(rangeToDomain_.begin()); }
+    const_range_iterator range_begin() const { return const_range_iterator(range_.begin()); }
     const_range_iterator range_cbegin() const { return range_cbegin(); }
-    const_range_iterator range_end() const { return const_range_iterator(rangeToDomain_.end()); }
+    const_range_iterator range_end() const { return const_range_iterator(range_.end()); }
     const_range_iterator range_cend() const { return range_cend(); }
 
-    const_reverse_range_iterator range_rbegin() const { return const_reverse_range_iterator(rangeToDomain_.rbegin()); }
+    const_reverse_range_iterator range_rbegin() const { return const_reverse_range_iterator(range_.rbegin()); }
     const_reverse_range_iterator range_crbegin() const { return range_crbegin(); }
-    const_reverse_range_iterator range_rend() const { return const_reverse_range_iterator(rangeToDomain_.rend()); }
+    const_reverse_range_iterator range_rend() const { return const_reverse_range_iterator(range_.rend()); }
     const_reverse_range_iterator range_crend() const { return range_crend(); }
 
     // Capacity
-    bool empty() const { return domainToRange_.empty(); }
-    size_type size() const { return domainToRange_.size(); }
+    bool empty() const { return domain_.empty(); }
+    size_type size() const { return domain_.size(); }
 
     // Modifiers
     void clear()
     {
-      domainToRange_.clear();
-      rangeToDomain_.clear();
+      domain_.clear();
+      range_.clear();
     }
-    void insert(const_domain_reference d, const_range_reference r)
+    std::pair<const_iterator, bool> insert(const_domain_reference d, const_range_reference r)
     {
-      assert(findDomain(d) == cendDomain() && "Duplicate domain element!");
-      assert(findRange(r) == cendRange() && "Duplicate range element!");
-      
-      auto entry1 = typename _Associative1::value_type(d, 0);
-      auto entry2 = typename _Associative2::value_type(r, 0);
-
-      auto res1 = domainToRange_.insert(entry1);
-      auto res2 = rangeToDomain_.insert(entry2);
-
-      res1.first->second = &res2.first->first;
-      res2.first->second = &res1.first->first;
+      auto itr = domain_.find(d);
+      if ( itr == domain_.end() )
+      {
+        assert(range_.find(r) == range_.end() && "Duplicate range element!");
+        range_[r] = d;
+        return domain_.insert(std::make_pair(d, r));
+      }
+      else
+      {
+        assert(itr->second == r && "Inconsistent range element!");
+        return std::make_pair(itr, false);
+      }
     } 
     void domain_erase(const_domain_reference d)
     {
-      rangeToDomain_.erase(*assert_at(domainToRange_, d));
-      domainToRange_.erase(d);
+      assert(domain_.find(d) != domain_.end() && "Unrecognized domain element!");
+      
+      auto itr = domain_.find(d);
+      range_.erase(itr->second);
+      domain_.erase(itr);
     }
     void range_erase(const_range_reference r)
     {
-      domainToRange_.erase(*assert_at(rangeToDomain_, r));
-      rangeToDomain_.erase(r);
+      assert(range_.find(r) != range_.end() && "Unrecognized range element!");
+
+      auto itr = range_.find(r);
+      domain_.erase(itr->second);
+      range_.erase(itr);
     }
     void swap(bijection& rhs)
     {
-      domainToRange_.swap(rhs.domainToRange_);
-      rangeToDomain_.swap(rhs.rangeToDomain_);
+      domain_.swap(rhs.domain_);
+      range_.swap(rhs.domain_);
     }
 
     // Lookup
-    const_iterator domain_find(const_domain_reference d) const { return const_iterator(domainToRange_.find(d)); }
-    //const_iterator range_find(const_range_reference r) const { return const_iterator(rangeToDomain_.find(r); }
+    const_domain_iterator domain_find(const_domain_reference d) const { return const_domain_iterator(domain_.find(d)); }
+    const_range_iterator range_find(const_range_reference r) const { return const_range_iterator(range_.find(r)); }
 
-    const_range_reference domain_assert_at(const_domain_reference d) const { return *assert_at(domainToRange_, d); }
-    const_domain_reference range_assert_at(const_range_reference r) const { return *assert_at(rangeToDomain_, r); }
+    const_range_reference domain_assert_at(const_domain_reference d) const { return assert_at(domain_, d); }
+    const_domain_reference range_assert_at(const_range_reference r) const { return assert_at(range_, r); }
 
   private:
-    _Associative1 domainToRange_;
-    _Associative2 rangeToDomain_;
+    _Associative1 domain_;
+    _Associative2 range_;
+};  
+
+template <typename _Domain, typename _Range, typename _Associative1, typename _Associative2>
+struct Serializer<bijection<_Domain, _Range, _Associative1, _Associative2>>
+{
+  static void serialize(std::ostream& os, const bijection<_Domain, _Range, _Associative1, _Associative2>& b, char delim = '"')
+  {
+    Serializer<_Associative1>::serialize(os, b.domain_, delim);
+    Serializer<_Associative2>::serialize(os, b.range_, delim);
+  }
+};
+
+template <typename _Domain, typename _Range, typename _Associative1, typename _Associative2>
+struct Deserializer<bijection<_Domain, _Range, _Associative1, _Associative2>>
+{
+  static void deserialize(std::istream& is, bijection<_Domain, _Range, _Associative1, _Associative2>& b, char delim = '"')
+  {
+    Deserializer<_Associative1>::deserialize(is, b.domain_, delim);
+    Deserializer<_Associative2>::deserialize(is, b.range_, delim);
+  }
 };
 
 }

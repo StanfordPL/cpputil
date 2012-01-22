@@ -30,20 +30,26 @@ int main()
   bijection<string, int> b2 = b;
 
   // Should remove these two elements from future operations
-  b2.eraseDomain("a");
-  b2.eraseRange(7);
+  b2.domain_erase("a");
+  b2.range_erase(7);
 
   // Should print the bijection in order, and then backwards
-  for ( auto i = b2.beginDomain(), ie = b2.endDomain(); i != ie; ++i )
-    cout << i->first << " " << *(i->second) << endl;
-  for ( auto i = b2.rbeginRange(), ie = b2.rendRange(); i != ie; ++i )
-    cout << i->first << " " << *(i->second) << endl;
+  for ( auto itr : b2 )
+    cout << itr.first << " " << itr.second << endl;
+  for ( auto i = b2.rbegin(), ie = b2.rend(); i != ie; ++i )
+    cout << i->first << " " << i->second << endl;
+
+  // Should print just the domain, and then just the range
+  for ( auto i = b2.domain_begin(), ie = b2.domain_end(); i != ie; ++i )
+    cout << *i << endl;
+  for ( auto i = b2.range_begin(), ie = b2.range_end(); i != ie; ++i )
+    cout << *i << endl;
 
   // Should print abc 2
-  cout << *(b2.findRange(2)->second) << " " << *(b2.findDomain("abc")->second) << endl;
+  cout << *b2.range_find(2) << " " << *b2.domain_find("abc") << endl;
 
   // Should print abc 2
-  cout << b2.assert_atRange(2) << " " << b2.assert_atDomain("abc") << endl;  
+  cout << b2.range_assert_at(2) << " " << b2.domain_assert_at("abc") << endl;  
 
   return 0;
 }

@@ -2,121 +2,95 @@
 #define TOKENIZER_H
 
 #include <cassert>
-#include <deque>
 #include <iostream>
 #include <map>
 
-#include "maputil.h"
+#include "bijection.h"
 #include "serialize.h"
 
 namespace cpputil
 {
 
-template <typename _T, typename _Associative = std::map<_T, unsigned int>, typename _Sequence = std::deque<const _T*> >
+template <typename _T, 
+          typename _Token = unsigned int,
+          typename _Bijection = bijection<_T, _Token>>
 class tokenizer
 {
+  // Friends
+  friend class Serializer<tokenizer>;
+  friend class Deserializer<tokenizer>;
+
   public:
 
     // Member types
-    typedef          _T                               value_type;
-    typedef          const _T&                        const_reference;
-    typedef          unsigned int                     token_type;
-    typedef typename _Sequence::size_type             size_type;
-    typedef          const_key_iterator<_Associative> const_token_iterator;
-
-    // Constructors
-    tokenizer() {}
-    tokenizer(const tokenizer& rhs)
-    {
-      valToToken_ = rhs.valToToken_;
-      tokenToVal_.resize(valToToken_.size());
-      for ( typename _Associative::value_type& i : valToToken_ )
-        tokenToVal_[i.second] = &i.first;
-    }
-    tokenizer& operator=(tokenizer rhs)
-    {
-      swap(rhs);
-      return *this;
-    }
+    typedef          _T                                                   value_type;
+    typedef          const _T&                                            const_reference;
+    typedef          _Token                                               token_type;
+    typedef typename bijection<_T, _Token>::size_type                     size_type;
+    typedef typename bijection<_T, _Token>::const_iterator                const_iterator;
+    typedef typename bijection<_T, _Token>::const_reverse_iterator        const_reverse_iterator;
+    typedef typename bijection<_T, _Token>::const_domain_iterator         const_value_iterator;
+    typedef typename bijection<_T, _Token>::const_reverse_domain_iterator const_reverse_value_iterator;
+    typedef typename bijection<_T, _Token>::const_range_iterator          const_token_iterator;
+    typedef typename bijection<_T, _Token>::const_reverse_range_iterator  const_reverse_token_iterator;
 
     // Element access
     token_type tokenize(const_reference t)
     {
-      if ( valToToken_.find(t) == valToToken_.end() )
+      if ( bijection_.domain_find(t) == bijection_.domain_end() )
       {
-        auto token = size();
-        auto res = valToToken_.insert(typename _Associative::value_type(t, token));
-        tokenToVal_.emplace_back(&(res.first->first));
+        token_type token = size();
+        bijection_.insert(t, token);
 
         return token;
       }
-      return valToToken_[t];
+      return bijection_.domain_assert_at(t);
     }
-    const_reference untokenize(token_type token) const
-    {
-      assert(token < size() && "Unrecognized token!");
-      return *tokenToVal_[token];
-    }
+    const_reference untokenize(token_type token) const { return bijection_.range_assert_at(token); }
 
     // Iterators
-    const_token_iterator begin() const { return const_key_iterator<_Associative>(valToToken_.begin()); }
-    const_token_iterator cbegin() const { return const_key_iterator<_Associative>(valToToken_.begin()); }
-    const_token_iterator end() const { return const_key_iterator<_Associative>(valToToken_.end()); }
-    const_token_iterator cend() const { return const_key_iterator<_Associative>(valToToken_.end()); } 
+    const_iterator begin() const { return bijection_.begin(); }
+    const_iterator cbegin() const { return begin(); }
+    const_iterator end() const { return bijection_.end(); }
+    const_iterator cend() const { return end(); }
+
+    const_value_iterator value_begin() const { return bijection_.domain_begin(); }
+    const_value_iterator value_cbegin() const { return value_begin(); }
+    const_value_iterator value_end() const { return bijection_.domain_end(); }
+    const_value_iterator value_cend() const { return value_end(); }
+
+    const_token_iterator token_begin() const { return bijection_.range_begin(); }
+    const_token_iterator token_cbegin() const { return token_begin(); }
+    const_token_iterator token_end() const { return bijection_.range_end(); }
+    const_token_iterator token_cend() const { return token_end(); }
 
     // Capacity
-    bool empty() const { return tokenToVal_.empty(); }
-    size_type size() const { return tokenToVal_.size(); }
+    bool empty() const { return bijection_.empty(); }
+    size_type size() const { return bijection_.size(); }
 
     // Modifiers
-    void clear()
-    {
-      valToToken_.clear();
-      tokenToVal_.clear();
-    }
-    void swap(tokenizer& rhs)
-    {
-      valToToken_.swap(rhs.valToToken_);
-      tokenToVal_.swap(rhs.tokenToVal_);
-    }
+    void clear() { bijection_.clear(); }
+    void swap(tokenizer& rhs) { bijection_.swap(rhs.bijection_); }
 
   private:
-    _Associative valToToken_;
-    _Sequence tokenToVal_;
+    _Bijection bijection_;
 };
 
-// TODO: This WONT preserve token->id mappings
-
-template <typename _T>
-struct Serializer<tokenizer<_T>>
+template <typename _T, typename _Token, typename _Bijection>
+struct Serializer<tokenizer<_T, _Token, _Bijection>>
 {
-  static void serialize(std::ostream& os, const tokenizer<_T>& t, char delim = '"')
+  static void serialize(std::ostream& os, const tokenizer<_T, _Token, _Bijection>& t, char delim = '"')
   {
-    os << t.size() << " ";
-    for ( auto itr : t )
-    {
-      Serializer<_T>::serialize(os, itr, delim);
-      os << " ";
-    }
+    Serializer<_Bijection>::serialize(os, t.bijection_, delim);
   }
 };
 
-template <typename _T>
-struct Deserializer<tokenizer<_T>>
+template <typename _T, typename _Token, typename _Bijection>
+struct Deserializer<tokenizer<_T, _Token, _Bijection>>
 {
-  static void deserialize(std::istream& is, tokenizer<_T>& t, char delim = '"')
+  static void deserialize(std::istream& is, tokenizer<_T, _Token, _Bijection>& t, char delim = '"')
   {
-    t.clear();
-
-    typename tokenizer<_T>::size_type size;
-    is >> size;
-
-    _T val;
-    for ( auto i = 0; i < size; ++i )
-    {
-      Deserializer<_T>::deserialize(is, val, delim);
-      t.tokenize(val);
-    }
+    Deserializer<_Bijection>::deserialize(is, t.bijection_, delim);
   }
 };
 
