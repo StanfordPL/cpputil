@@ -10,8 +10,8 @@
 namespace cpputil
 {
 
-template <typename _CharT, typename _Traits>
-class basic_logstream : public std::basic_ostream<_CharT, _Traits>
+template <typename _Char, typename _Traits>
+class basic_logstream : public std::basic_ostream<_Char, _Traits>
 {
   public:
     enum Level
@@ -27,7 +27,7 @@ class basic_logstream : public std::basic_ostream<_CharT, _Traits>
     };
 
     basic_logstream(std::ostream& os) :
-      std::basic_ostream<_CharT, _Traits>(&fbuf_),
+      std::basic_ostream<_Char, _Traits>(&fbuf_),
       fbuf_(os.rdbuf()),
       level_(FINEST)
     {
@@ -80,7 +80,7 @@ class basic_logstream : public std::basic_ostream<_CharT, _Traits>
     }
 
   private:
-    basic_forwardingbuf<_CharT, _Traits> fbuf_;
+    basic_forwardingbuf<_Char, _Traits> fbuf_;
     Level level_;
 };
 

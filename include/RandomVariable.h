@@ -11,7 +11,8 @@
 namespace cpputil
 {
 
-template <typename _T, typename _Associative = std::map<_T, unsigned int>>
+template <typename _T, 
+          typename _Associative = std::map<_T, unsigned int>>
 class RandomVariable
 {
   // Friends

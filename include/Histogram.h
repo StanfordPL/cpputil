@@ -9,7 +9,8 @@
 namespace cpputil
 {
 
-template <typename _T, typename _Associative = std::map<_T, unsigned int>>
+template <typename _T, 
+          typename _Associative = std::map<_T, unsigned int>>
 class Histogram
 {
   // Friends
@@ -38,6 +39,7 @@ class Histogram
     const_reverse_iterator crend() const { return rend(); }
 
     // Capacity
+    bool empty() const { return histogram_.empty(); }
     size_type size() const { return histogram_.size(); }
 
     // Modifiers
