@@ -12,12 +12,12 @@ INC=-I./include
 
 test: test/bijection.o \
 		 test/forwardingstream.o \
-		 test/Histogram.o \
-		 test/Interner.o \
+		 test/histogram.o \
+		 test/interner.o \
 		 test/logstream.o \
 		 test/maputil.o \
 		 test/serialize.o \
-		 test/Singleton.o \
+		 test/singleton.o \
 		 test/Sqlite.o \
 		 test/socketstream.o \
 		 test/stringutil.o \
