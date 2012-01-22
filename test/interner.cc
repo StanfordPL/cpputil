@@ -2,14 +2,14 @@
 #include <sstream>
 #include <string>
 
-#include "Interner.h"
+#include "interner.h"
 
 using namespace cpputil;
 using namespace std;
 
 int main()
 {
-  Interner<string> i;
+  interner<string> i;
 
   string s1 = "Hello";
   string s2 = "Hello";
@@ -30,7 +30,7 @@ int main()
     cout << itr << " ";
   cout << endl;
 
-  Interner<string> i2;
+  interner<string> i2;
 
   ostringstream oss;
   serialize(oss, i);

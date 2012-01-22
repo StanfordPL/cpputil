@@ -13,11 +13,11 @@ namespace cpputil
 template <typename _T, 
           typename _Mass = unsigned int,
           typename _Associative = std::map<_T, _Mass>>
-class Histogram
+class histogram
 {
   // Friends
-  friend class Serializer<Histogram>;
-  friend class Deserializer<Histogram>;
+  friend class Serializer<histogram>;
+  friend class Deserializer<histogram>;
 
   public:
 
@@ -66,16 +66,16 @@ class Histogram
       else
         itr->second += mass;
     }
-    void swap(Histogram& rhs) { histogram_.swap(rhs.histogram_); }
-    Histogram& operator+=(const Histogram& rhs)
+    void swap(histogram& rhs) { histogram_.swap(rhs.histogram_); }
+    histogram& operator+=(const histogram& rhs)
     {
       for ( auto itr : rhs )
         insert(itr.first, itr.second);
       return *this;
     }
-    Histogram operator+(const Histogram& rhs)
+    histogram operator+(const histogram& rhs)
     {
-      Histogram h = *this;
+      histogram h = *this;
       h += rhs;
       return h;
     }
@@ -85,18 +85,18 @@ class Histogram
 };
 
 template <typename _T, typename _Mass, typename _Associative>
-struct Serializer<Histogram<_T, _Mass, _Associative>>
+struct Serializer<histogram<_T, _Mass, _Associative>>
 {
-  static void serialize(std::ostream& os, const Histogram<_T, _Mass, _Associative>& h, char delim = '"')
+  static void serialize(std::ostream& os, const histogram<_T, _Mass, _Associative>& h, char delim = '"')
   {
     Serializer<_Associative>::serialize(os, h.histogram_, delim);
   }
 };
 
 template <typename _T, typename _Mass, typename _Associative>
-struct Deserializer<Histogram<_T, _Mass, _Associative>>
+struct Deserializer<histogram<_T, _Mass, _Associative>>
 {
-  static void deserialize(std::istream& is, Histogram<_T, _Mass, _Associative>& h, char delim = '"')
+  static void deserialize(std::istream& is, histogram<_T, _Mass, _Associative>& h, char delim = '"')
   {
     Deserializer<_Associative>::deserialize(is, h.histogram_, delim);    
   }

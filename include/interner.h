@@ -11,11 +11,11 @@ namespace cpputil
 
 template <typename _T,
           typename _Set = std::set<_T>>
-class Interner
+class interner
 {
   // Friends:
-  friend class Serializer<Interner>;
-  friend class Deserializer<Interner>;
+  friend class Serializer<interner>;
+  friend class Deserializer<interner>;
 
   public:
    
@@ -50,25 +50,25 @@ class Interner
 
     // Modifiers
     void clear() { vals_.clear(); }
-    void swap(Interner& rhs) { vals_.swap(rhs.vals_); }
+    void swap(interner& rhs) { vals_.swap(rhs.vals_); }
 
   private:
     _Set vals_;
 };
 
 template <typename _T, typename _Set>
-struct Serializer<Interner<_T, _Set>>
+struct Serializer<interner<_T, _Set>>
 {
-  static void serialize(std::ostream& os, const Interner<_T, _Set>& i, char delim = ' ')
+  static void serialize(std::ostream& os, const interner<_T, _Set>& i, char delim = ' ')
   {
     Serializer<_Set>::serialize(os, i.vals_, delim);
   }
 };
 
 template <typename _T, typename _Set>
-struct Deserializer<Interner<_T, _Set>>
+struct Deserializer<interner<_T, _Set>>
 {
-  static void deserialize(std::istream& is, Interner<_T, _Set>& i, char delim = ' ')
+  static void deserialize(std::istream& is, interner<_T, _Set>& i, char delim = ' ')
   {
     Deserializer<_Set>::deserialize(is, i.vals_, delim);
   }

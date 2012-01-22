@@ -5,15 +5,15 @@ namespace cpputil
 {
 
 template <typename _T>
-struct Singleton
+struct singleton
 {
   // Member types
   typedef _T& reference;
 
   // Constructors
-  Singleton() = delete;
-  Singleton(const Singleton& s) = delete;
-  Singleton& operator=(Singleton s) = delete;
+  singleton() = delete;
+  singleton(const singleton& s) = delete;
+  singleton& operator=(singleton s) = delete;
 
   // Element access
   static reference get()
