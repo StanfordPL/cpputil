@@ -19,17 +19,23 @@ class Histogram
   public:
 
     // Member types
-    typedef          _T                           value_type;
-    typedef          const _T&                    const_reference;
-    typedef          unsigned int                 mass_type;
-    typedef typename _Associative::const_iterator const_iterator;
-    typedef typename _Associative::size_type      size_type;
+    typedef          _T                                   value_type;
+    typedef          const _T&                            const_reference;
+    typedef          unsigned int                         mass_type;
+    typedef typename _Associative::const_iterator         const_iterator;
+    typedef typename _Associative::const_reverse_iterator const_reverse_iterator;
+    typedef typename _Associative::size_type              size_type;
 
     // Iterators
     const_iterator begin() const { return histogram_.begin(); }
     const_iterator cbegin() const { return begin(); }
     const_iterator end() const { return histogram_.end(); }
     const_iterator cend() const { return end(); }
+
+    const_reverse_iterator rbegin() const { return histogram_.rbegin(); }
+    const_reverse_iterator crbegin() const { return rbegin(); }
+    const_reverse_iterator rend() const { return histogram_.rend(); }
+    const_reverse_iterator crend() const { return rend(); }
 
     // Capacity
     size_type size() const { return histogram_.size(); }

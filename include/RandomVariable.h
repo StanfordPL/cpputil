@@ -81,8 +81,6 @@ struct Deserializer<RandomVariable<_T, _Associative>>
   }
 };
 
-
-
 }
 
 #endif
