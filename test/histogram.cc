@@ -2,14 +2,14 @@
 #include <sstream>
 #include <string>
 
-#include "Histogram.h"
+#include "histogram.h"
 
 using namespace cpputil;
 using namespace std;
 
 int main()
 {
-  Histogram<string> h;
+  histogram<string> h;
   h.insert("hello", 10);
   h.insert("world", 20);
   h.insert("foo", 30);
@@ -22,7 +22,7 @@ int main()
     cout << itr.first << " " << itr.second << " ";
   cout << endl;
 
-  Histogram<string> h2 = h;
+  histogram<string> h2 = h;
 
   // Should print hello 11, world 22, foo 33, baz 44
   h2.insert("baz", 44);
@@ -37,7 +37,7 @@ int main()
     cout << itr.first << " " << itr.second << " ";
   cout << endl;
 
-  Histogram<string> h3 = h + h2;
+  histogram<string> h3 = h + h2;
 
   // Should print hello 33, world 66, foo 99, baz 88
   for ( auto itr : h3 )
@@ -48,7 +48,7 @@ int main()
   serialize(oss, h3);
   istringstream iss(oss.str());
 
-  Histogram<string> h4;
+  histogram<string> h4;
   deserialize(iss, h4);
     
   // Should print the same
