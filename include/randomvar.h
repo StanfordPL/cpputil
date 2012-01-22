@@ -1,5 +1,5 @@
-#ifndef RANDOM_VARIABLE_H
-#define RANDOM_VARIABLE_H
+#ifndef RANDOMVAR_H
+#define RANDOMVAR_H
 
 #include <cassert>
 #include <cstdlib>
@@ -13,11 +13,11 @@ namespace cpputil
 
 template <typename _T, 
           typename _Histogram = Histogram<_T>>
-class RandomVariable
+class randomvar
 {
   // Friends
-  friend class Serializer<RandomVariable>;
-  friend class Deserializer<RandomVariable>;
+  friend class Serializer<randomvar>;
+  friend class Deserializer<randomvar>;
 
   public:
 
@@ -27,7 +27,7 @@ class RandomVariable
     typedef typename _Histogram::mass_type       mass_type;
 
     // Constructors
-    RandomVariable() : mass_(0) {}
+    randomvar() : mass_(0) {}
 
     // Element access
     const_reference sample() const
@@ -56,7 +56,7 @@ class RandomVariable
       mass_ += mass;
       vals_.insert(val, mass);
     }
-    void swap(RandomVariable& rhs)
+    void swap(randomvar& rhs)
     {
       swap(mass_, rhs.mass);
       vals_.swap(rhs.vals_);
@@ -68,21 +68,21 @@ class RandomVariable
 };
 
 template <typename _T, typename _Histogram>
-struct Serializer<RandomVariable<_T, _Histogram>>
+struct Serializer<randomvar<_T, _Histogram>>
 {
-  static void serialize(std::ostream& os, const RandomVariable<_T, _Histogram>& rv, char delim = '"')
+  static void serialize(std::ostream& os, const randomvar<_T, _Histogram>& rv, char delim = '"')
   {
-    Serializer<RandomVariable<_T, _Histogram>::mass_type>::serialize(os, rv.mass_, delim);
+    Serializer<randomvar<_T, _Histogram>::mass_type>::serialize(os, rv.mass_, delim);
     Serializer<Histogram_>::serialize(os, rv.vals_, delim);
   }
 };
 
 template <typename _T, typename _Histogram>
-struct Deserializer<RandomVariable<_T, _Histogram>>
+struct Deserializer<randomvar<_T, _Histogram>>
 {
-  static void deserialize(std::istream& is, RandomVariable<_T, _Histogram>& rv, char delim = '"')
+  static void deserialize(std::istream& is, randomvar<_T, _Histogram>& rv, char delim = '"')
   {
-    Deserializer<typename RandomVariable<_T, _Histogram>::mass_type>::deserialize(is, rv.mass_, delim);
+    Deserializer<typename randomvar<_T, _Histogram>::mass_type>::deserialize(is, rv.mass_, delim);
     Deserializer<Histogram_>::deserialize(is, rv.vals_, delim);
   }
 };
