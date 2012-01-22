@@ -12,6 +12,7 @@ INC=-I./include
 
 test: test/forwardingstream.o \
 		 test/Histogram.o \
+		 test/Interner.o \
 		 test/logstream.o \
 		 test/maputil.o \
 		 test/serialize.o \
