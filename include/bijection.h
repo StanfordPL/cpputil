@@ -131,7 +131,6 @@ struct Serializer<bijection<_Domain, _Range, _Associative1, _Associative2>>
   static void serialize(std::ostream& os, const bijection<_Domain, _Range, _Associative1, _Associative2>& b, char delim = '"')
   {
     Serializer<_Associative1>::serialize(os, b.domain_, delim);
-    Serializer<_Associative2>::serialize(os, b.range_, delim);
   }
 };
 
@@ -141,7 +140,10 @@ struct Deserializer<bijection<_Domain, _Range, _Associative1, _Associative2>>
   static void deserialize(std::istream& is, bijection<_Domain, _Range, _Associative1, _Associative2>& b, char delim = '"')
   {
     Deserializer<_Associative1>::deserialize(is, b.domain_, delim);
-    Deserializer<_Associative2>::deserialize(is, b.range_, delim);
+
+    b.range_.clear();
+    for ( auto itr : b.domain_ )
+      b.range_[itr.second] = itr.first;
   }
 };
 
