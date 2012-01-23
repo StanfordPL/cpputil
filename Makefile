@@ -7,7 +7,7 @@ doc: doxyfile
 	doxygen doxyfile
 
 CXX=g++
-OPT=-std=c++0x
+OPT=-Wall -std=c++0x
 INC=-I./include
 
 test: test/bijection.o \

@@ -58,19 +58,28 @@ struct Serializer<std::list<_T>>
   }
 };
 
-template <typename _Key, typename _Val>
-struct Serializer<std::map<_Key, _Val>>
+template <typename _T1, typename _T2>
+struct Serializer<std::map<_T1, _T2>>
 {
-  static void serialize(std::ostream& os, const std::map<_Key, _Val>& m, char delim = '"')
+  static void serialize(std::ostream& os, const std::map<_T1, _T2>& m, char delim = '"')
   {
     os << m.size() << " ";
     for ( auto p : m )
     {
-      Serializer<_Key>::serialize(os, p.first, delim);
-      os << " ";
-      Serializer<_Val>::serialize(os, p.second, delim);
+      Serializer<typename std::map<_T1, _T2>::value_type>::serialize(os, p, delim);
       os << " ";
     }
+  }
+};
+
+template <typename _T1, typename _T2>
+struct Serializer<std::pair<_T1, _T2>>
+{
+  static void serialize(std::ostream& os, const std::pair<_T1, _T2>& p, char delim = '"')
+  {
+    Serializer<_T1>::serialize(os, p.first, delim);
+    os << " ";
+    Serializer<_T2>::serialize(os, p.second, delim);
   }
 };
 
@@ -138,7 +147,7 @@ struct Deserializer<std::deque<_T>>
     is >> size;
 
     _T t;
-    for ( auto i = 0; i < size; ++i )
+    for ( typename std::deque<_T>::size_type i = 0; i < size; ++i )
     {
       Deserializer<_T>::deserialize(is, t, delim);
       ts.emplace_back(t);
@@ -157,7 +166,7 @@ struct Deserializer<std::list<_T>>
     is >> size;
 
     _T t;
-    for ( auto i = 0; i < size; ++i )
+    for ( typename std::list<_T>::size_type i = 0; i < size; ++i )
     {
       Deserializer<_T>::deserialize(is, t, delim);
       ts.emplace_back(t);
@@ -165,24 +174,35 @@ struct Deserializer<std::list<_T>>
   }
 };
 
-template <typename _Key, typename _Val>
-struct Deserializer<std::map<_Key, _Val>>
+template <typename _T1, typename _T2>
+struct Deserializer<std::map<_T1, _T2>>
 {
-  static void deserialize(std::istream& is, std::map<_Key, _Val>& m, char delim = '"')
+  static void deserialize(std::istream& is, std::map<_T1, _T2>& m, char delim = '"')
   {
     m.clear();
 
-    typename std::map<_Key, _Val>::size_type size;
+    typename std::map<_T1, _T2>::size_type size;
     is >> size;
 
-    _Key key;
-    _Val val;
-    for ( auto i = 0; i < size; ++i )
+    // NOTE: We can't use std::map<_T1, _T2>::value_type here:
+    //       value_type = std::pair<const _T1, _T2>.
+
+    std::pair<_T1, _T2> p;
+    for ( typename std::map<_T1, _T2>::size_type i = 0; i < size; ++i )
     {
-      Deserializer<_Key>::deserialize(is, key, delim);
-      Deserializer<_Val>::deserialize(is, val, delim);
-      m[key] = val;
+      Deserializer<std::pair<_T1, _T2>>::deserialize(is, p, delim);
+      m.insert(p);
     }
+  }
+};
+
+template <typename _T1, typename _T2>
+struct Deserializer<std::pair<_T1, _T2>>
+{
+  static void deserialize(std::istream& is, std::pair<_T1, _T2>& p, char delim = '"')
+  {
+    Deserializer<_T1>::deserialize(is, p.first, delim);
+    Deserializer<_T2>::deserialize(is, p.second, delim);
   }
 };
 
@@ -197,7 +217,7 @@ struct Deserializer<std::set<_T>>
     is >> size;
 
     _T t;
-    for ( auto i = 0; i < size; ++i )
+    for ( typename std::set<_T>::size_type i = 0; i < size; ++i )
     {
       Deserializer<_T>::deserialize(is, t, delim);
       ts.insert(t);
@@ -217,7 +237,7 @@ struct Deserializer<std::vector<_T>>
     ts.reserve(size);
 
     _T t;
-    for ( auto i = 0; i < size; ++i )
+    for ( typename std::vector<_T>::size_type i = 0; i < size; ++i )
     {
       Deserializer<_T>::deserialize(is, t, delim);
       ts.emplace_back(t);
