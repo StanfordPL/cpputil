@@ -14,6 +14,7 @@ test: test/bijection.o \
 		 test/forwardingstream.o \
 		 test/histogram.o \
 		 test/interner.o \
+		 test/json.o \
 		 test/logstream.o \
 		 test/maputil.o \
 		 test/serialize.o \

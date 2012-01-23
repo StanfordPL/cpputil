@@ -66,7 +66,7 @@ struct Serializer<std::map<_T1, _T2>>
     os << m.size() << " ";
     for ( auto p : m )
     {
-      Serializer<typename std::map<_T1, _T2>::value_type>::serialize(os, p, delim);
+      Serializer<std::pair<_T1, _T2>>::serialize(os, p, delim);
       os << " ";
     }
   }
@@ -183,9 +183,6 @@ struct Deserializer<std::map<_T1, _T2>>
 
     typename std::map<_T1, _T2>::size_type size;
     is >> size;
-
-    // NOTE: We can't use std::map<_T1, _T2>::value_type here:
-    //       value_type = std::pair<const _T1, _T2>.
 
     std::pair<_T1, _T2> p;
     for ( typename std::map<_T1, _T2>::size_type i = 0; i < size; ++i )
