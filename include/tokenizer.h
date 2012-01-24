@@ -23,16 +23,16 @@ class tokenizer
   public:
 
     // Member types
-    typedef          _T                                                   value_type;
-    typedef          const _T&                                            const_reference;
-    typedef          _Token                                               token_type;
-    typedef typename bijection<_T, _Token>::size_type                     size_type;
-    typedef typename bijection<_T, _Token>::const_iterator                const_iterator;
-    typedef typename bijection<_T, _Token>::const_reverse_iterator        const_reverse_iterator;
-    typedef typename bijection<_T, _Token>::const_domain_iterator         const_value_iterator;
-    typedef typename bijection<_T, _Token>::const_reverse_domain_iterator const_reverse_value_iterator;
-    typedef typename bijection<_T, _Token>::const_range_iterator          const_token_iterator;
-    typedef typename bijection<_T, _Token>::const_reverse_range_iterator  const_reverse_token_iterator;
+    typedef          _T                                        value_type;
+    typedef          const _T&                                 const_reference;
+    typedef          _Token                                    token_type;
+    typedef typename _Bijection::size_type                     size_type;
+    typedef typename _Bijection::const_iterator                const_iterator;
+    typedef typename _Bijection::const_reverse_iterator        const_reverse_iterator;
+    typedef typename _Bijection::const_domain_iterator         const_value_iterator;
+    typedef typename _Bijection::const_reverse_domain_iterator const_reverse_value_iterator;
+    typedef typename _Bijection::const_range_iterator          const_token_iterator;
+    typedef typename _Bijection::const_reverse_range_iterator  const_reverse_token_iterator;
 
     // Element access
     token_type tokenize(const_reference t)
