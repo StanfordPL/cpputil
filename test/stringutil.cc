@@ -35,5 +35,8 @@ int main()
 
   cout << "[" << unsplit(ls2.begin(), ls2.end(), '#') << "]" << endl;
 
+  string file = readfile("stringutil.cc");
+  cout << file << endl;
+
   return 0;
 }

@@ -1,6 +1,7 @@
 #ifndef STRING_UTIL_H
 #define STRING_UTIL_H
 
+#include <fstream>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -80,6 +81,17 @@ inline std::string itoa(int x)
 inline std::string utoa(unsigned int x)
 {
   return ttoa(x);
+}
+
+inline std::string readfile(const char* file)
+{
+  std::ifstream ifs(file);
+  if ( ! ifs.is_open() )
+    return "";
+
+  std::stringstream ss;
+  ss << ifs.rdbuf();
+  return ss.str();
 }
 
 }
