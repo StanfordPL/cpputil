@@ -10,7 +10,8 @@ CXX=g++
 OPT=-Wall -std=c++0x
 INC=-I./include
 
-test: test/bijection.o \
+test: test/architecture.o \
+		 test/bijection.o \
 		 test/forwardingstream.o \
 		 test/histogram.o \
 		 test/interner.o \
