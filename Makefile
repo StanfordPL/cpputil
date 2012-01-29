@@ -20,6 +20,7 @@ test: test/architecture.o \
 		 test/logstream.o \
 		 test/maputil.o \
 		 test/serialize.o \
+		 test/serialstream.o \
 		 test/singleton.o \
 		 test/Sqlite.o \
 		 test/socketstream.o \
