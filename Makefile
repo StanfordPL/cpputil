@@ -7,11 +7,12 @@ doc: doxyfile
 	doxygen doxyfile
 
 CXX=g++
-OPT=-Wall -std=c++0x
+OPT=-g -Wall -std=c++0x
 INC=-I./include
 
 test: test/architecture.o \
 		 test/bijection.o \
+		 test/delegatestream.o \
 		 test/forwardingstream.o \
 		 test/histogram.o \
 		 test/interner.o \
