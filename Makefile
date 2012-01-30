@@ -1,5 +1,4 @@
-OBJ=test/architecture.o \
-		test/bijection.o \
+OBJ=test/bijection.o \
 		test/histogram.o \
 		test/interner.o \
 		test/json.o \
@@ -10,6 +9,7 @@ OBJ=test/architecture.o \
 		test/socketstream.o \
 		test/stringutil.o \
 		test/tokenizer.o \
+		test/system/architecture.o \
 		test/stream/delegatestream.o \
 		test/stream/indentstream.o \
 		test/stream/logstream.o \
