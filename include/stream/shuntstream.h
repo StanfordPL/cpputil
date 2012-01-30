@@ -2,7 +2,7 @@
 #define CPPUTIL_STREAM_SHUNTSTREAM
 
 /// @file shuntstream.h
-/// @brief Templated basic_delegatebuf's and basic_iostream's that can selectively ignore output characters.
+/// @brief Templated basic_delegatebuf's and basic_ostream's that can selectively ignore output characters.
 
 #include "stream/delegatestream.h"
 

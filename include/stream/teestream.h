@@ -2,7 +2,7 @@
 #define CPPUTIL_STREAM_TEESTREAM
 
 /// @file teestream.h
-/// @brief Templated basic_delegatebuf's and basic_iostream's that copy their inputs to a second basic_delegatebuf.
+/// @brief Templated basic_delegatebuf's and basic_ostream's that copy their inputs to a second basic_delegatebuf.
 
 #include "stream/delegatestream.h"
 

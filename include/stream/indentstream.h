@@ -2,7 +2,7 @@
 #define CPPUTIL_STREAM_INDENT_STREAM_H
 
 /// @file indentstream.h
-/// @brief Templated basic_delegatebuf's and basic_iostream's that implement indent on carriage return.
+/// @brief Templated basic_delegatebuf's and basic_ostream's that implement indent on carriage return.
 
 #include <stddef.h>
 #include <stdexcept>

@@ -12,6 +12,7 @@ OBJ=test/architecture.o \
 		test/tokenizer.o \
 		test/stream/delegatestream.o \
 		test/stream/indentstream.o \
+		test/stream/logstream.o \
 		test/stream/shuntstream.o \
 		test/stream/teestream.o 
 
