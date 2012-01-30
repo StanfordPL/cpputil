@@ -1,5 +1,14 @@
-#ifndef ARCHITECTURE_H
-#define ARCHITECTURE_H
+#ifndef CPPUTIL_SYSTEM_ARCHITECTURE_H
+#define CPPUTIL_SYSTEM_ARCHITECTURE_H
+
+/// @file architecture.h
+/// @brief Defines macros for testing architecture properties.
+
+/// @def IS_32_BIT
+/// @brief Defined iff the architecture is 32-bit.
+
+/// @def IS_64_BIT
+/// @brief Defined iff the architecture is 64-bit.
 
 // Windows
 #if _WIN32 || _WIN64
