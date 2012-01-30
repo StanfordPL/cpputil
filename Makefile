@@ -7,7 +7,6 @@ OBJ=test/architecture.o \
 		test/logstream.o \
 		test/maputil.o \
 		test/serialize.o \
-		test/serialstream.o \
 		test/singleton.o \
 		test/Sqlite.o \
 		test/socketstream.o \
@@ -15,7 +14,8 @@ OBJ=test/architecture.o \
 		test/teestream.o \
 		test/tokenizer.o \
 		test/stream/delegatestream.o \
-		test/stream/indentstream.o 
+		test/stream/indentstream.o \
+		test/stream/shuntstream.o
 
 CXX=g++
 OPT=-g -Wall -std=c++0x
@@ -30,7 +30,7 @@ doc: doxyfile
 test/Sqlite.o: test/Sqlite.cc
 	$(CXX) $(OPT) $(INC) $< -o $@ -lsqlite3
 
-all: doc obj
+all: doc $(OBJ)
 
 clean:
 	rm -rf $(OBJ) documentation

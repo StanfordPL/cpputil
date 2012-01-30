@@ -82,9 +82,10 @@ class basic_indentbuf : public basic_delegatebuf<Char, Traits>
 
   protected:
 
-    /// @brief Invokes overflow on the delegate basic_streambuf and inserts spaces prior to the first character of a new line.
+    /// @brief Inserts spaces prior to the first character of a new line.
     ///
-    /// Control will abort on the first unsuccessful delegated call to overflow.
+    /// The responsibility of inserting those spaces, along with the input character, is delegated to the underlying basic_streambuf.
+    /// Control aborts on the first unsuccessful delegated call to overflow.
     ///
     /// @return the result of the final invocation of overflow, or eof on error.
     virtual int_type overflow(int_type c = traits_type::eof())
@@ -124,12 +125,9 @@ class basic_oindentstream : public std::basic_ostream<Char, Traits>
 
     /// @cond DELETED_METHODS
     basic_oindentstream() = delete;
+    basic_oindentstream(basic_oindentstream&& rhs) = delete;
+    basic_oindentstream& operator=(const basic_oindentstream& rhs) = delete;
     /// @endcond
-
-    /// @brief The default move constructor provided by the compiler.
-    basic_oindentstream(basic_oindentstream&& rhs) = default;
-    /// @brief The default assignment operator provided by the compiler.
-    basic_oindentstream& operator=(const basic_oindentstream& rhs) = default;
 
     /// @brief Constructs a basic_oindentstream from a basic_ostream.
     basic_oindentstream(std::basic_ostream<Char, Traits>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
@@ -164,14 +162,9 @@ class basic_indentstream : public std::basic_iostream<Char, Traits>
 
     /// @cond DELETED_METHODS
     basic_indentstream() = delete;
+    basic_indentstream(basic_indentstream&& rhs) = delete;
+    basic_indentstream& operator=(const basic_indentstream& rhs) = delete;
     /// @endcond
-
-    /// @brief The default copy constructor provided by the compiler.
-    basic_indentstream(const basic_indentstream& rhs) = default;
-    /// @brief The default move constructor provided by the compiler.
-    basic_indentstream(basic_indentstream&& rhs) = default;
-    /// @brief The default assignment operator provided by the compiler.
-    basic_indentstream& operator=(const basic_indentstream& rhs) = default;
 
     /// @brief Constructs a basic_indentstream from a basic_iostream.
     basic_indentstream(std::basic_iostream<Char, Traits>& ios /**< A basic_iostream from which to co-opt a basic_streambuf to delegate to. */
