@@ -18,7 +18,7 @@ class basic_shuntbuf : public basic_delegatebuf<Char, Traits>
     typedef typename basic_delegatebuf<Char, Traits>::char_type   char_type;   ///< Redefinition of the underlying char_type.
     typedef typename basic_delegatebuf<Char, Traits>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
     typedef typename basic_delegatebuf<Char, Traits>::int_type    int_type;    ///< Redefinition of the underlying int_type.
-    typedef typename basic_delegatebuf<Char, Traits>::pos_type    pos_type;    ///< Redefinition of the underlying indent_type.
+    typedef typename basic_delegatebuf<Char, Traits>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
     typedef typename basic_delegatebuf<Char, Traits>::off_type    off_type;    ///< Redefinition of the underlying off_type.
 
     /// @cond DELETED_METHODS
@@ -34,7 +34,7 @@ class basic_shuntbuf : public basic_delegatebuf<Char, Traits>
 
     /// @brief Constructs a basic_delegatebuf from a basic_streambuf.
     basic_shuntbuf(std::basic_streambuf<Char, Traits>* buf /**< [in,out] The streambuf to which methods are delegated; must outlast the lifetime of this object. */
-                   ) : 
+                  ) : 
       basic_delegatebuf<Char, Traits>(buf),
       open_(true)
     {
@@ -55,7 +55,7 @@ class basic_shuntbuf : public basic_delegatebuf<Char, Traits>
 
   protected:
 
-    /// @brief Passes characters to the underlying basic_streambuf iff the shunt is open.
+    /// @brief Passes the input character to the underlying basic_streambuf iff the shunt is open.
     ///
     /// @return the input character if the shunt is closed, or the result of the delegated invocation of overflow.
     virtual int_type overflow(int_type c = traits_type::eof())
@@ -83,12 +83,12 @@ class basic_oshuntstream : public std::basic_ostream<Char, Traits>
 
     /// @brief Constructs a basic_oshuntstream from a basic_ostream.
     basic_oshuntstream(std::basic_ostream<Char, Traits>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
-                    ) :
+                      ) :
       std::basic_ostream<Char, Traits>(&buf_),
       buf_(os.rdbuf()) 
-      {
-        // Does nothing.
-      }
+    {
+      // Does nothing.
+    }
 
     /// @brief Returns a pointer to the underlying basic_shuntbuf.
     /// @return the underlying basic_shuntbuf
@@ -104,43 +104,6 @@ class basic_oshuntstream : public std::basic_ostream<Char, Traits>
 
 typedef basic_oshuntstream<char, std::char_traits<char>> oshuntstream;        ///< Convenience typedef for chars.
 typedef basic_oshuntstream<wchar_t, std::char_traits<wchar_t>> woshuntstream; ///< Convenience typedef for wide chars.
-
-/// @brief A basic_iostream backed by a basic_shuntbuf.
-/// @sa http://www.cplusplus.com/reference/iostream
-template <typename Char, typename Traits>
-class basic_shuntstream : public std::basic_iostream<Char, Traits>
-{
-  public:
-
-    /// @cond DELETED_METHODS
-    basic_shuntstream() = delete;
-    basic_shuntstream(basic_shuntstream&& rhs) = delete;
-    basic_shuntstream& operator=(const basic_shuntstream& rhs) = delete;
-    /// @endcond
-
-    /// @brief Constructs a basic_shuntstream from a basic_iostream.
-    basic_shuntstream(std::basic_iostream<Char, Traits>& ios /**< A basic_iostream from which to co-opt a basic_streambuf to delegate to. */
-                      ) :
-      std::basic_iostream<Char, Traits>(&buf_),
-      buf_(ios.rdbuf()) 
-      {
-        // Does nothing.
-      }
-
-    /// @brief Returns a pointer to the underlying basic_shuntbuf.
-    /// @return the underlying basic_shuntbuf
-    basic_shuntbuf<Char, Traits>* buf() const
-    {
-      return &buf_;
-    }
-
-  private:
-
-    basic_shuntbuf<Char, Traits> buf_; /**< The default implementation of iostream will redirect all read/write methods to this object. */
-};
-
-typedef basic_shuntstream<char, std::char_traits<char>> shuntstream;        ///< Convenience typedef for chars.
-typedef basic_shuntstream<wchar_t, std::char_traits<wchar_t>> wshuntstream; ///< Convenience typedef for wide chars.
 
 }
 

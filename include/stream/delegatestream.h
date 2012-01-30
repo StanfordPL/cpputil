@@ -147,9 +147,9 @@ class basic_idelegatestream : public std::basic_istream<Char, Traits>
                          ) :
       std::basic_istream<Char, Traits>(&buf_),
       buf_(is.rdbuf()) 
-  {
-    // Does nothing.
-  }
+    {
+      // Does nothing.
+    }
 
   private:
 
@@ -178,9 +178,9 @@ class basic_odelegatestream : public std::basic_ostream<Char, Traits>
                          ) :
       std::basic_ostream<Char, Traits>(&buf_),
       buf_(os.rdbuf()) 
-      {
-        // Does nothing.
-      }
+    {
+      // Does nothing.
+    }
 
   private:
 
@@ -209,9 +209,9 @@ class basic_delegatestream : public std::basic_iostream<Char, Traits>
                         ) :
       std::basic_iostream<Char, Traits>(&buf_),
       buf_(ios.rdbuf()) 
-      {
-        // Does nothing.
-      }
+    {
+      // Does nothing.
+    }
 
   private:
 

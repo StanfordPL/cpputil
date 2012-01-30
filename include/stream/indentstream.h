@@ -21,10 +21,10 @@ class basic_indentbuf : public basic_delegatebuf<Char, Traits>
     typedef typename basic_delegatebuf<Char, Traits>::char_type   char_type;   ///< Redefinition of the underlying char_type.
     typedef typename basic_delegatebuf<Char, Traits>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
     typedef typename basic_delegatebuf<Char, Traits>::int_type    int_type;    ///< Redefinition of the underlying int_type.
-    typedef typename basic_delegatebuf<Char, Traits>::pos_type    pos_type;    ///< Redefinition of the underlying indent_type.
+    typedef typename basic_delegatebuf<Char, Traits>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
     typedef typename basic_delegatebuf<Char, Traits>::off_type    off_type;    ///< Redefinition of the underlying off_type.
 
-    typedef          size_t                                       size_type;   ///< Tabstop and indent counting type.
+    typedef size_t size_type; ///< Tabstop and indent counting type.
 
     /// @cond DELETED_METHODS
     basic_indentbuf() = delete;
@@ -134,9 +134,9 @@ class basic_oindentstream : public std::basic_ostream<Char, Traits>
                     ) :
       std::basic_ostream<Char, Traits>(&buf_),
       buf_(os.rdbuf()) 
-      {
-        // Does nothing.
-      }
+    {
+      // Does nothing.
+    }
 
     /// @brief Returns a pointer to the underlying basic_indentbuf.
     /// @return the underlying basic_indentbuf
@@ -152,43 +152,6 @@ class basic_oindentstream : public std::basic_ostream<Char, Traits>
 
 typedef basic_oindentstream<char, std::char_traits<char>> oindentstream;        ///< Convenience typedef for chars.
 typedef basic_oindentstream<wchar_t, std::char_traits<wchar_t>> woindentstream; ///< Convenience typedef for wide chars.
-
-/// @brief A basic_iostream backed by a basic_indentbuf.
-/// @sa http://www.cplusplus.com/reference/iostream
-template <typename Char, typename Traits>
-class basic_indentstream : public std::basic_iostream<Char, Traits>
-{
-  public:
-
-    /// @cond DELETED_METHODS
-    basic_indentstream() = delete;
-    basic_indentstream(basic_indentstream&& rhs) = delete;
-    basic_indentstream& operator=(const basic_indentstream& rhs) = delete;
-    /// @endcond
-
-    /// @brief Constructs a basic_indentstream from a basic_iostream.
-    basic_indentstream(std::basic_iostream<Char, Traits>& ios /**< A basic_iostream from which to co-opt a basic_streambuf to delegate to. */
-                      ) :
-      std::basic_iostream<Char, Traits>(&buf_),
-      buf_(ios.rdbuf()) 
-      {
-        // Does nothing.
-      }
-
-    /// @brief Returns a pointer to the underlying basic_indentbuf.
-    /// @return the underlying basic_indentbuf
-    basic_indentbuf<Char, Traits>* buf() const
-    {
-      return &buf_;
-    }
-
-  private:
-
-    basic_indentbuf<Char, Traits> buf_; /**< The default implementation of iostream will redirect all read/write methods to this object. */
-};
-
-typedef basic_indentstream<char, std::char_traits<char>> indentstream;        ///< Convenience typedef for chars.
-typedef basic_indentstream<wchar_t, std::char_traits<wchar_t>> windentstream; ///< Convenience typedef for wide chars.
 
 }
 
