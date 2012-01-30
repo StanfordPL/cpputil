@@ -1,8 +1,8 @@
 #ifndef CPPUTIL_STREAM_LOGSTREAM
 #define CPPUTIL_STREAM_LOGSTREAM
 
-/// @file log.h
-/// @brief Templated basic_delegatebuf's and basic_iostream's that can selectively ignore output characters.
+/// @file logstream.h
+/// @brief A templated basic_ostream for filtering log messages based on severity level.
 
 #include <array>
 #include <stdexcept>
