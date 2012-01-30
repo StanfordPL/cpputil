@@ -1,6 +1,5 @@
 OBJ=test/architecture.o \
 		test/bijection.o \
-		test/forwardingstream.o \
 		test/histogram.o \
 		test/interner.o \
 		test/json.o \
