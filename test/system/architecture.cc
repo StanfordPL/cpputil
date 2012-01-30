@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "architecture.h"
+#include "system/architecture.h"
 
 using namespace std;
 
