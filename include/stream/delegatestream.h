@@ -1,8 +1,11 @@
-#ifndef DELEGATE_STREAM_H
-#define DELEGATE_STREAM_H
+#ifndef CPPUTIL_STREAM_DELEGATESTREAM_H
+#define CPPUTIL_STREAM_DELEGATESTREAM_H
 
 /// @file delegatestream.h
 /// @brief Templated basic_streambuf's and basic_iostream's that delegate read/write requests to existing basic_streambuf's.
+///
+/// The following references were extremely helpful in writing this header:
+///  - @link http://wordaligned.org/articles/cpp-streambufs
 
 #include <iostream>
 #include <streambuf>
@@ -40,8 +43,6 @@ class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
     basic_delegatebuf(basic_delegatebuf&& rhs) = default;
     /// @brief The default assignment operator provided by the compiler.
     basic_delegatebuf& operator=(const basic_delegatebuf& rhs) = default;
-    /// @brief The default destructor provided by the compiler.
-    ~basic_delegatebuf() = default;
 
     /// @brief Constructs a basic_delegatebuf from a basic_streambuf.
     basic_delegatebuf(std::basic_streambuf<Char, Traits>* buf /**< [in,out] The streambuf to which methods are delegated; must outlast the lifetime of this object. */
@@ -97,7 +98,7 @@ class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
     {
       const auto eof = Traits::eof();
 
-      if ( Traits::eq_int_type(c, eof) )
+      if ( traits_type::eq_int_type(c, eof) )
         return Traits::not_eof(c);
 
       const auto ch = traits_type::to_char_type(c);
@@ -127,7 +128,7 @@ class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
     std::basic_streambuf<Char, Traits>* buf_; /**< The basic_streambuf to which methods are delegated. */
 };
 
-/// @brief A basic_istream backed by a basic_delegatestreambuf.
+/// @brief A basic_istream backed by a basic_delegatebuf.
 /// @sa http://www.cplusplus.com/reference/istream
 template <typename Char, typename Traits>
 class basic_idelegatestream : public std::basic_istream<Char, Traits>
@@ -136,16 +137,10 @@ class basic_idelegatestream : public std::basic_istream<Char, Traits>
 
     /// @cond DELETED_METHODS
     basic_idelegatestream() = delete;
+    basic_idelegatestream(const basic_idelegatestream& rhs) = delete;
+    basic_idelegatestream(basic_idelegatestream&& rhs) = delete;
+    basic_idelegatestream& operator=(const basic_idelegatestream& rhs) = delete;
     /// @endcond
-
-    /// @brief The default copy constructor provided by the compiler.
-    basic_idelegatestream(const basic_idelegatestream& rhs) = default;
-    /// @brief The default move constructor provided by the compiler.
-    basic_idelegatestream(basic_idelegatestream&& rhs) = default;
-    /// @brief The default assignment operator provided by the compiler.
-    basic_idelegatestream& operator=(const basic_idelegatestream& rhs) = default;
-    /// @brief The default destructor provided by the compiler.
-    ~basic_idelegatestream() = default;
 
     /// @brief Constructs a basic_idelegatestream from a basic_istream.
     basic_idelegatestream(std::basic_istream<Char, Traits>& is /**< A basic_istream from which to co-opt a basic_streambuf to delegate to. */
@@ -158,13 +153,13 @@ class basic_idelegatestream : public std::basic_istream<Char, Traits>
 
   private:
 
-    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of istream will redirect all read methods to this streambuf. */
+    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of istream will redirect all read methods to this object. */
 };
 
 typedef basic_idelegatestream<char, std::char_traits<char>> idelegatestream;        ///< Convenience typedef for chars.
 typedef basic_idelegatestream<wchar_t, std::char_traits<wchar_t>> widelegatestream; ///< Convenience typedef for wide chars.
 
-/// @brief A basic_ostream backed by a basic_delegatestreambuf.
+/// @brief A basic_ostream backed by a basic_delegatebuf.
 /// @sa http://www.cplusplus.com/reference/ostream
 template <typename Char, typename Traits>
 class basic_odelegatestream : public std::basic_ostream<Char, Traits>
@@ -173,16 +168,10 @@ class basic_odelegatestream : public std::basic_ostream<Char, Traits>
 
     /// @cond DELETED_METHODS
     basic_odelegatestream() = delete;
+    basic_odelegatestream(const basic_odelegatestream& rhs) = delete;
+    basic_odelegatestream(basic_odelegatestream&& rhs) = delete;
+    basic_odelegatestream& operator=(const basic_odelegatestream& rhs) = delete;
     /// @endcond
-
-    /// @brief The default copy constructor provided by the compiler.
-    basic_odelegatestream(const basic_idelegatestream& rhs) = default;
-    /// @brief The default move constructor provided by the compiler.
-    basic_odelegatestream(basic_idelegatestream&& rhs) = default;
-    /// @brief The default assignment operator provided by the compiler.
-    basic_odelegatestream& operator=(const basic_idelegatestream& rhs) = default;
-    /// @brief The default destructor provided by the compiler.
-    ~basic_odelegatestream() = default;
 
     /// @brief Constructs a basic_odelegatestream from a basic_ostream.
     basic_odelegatestream(std::basic_ostream<Char, Traits>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
@@ -195,13 +184,13 @@ class basic_odelegatestream : public std::basic_ostream<Char, Traits>
 
   private:
 
-    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of ostream will redirect all write methods to this streambuf. */
+    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
 };
 
 typedef basic_odelegatestream<char, std::char_traits<char>> odelegatestream;        ///< Convenience typedef for chars.
 typedef basic_odelegatestream<wchar_t, std::char_traits<wchar_t>> wodelegatestream; ///< Convenience typedef for wide chars.
 
-/// @brief A basic_iostream backed by a basic_delegatestreambuf.
+/// @brief A basic_iostream backed by a basic_delegatebuf.
 /// @sa http://www.cplusplus.com/reference/iostream
 template <typename Char, typename Traits>
 class basic_delegatestream : public std::basic_iostream<Char, Traits>
@@ -210,16 +199,10 @@ class basic_delegatestream : public std::basic_iostream<Char, Traits>
 
     /// @cond DELETED_METHODS
     basic_delegatestream() = delete;
+    basic_delegatestream(const basic_delegatestream& rhs) = delete;
+    basic_delegatestream(basic_delegatestream&& rhs) = delete;
+    basic_delegatestream& operator=(const basic_delegatestream& rhs) = delete;
     /// @endcond
-
-    /// @brief The default copy constructor provided by the compiler.
-    basic_delegatestream(const basic_idelegatestream& rhs) = default;
-    /// @brief The default move constructor provided by the compiler.
-    basic_delegatestream(basic_idelegatestream&& rhs) = default;
-    /// @brief The default assignment operator provided by the compiler.
-    basic_delegatestream& operator=(const basic_idelegatestream& rhs) = default;
-    /// @brief The default destructor provided by the compiler.
-    ~basic_delegatestream() = default;
 
     /// @brief Constructs a basic_delegatestream from a basic_iostream.
     basic_delegatestream(std::basic_iostream<Char, Traits>& ios /**< A basic_iostream from which to co-opt a basic_streambuf to delegate to. */
@@ -232,7 +215,7 @@ class basic_delegatestream : public std::basic_iostream<Char, Traits>
 
   private:
 
-    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of iostream will redirect all read/write methods to this streambuf. */
+    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of iostream will redirect all read/write methods to this object. */
 };
 
 typedef basic_delegatestream<char, std::char_traits<char>> delegatestream;        ///< Convenience typedef for chars.
