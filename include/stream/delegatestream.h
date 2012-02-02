@@ -22,16 +22,16 @@ namespace cpputil
 ///
 /// @sa http://www.cplusplus.com/reference/iostream/streambuf
 
-template <typename Char, typename Traits>
-class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_delegatebuf : public std::basic_streambuf<Ch, Tr>
 {
   public:
 
-    typedef typename std::basic_streambuf<Char, Traits>::char_type   char_type;   ///< Redefinition of the underlying char_type.
-    typedef typename std::basic_streambuf<Char, Traits>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
-    typedef typename std::basic_streambuf<Char, Traits>::int_type    int_type;    ///< Redefinition of the underlying int_type.
-    typedef typename std::basic_streambuf<Char, Traits>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
-    typedef typename std::basic_streambuf<Char, Traits>::off_type    off_type;    ///< Redefinition of the underlying off_type.
+    typedef typename std::basic_streambuf<Ch, Tr>::char_type   char_type;   ///< Redefinition of the underlying char_type.
+    typedef typename std::basic_streambuf<Ch, Tr>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
+    typedef typename std::basic_streambuf<Ch, Tr>::int_type    int_type;    ///< Redefinition of the underlying int_type.
+    typedef typename std::basic_streambuf<Ch, Tr>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
+    typedef typename std::basic_streambuf<Ch, Tr>::off_type    off_type;    ///< Redefinition of the underlying off_type.
 
     /// @cond DELETED_METHODS
     basic_delegatebuf() = delete;
@@ -45,7 +45,7 @@ class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
     basic_delegatebuf& operator=(const basic_delegatebuf& rhs) = default;
 
     /// @brief Constructs a basic_delegatebuf from a basic_streambuf.
-    basic_delegatebuf(std::basic_streambuf<Char, Traits>* buf /**< [in,out] The streambuf to which methods are delegated; must outlast the lifetime of this object. */
+    basic_delegatebuf(std::basic_streambuf<Ch, Tr>* buf /**< [in,out] The streambuf to which methods are delegated; must outlast the lifetime of this object. */
                      ) : 
       buf_(buf) 
     {
@@ -64,7 +64,7 @@ class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
     /// @brief Invokes pubsetbuf the delegate basic_streambuf.
     /// @sa http://www.cplusplus.com/reference/iostream/streambuf/setbuf/
     /// @sa http://www.cplusplus.com/reference/iostream/streambuf/pubsetbuf/
-    virtual std::basic_streambuf<Char, Traits>* setbuf(char_type* s, std::streamsize n) 
+    virtual std::basic_streambuf<Ch, Tr>* setbuf(char_type* s, std::streamsize n) 
     { 
       return buf_->pubsetbuf(s, n); 
     }
@@ -96,10 +96,10 @@ class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
     /// @sa http://www.cplusplus.com/reference/iostream/streambuf/sputc/
     virtual int_type overflow(int_type c = traits_type::eof())
     {
-      const auto eof = Traits::eof();
+      const auto eof = traits_type::eof();
 
       if ( traits_type::eq_int_type(c, eof) )
-        return Traits::not_eof(c);
+        return traits_type::not_eof(c);
 
       const auto ch = traits_type::to_char_type(c);
       const auto result = buf_->sputc(ch);
@@ -125,13 +125,13 @@ class basic_delegatebuf : public std::basic_streambuf<Char, Traits>
 
   private:
 
-    std::basic_streambuf<Char, Traits>* buf_; /**< The basic_streambuf to which methods are delegated. */
+    std::basic_streambuf<Ch, Tr>* buf_; /**< The basic_streambuf to which methods are delegated. */
 };
 
 /// @brief A basic_istream backed by a basic_delegatebuf.
 /// @sa http://www.cplusplus.com/reference/istream
-template <typename Char, typename Traits>
-class basic_idelegatestream : public std::basic_istream<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_idelegatestream : public std::basic_istream<Ch, Tr>
 {
   public:
 
@@ -143,9 +143,9 @@ class basic_idelegatestream : public std::basic_istream<Char, Traits>
     /// @endcond
 
     /// @brief Constructs a basic_idelegatestream from a basic_istream.
-    basic_idelegatestream(std::basic_istream<Char, Traits>& is /**< A basic_istream from which to co-opt a basic_streambuf to delegate to. */
+    basic_idelegatestream(std::basic_istream<Ch, Tr>& is /**< A basic_istream from which to co-opt a basic_streambuf to delegate to. */
                          ) :
-      std::basic_istream<Char, Traits>(&buf_),
+      std::basic_istream<Ch, Tr>(&buf_),
       buf_(is.rdbuf()) 
     {
       // Does nothing.
@@ -153,7 +153,7 @@ class basic_idelegatestream : public std::basic_istream<Char, Traits>
 
   private:
 
-    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of istream will redirect all read methods to this object. */
+    basic_delegatebuf<Ch, Tr> buf_; /**< The default implementation of istream will redirect all read methods to this object. */
 };
 
 typedef basic_idelegatestream<char, std::char_traits<char>> idelegatestream;        ///< Convenience typedef for chars.
@@ -161,8 +161,8 @@ typedef basic_idelegatestream<wchar_t, std::char_traits<wchar_t>> widelegatestre
 
 /// @brief A basic_ostream backed by a basic_delegatebuf.
 /// @sa http://www.cplusplus.com/reference/ostream
-template <typename Char, typename Traits>
-class basic_odelegatestream : public std::basic_ostream<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_odelegatestream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
@@ -174,9 +174,9 @@ class basic_odelegatestream : public std::basic_ostream<Char, Traits>
     /// @endcond
 
     /// @brief Constructs a basic_odelegatestream from a basic_ostream.
-    basic_odelegatestream(std::basic_ostream<Char, Traits>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
+    basic_odelegatestream(std::basic_ostream<Ch, Tr>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
                          ) :
-      std::basic_ostream<Char, Traits>(&buf_),
+      std::basic_ostream<Ch, Tr>(&buf_),
       buf_(os.rdbuf()) 
     {
       // Does nothing.
@@ -184,7 +184,7 @@ class basic_odelegatestream : public std::basic_ostream<Char, Traits>
 
   private:
 
-    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
+    basic_delegatebuf<Ch, Tr> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
 };
 
 typedef basic_odelegatestream<char, std::char_traits<char>> odelegatestream;        ///< Convenience typedef for chars.
@@ -192,8 +192,8 @@ typedef basic_odelegatestream<wchar_t, std::char_traits<wchar_t>> wodelegatestre
 
 /// @brief A basic_iostream backed by a basic_delegatebuf.
 /// @sa http://www.cplusplus.com/reference/iostream
-template <typename Char, typename Traits>
-class basic_delegatestream : public std::basic_iostream<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_delegatestream : public std::basic_iostream<Ch, Tr>
 {
   public:
 
@@ -205,9 +205,9 @@ class basic_delegatestream : public std::basic_iostream<Char, Traits>
     /// @endcond
 
     /// @brief Constructs a basic_delegatestream from a basic_iostream.
-    basic_delegatestream(std::basic_iostream<Char, Traits>& ios /**< A basic_iostream from which to co-opt a basic_streambuf to delegate to. */
+    basic_delegatestream(std::basic_iostream<Ch, Tr>& ios /**< A basic_iostream from which to co-opt a basic_streambuf to delegate to. */
                         ) :
-      std::basic_iostream<Char, Traits>(&buf_),
+      std::basic_iostream<Ch, Tr>(&buf_),
       buf_(ios.rdbuf()) 
     {
       // Does nothing.
@@ -215,7 +215,7 @@ class basic_delegatestream : public std::basic_iostream<Char, Traits>
 
   private:
 
-    basic_delegatebuf<Char, Traits> buf_; /**< The default implementation of iostream will redirect all read/write methods to this object. */
+    basic_delegatebuf<Ch, Tr> buf_; /**< The default implementation of iostream will redirect all read/write methods to this object. */
 };
 
 typedef basic_delegatestream<char, std::char_traits<char>> delegatestream;        ///< Convenience typedef for chars.

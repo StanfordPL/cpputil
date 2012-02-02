@@ -1,5 +1,5 @@
-#ifndef CPPUTIL_STREAM_LOGSTREAM
-#define CPPUTIL_STREAM_LOGSTREAM
+#ifndef CPPUTIL_STREAM_LOGSTREAM_H
+#define CPPUTIL_STREAM_LOGSTREAM_H
 
 /// @file logstream.h
 /// @brief A templated basic_ostream for filtering log messages based on severity level.
@@ -34,8 +34,8 @@ namespace cpputil
 
 /// @brief A basic_ostream backed by a basic_shuntbuf.
 /// @sa http://www.cplusplus.com/reference/ostream
-template <typename Char, typename Traits>
-class basic_ologstream : public std::basic_ostream<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_ologstream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
@@ -59,10 +59,10 @@ class basic_ologstream : public std::basic_ostream<Char, Traits>
     /// @endcond
 
     /// @brief Constructs a basic_ologstream from a basic_ostream, and an optional default filtering level.
-    basic_ologstream(std::basic_ostream<Char, Traits>& os, /**< A basic_ostream to which log messages should be directed. */
-                     Level level = INFO                    /**< The initial filtering level. */
+    basic_ologstream(std::basic_ostream<Ch, Tr>& os, /**< A basic_ostream to which log messages should be directed. */
+                     Level level = INFO              /**< The initial filtering level. */
                     ) :
-      std::basic_ostream<Char, Traits>(&shunt_),
+      std::basic_ostream<Ch, Tr>(&shunt_),
       shunt_(&indent_),
       indent_(os.rdbuf(), 10),
       level_(level)
@@ -102,9 +102,9 @@ class basic_ologstream : public std::basic_ostream<Char, Traits>
 
   private:
 
-    basic_shuntbuf<Char, Traits> shunt_;   ///< Controls whether log messages are emitted.
-    basic_indentbuf<Char, Traits> indent_; ///< Controls log message indenting.
-    Level level_;                          ///< The current filtering level.
+    basic_shuntbuf<Ch, Tr> shunt_;   ///< Controls whether log messages are emitted.
+    basic_indentbuf<Ch, Tr> indent_; ///< Controls log message indenting.
+    Level level_;                    ///< The current filtering level.
 };
 
 typedef basic_ologstream<char, std::char_traits<char>> ologstream;        ///< Convenience typedef for chars.

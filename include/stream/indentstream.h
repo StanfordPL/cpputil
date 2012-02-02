@@ -13,16 +13,16 @@ namespace cpputil
 {
 
 /// @brief A basic_delegatebuf that implements indentation on carriage return.
-template <typename Char, typename Traits>
-class basic_indentbuf : public basic_delegatebuf<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_indentbuf : public basic_delegatebuf<Ch, Tr>
 {
   public:
 
-    typedef typename basic_delegatebuf<Char, Traits>::char_type   char_type;   ///< Redefinition of the underlying char_type.
-    typedef typename basic_delegatebuf<Char, Traits>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
-    typedef typename basic_delegatebuf<Char, Traits>::int_type    int_type;    ///< Redefinition of the underlying int_type.
-    typedef typename basic_delegatebuf<Char, Traits>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
-    typedef typename basic_delegatebuf<Char, Traits>::off_type    off_type;    ///< Redefinition of the underlying off_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::char_type   char_type;   ///< Redefinition of the underlying char_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::int_type    int_type;    ///< Redefinition of the underlying int_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::off_type    off_type;    ///< Redefinition of the underlying off_type.
 
     typedef size_t size_type; ///< Tabstop and indent counting type.
 
@@ -38,10 +38,10 @@ class basic_indentbuf : public basic_delegatebuf<Char, Traits>
     basic_indentbuf& operator=(const basic_indentbuf& rhs) = default;
 
     /// @brief Constructs a basic_delegatebuf from a basic_streambuf, with an optional tab stop.
-    basic_indentbuf(std::basic_streambuf<Char, Traits>* buf, /**< [in,out] The streambuf to which methods are delegated; must outlast the lifetime of this object. */
-                    size_type tabstop = 2                    /**< [in]     The width of a tab stop. */
+    basic_indentbuf(std::basic_streambuf<Ch, Tr>* buf, /**< [in,out] The streambuf to which methods are delegated; must outlast the lifetime of this object. */
+                    size_type tabstop = 2              /**< [in]     The width of a tab stop. */
                    ) : 
-      basic_delegatebuf<Char, Traits>(buf),
+      basic_delegatebuf<Ch, Tr>(buf),
       tabstop_(tabstop),
       pending_(true),
       indent_(0)
@@ -90,14 +90,14 @@ class basic_indentbuf : public basic_delegatebuf<Char, Traits>
     /// @return the result of the final invocation of overflow, or eof on error.
     virtual int_type overflow(int_type c = traits_type::eof())
     {
-      const auto eof = Traits::eof();
+      const auto eof = Tr::eof();
 
       if ( pending_ )
       {
         pending_ = false;
         for ( size_type i = 0, ie = tabstop_ * indent_; i < ie; ++i )
         {
-          const auto result = basic_delegatebuf<Char, Traits>::overflow(' ');
+          const auto result = basic_delegatebuf<Ch, Tr>::overflow(' ');
           if ( traits_type::eq_int_type(result, eof) )
             return eof;
         }
@@ -106,7 +106,7 @@ class basic_indentbuf : public basic_delegatebuf<Char, Traits>
       if ( c == '\n' )
         pending_ = true;
 
-      return basic_delegatebuf<Char, Traits>::overflow(c);
+      return basic_delegatebuf<Ch, Tr>::overflow(c);
     }
 
   private:
@@ -118,8 +118,8 @@ class basic_indentbuf : public basic_delegatebuf<Char, Traits>
 
 /// @brief A basic_ostream backed by a basic_indentbuf.
 /// @sa http://www.cplusplus.com/reference/ostream
-template <typename Char, typename Traits>
-class basic_oindentstream : public std::basic_ostream<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_oindentstream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
@@ -130,9 +130,9 @@ class basic_oindentstream : public std::basic_ostream<Char, Traits>
     /// @endcond
 
     /// @brief Constructs a basic_oindentstream from a basic_ostream.
-    basic_oindentstream(std::basic_ostream<Char, Traits>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
+    basic_oindentstream(std::basic_ostream<Ch, Tr>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
                     ) :
-      std::basic_ostream<Char, Traits>(&buf_),
+      std::basic_ostream<Ch, Tr>(&buf_),
       buf_(os.rdbuf()) 
     {
       // Does nothing.
@@ -140,14 +140,14 @@ class basic_oindentstream : public std::basic_ostream<Char, Traits>
 
     /// @brief Returns a pointer to the underlying basic_indentbuf.
     /// @return the underlying basic_indentbuf
-    basic_indentbuf<Char, Traits>* buf() 
+    basic_indentbuf<Ch, Tr>* buf() 
     {
       return &buf_;
     }
 
   private:
 
-    basic_indentbuf<Char, Traits> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
+    basic_indentbuf<Ch, Tr> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
 };
 
 typedef basic_oindentstream<char, std::char_traits<char>> oindentstream;        ///< Convenience typedef for chars.

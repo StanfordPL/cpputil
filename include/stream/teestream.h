@@ -1,5 +1,5 @@
-#ifndef CPPUTIL_STREAM_TEESTREAM
-#define CPPUTIL_STREAM_TEESTREAM
+#ifndef CPPUTIL_STREAM_TEESTREAM_H
+#define CPPUTIL_STREAM_TEESTREAM_H
 
 /// @file teestream.h
 /// @brief Templated basic_delegatebuf's and basic_ostream's that copy their inputs to a second basic_delegatebuf.
@@ -10,16 +10,16 @@ namespace cpputil
 {
 
 /// @brief A basic_delegatebuf that copies its input to a second basic_delegatebuf.
-template <typename Char, typename Traits>
-class basic_teebuf : public basic_delegatebuf<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_teebuf : public basic_delegatebuf<Ch, Tr>
 {
   public:
 
-    typedef typename basic_delegatebuf<Char, Traits>::char_type   char_type;   ///< Redefinition of the underlying char_type.
-    typedef typename basic_delegatebuf<Char, Traits>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
-    typedef typename basic_delegatebuf<Char, Traits>::int_type    int_type;    ///< Redefinition of the underlying int_type.
-    typedef typename basic_delegatebuf<Char, Traits>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
-    typedef typename basic_delegatebuf<Char, Traits>::off_type    off_type;    ///< Redefinition of the underlying off_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::char_type   char_type;   ///< Redefinition of the underlying char_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::int_type    int_type;    ///< Redefinition of the underlying int_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
+    typedef typename basic_delegatebuf<Ch, Tr>::off_type    off_type;    ///< Redefinition of the underlying off_type.
 
     /// @cond DELETED_METHODS
     basic_teebuf() = delete;
@@ -33,10 +33,10 @@ class basic_teebuf : public basic_delegatebuf<Char, Traits>
     basic_teebuf& operator=(const basic_teebuf& rhs) = default;
 
     /// @brief Constructs a basic_delegatebuf from two basic_streambuf's.
-    basic_teebuf(std::basic_streambuf<Char, Traits>* buf1, /**< [in,out] The first streambuf to which methods are delegated; must outlast the lifetime of this object. */
-                 std::basic_streambuf<Char, Traits>* buf2  /**< [in,out] The second streambuf to which methods are delegated; must outlast the lifetime of this object. */
+    basic_teebuf(std::basic_streambuf<Ch, Tr>* buf1, /**< [in,out] The first streambuf to which methods are delegated; must outlast the lifetime of this object. */
+                 std::basic_streambuf<Ch, Tr>* buf2  /**< [in,out] The second streambuf to which methods are delegated; must outlast the lifetime of this object. */
                 ) : 
-      basic_delegatebuf<Char, Traits>(buf1),
+      basic_delegatebuf<Ch, Tr>(buf1),
       buf2_(buf2)
     {
       // Does nothing.
@@ -51,7 +51,7 @@ class basic_teebuf : public basic_delegatebuf<Char, Traits>
     {
       const int_type eof = traits_type::eof();
 
-      auto res1 = basic_delegatebuf<Char, Traits>::overflow(c);
+      auto res1 = basic_delegatebuf<Ch, Tr>::overflow(c);
       auto res2 = buf2_.sputc(c);
 
       return traits_type::eq_int_type(res1, eof) || traits_type::eq_int_type(res2, eof) ? eof : c;
@@ -59,13 +59,13 @@ class basic_teebuf : public basic_delegatebuf<Char, Traits>
 
   private:
 
-    basic_delegatebuf<Char, Traits> buf2_; ///< The second underlying basic_delegatebuf.
+    basic_delegatebuf<Ch, Tr> buf2_; ///< The second underlying basic_delegatebuf.
 };
 
 /// @brief A basic_ostream backed by a basic_teebuf.
 /// @sa http://www.cplusplus.com/reference/ostream
-template <typename Char, typename Traits>
-class basic_oteestream : public std::basic_ostream<Char, Traits>
+template <typename Ch, typename Tr>
+class basic_oteestream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
@@ -76,10 +76,10 @@ class basic_oteestream : public std::basic_ostream<Char, Traits>
     /// @endcond
 
     /// @brief Constructs a basic_oteestream from two basic_ostreams.
-    basic_oteestream(std::basic_ostream<Char, Traits>& os1, /**< The first basic_ostream from which to co-opt a basic_streambuf to delegate to. */
-                     std::basic_ostream<Char, Traits>& os2  /**< The second basic_ostream from which to co-opt a basic_streambuf to delegate to. */
+    basic_oteestream(std::basic_ostream<Ch, Tr>& os1, /**< The first basic_ostream from which to co-opt a basic_streambuf to delegate to. */
+                     std::basic_ostream<Ch, Tr>& os2  /**< The second basic_ostream from which to co-opt a basic_streambuf to delegate to. */
                     ) :
-      std::basic_ostream<Char, Traits>(&buf_),
+      std::basic_ostream<Ch, Tr>(&buf_),
       buf_(os1.rdbuf(), os2.rdbuf()) 
     {
       // Does nothing.
@@ -87,7 +87,7 @@ class basic_oteestream : public std::basic_ostream<Char, Traits>
 
   private:
 
-    basic_teebuf<Char, Traits> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
+    basic_teebuf<Ch, Tr> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
 };
 
 typedef basic_oteestream<char, std::char_traits<char>> oteestream;        ///< Convenience typedef for chars.
