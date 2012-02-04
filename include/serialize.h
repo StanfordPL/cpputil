@@ -12,6 +12,8 @@
 namespace cpputil
 {
 
+  // TODO: This header is deprecated!  Don't use it!
+
 template <typename _T>
 struct Serializer
 {
