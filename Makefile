@@ -9,12 +9,14 @@ OBJ=test/bijection.o \
 		test/socketstream.o \
 		test/stringutil.o \
 		test/tokenizer.o \
+		test/io/serialize.o \
 		test/system/architecture.o \
 		test/stream/delegatestream.o \
 		test/stream/indentstream.o \
 		test/stream/logstream.o \
 		test/stream/shuntstream.o \
-		test/stream/teestream.o 
+		test/stream/teestream.o \
+		test/traits/traits.o
 
 CXX=g++
 OPT=-g -Wall -std=c++0x
