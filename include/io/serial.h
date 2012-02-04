@@ -15,7 +15,7 @@ template <typename Ch, typename Tr, typename T, typename Enable = void>
 class basic_serialwriter;
 
 template <typename Ch, typename Tr, typename T>
-class basic_serialwriter<Ch, Tr, T, typename std::enable_if<std::is_scalar<typename std::remove_const<T>::type>::value>::type>
+class basic_serialwriter<Ch, Tr, T, typename std::enable_if<std::is_scalar<T>::value>::type>
 {
   public:
     basic_serialwriter(const T t) : t_(t) {}
@@ -43,7 +43,7 @@ class basic_serialwriter<Ch1, Tr1, std::basic_string<Ch2, Tr2>>
 };
 
 template <typename Ch, typename Tr, typename T>
-class basic_serialwriter<Ch, Tr, T, typename std::enable_if<is_stl_container<typename std::remove_const<T>::type>::value>::type>
+class basic_serialwriter<Ch, Tr, T, typename std::enable_if<is_stl_container<T>::value>::type>
 {
   public:
     basic_serialwriter(const T& t) : t_(t) {}
