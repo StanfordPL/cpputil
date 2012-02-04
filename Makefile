@@ -9,7 +9,7 @@ OBJ=test/bijection.o \
 		test/stringutil.o \
 		test/tokenizer.o \
 		\
-		test/io/serialize.o \
+		test/io/serial.o \
 		test/system/architecture.o \
 		test/stream/delegatestream.o \
 		test/stream/indentstream.o \

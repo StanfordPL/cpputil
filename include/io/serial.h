@@ -91,6 +91,12 @@ basic_serialwriter<char, std::char_traits<char>, T> serialwriter(const T& t)
   return basic_serialwriter<char, std::char_traits<char>, T>(t);
 }
 
+template <typename T>
+basic_serialwriter<wchar_t, std::char_traits<wchar_t>, T> wserialwriter(const T& t)
+{
+  return basic_serialwriter<wchar_t, std::char_traits<wchar_t>, T>(t);
+}
+
 
 
 template <typename Ch, typename Tr, typename T, typename Enable = void>
@@ -227,6 +233,12 @@ template <typename T>
 basic_serialreader<char, std::char_traits<char>, T> serialreader(T& t)
 {
   return basic_serialreader<char, std::char_traits<char>, T>(t);
+}
+
+template <typename T>
+basic_serialreader<wchar_t, std::char_traits<wchar_t>, T> wserialreader(T& t)
+{
+  return basic_serialreader<wchar_t, std::char_traits<wchar_t>, T>(t);
 }
 
 }
