@@ -3,12 +3,12 @@ OBJ=test/bijection.o \
 		test/interner.o \
 		test/json.o \
 		test/maputil.o \
-		test/serialize.o \
 		test/singleton.o \
 		test/Sqlite.o \
 		test/socketstream.o \
 		test/stringutil.o \
 		test/tokenizer.o \
+		\
 		test/io/serialize.o \
 		test/system/architecture.o \
 		test/stream/delegatestream.o \
