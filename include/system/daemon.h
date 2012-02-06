@@ -1,8 +1,9 @@
-#ifndef DAEMON_H
-#define DAEMON_H
+#ifndef CPPUTIL_SYSTEM_DAEMON_H
+#define CPPUTIL_SYSTEM_DAEMON_H
 
 #include <cstdio>
 #include <cstdlib>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
