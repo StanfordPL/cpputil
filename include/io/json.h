@@ -1,150 +1,128 @@
-#ifndef JSON_H
-#define JSON_H
+#ifndef CPPUTIL_IO_JSON_H
+#define CPPUTIL_IO_JSON_H
 
-#include <deque>
 #include <iostream>
-#include <list>
-#include <map>
-#include <set>
 #include <string>
-#include <vector>
+#include <type_traits>
+
+#include "traits/traits.h"
 
 namespace cpputil
 {
 
-template <typename _T>
-struct Json
-{
-  static void json(std::ostream& os, const _T& t)
-  {
-    os << t;
-  }
-};
+template <typename T> 
+struct requires_quotes : public std::false_type {};
 
 template <>
-struct Json<char>
-{
-  static void json(std::ostream& os, char c)
-  {
-    os << "\"" << c << "\"";
-  }
-};
-
+struct requires_quotes<char> : public std::true_type {};
 template <>
-struct Json<bool>
-{
-  static void json(std::ostream& os, bool b)
-  {
-    os << (b ? "true" : "false");
-  }
-};
+struct requires_quotes<wchar_t> : public std::true_type {};
+template <typename Ch, typename Tr>
+struct requires_quotes<std::basic_string<Ch, Tr>> : public std::true_type {};
 
-template <typename _Char, typename _Traits>
-struct Json<std::basic_string<_Char, _Traits>>
-{
-  static void json(std::ostream& os, const std::basic_string<_Char, _Traits>& s)
-  {
-    os << "\"" << s << "\"";
-  }
-};
 
-template <typename _T>
-struct Json<std::deque<_T>>
+
+template <typename Ch, typename Tr, typename T, typename Enable = void>
+class basic_jsonwriter;
+
+template <typename Ch, typename Tr, typename T>
+class basic_jsonwriter<Ch, Tr, T, typename std::enable_if<std::is_arithmetic<T>::value && !std::is_same<T, char>::value>::type>
 {
-  static void json(std::ostream& os, const std::deque<_T>& ts)
-  {
-    os << "[";
-    for ( auto i = ts.begin(), ie = ts.end(); i != ie; ++i )
+  public:
+    basic_jsonwriter(const T t) : t_(t) {}
+    void operator()(std::basic_ostream<Ch, Tr>& os) const
     {
-      if ( i != ts.begin() )
-        os << ",";
-      Json<_T>::json(os, *i);
+      os << t_;
     }
-    os << "]";
-  }
+
+  private:
+    const T t_;
 };
 
-template <typename _T>
-struct Json<std::list<_T>>
+template <typename Ch, typename Tr>
+class basic_jsonwriter<Ch, Tr, bool>
 {
-  static void json(std::ostream& os, const std::list<_T>& ts)
-  {
-    os << "[";
-    for ( auto i = ts.begin(), ie = ts.end(); i != ie; ++i )
+  public:
+    basic_jsonwriter(const bool b) : b_(b) {}
+    void operator()(std::basic_ostream<Ch, Tr>& os) const
     {
-      if ( i != ts.begin() )
-        os << ",";
-      Json<_T>::json(os, *i);
+      os << b_ ? "true" : "false";
     }
-    os << "]";
-  }
+
+  private:
+    const bool b_;
 };
 
-template <typename _T1, typename _T2>
-struct Json<std::map<_T1, _T2>>
+template <typename Ch, typename Tr, typename T>
+class basic_jsonwriter<Ch, Tr, T, typename std::enable_if<requires_quotes<T>::value>::type>
 {
-  static void json(std::ostream& os, const std::map<_T1, _T2>& m)
-  {
-    os << "[";
-    for ( auto i = m.begin(), ie = m.end(); i != ie; ++i )
+  public:
+    basic_jsonwriter(const T& t) : t_(t) {}
+    void operator()(std::basic_ostream<Ch, Tr>& os) const
     {
-      if ( i != m.begin() )
-        os << ",";
-      Json<std::pair<_T1, _T2>>::json(os, *i);
+      os << "\"" << t_ << "\"";
     }
-    os << "]";
-  }
+
+  private:
+    const T& t_;
 };
 
-template <typename _T1, typename _T2>
-struct Json<std::pair<_T1, _T2>>
+template <typename Ch, typename Tr, typename T1, typename T2>
+class basic_jsonwriter<Ch, Tr, std::pair<T1, T2>>
 {
-  static void json(std::ostream& os, const std::pair<_T1, _T2>& p)
-  {
-    os << "{\"first\":";
-    Json<_T1>::json(os, p.first);
-    os << ",\"second\":";
-    Json<_T2>::json(os, p.second);
-    os << "}";
-  }
-};
-
-template <typename _T>
-struct Json<std::set<_T>>
-{
-  static void json(std::ostream& os, const std::set<_T>& ts)
-  {
-    os << "[";
-    for ( auto i = ts.begin(), ie = ts.end(); i != ie; ++i )
+  public:
+    basic_jsonwriter(const std::pair<T1, T2>& p) : p_(p) {}
+    void operator()(std::basic_ostream<Ch, Tr>& os) const
     {
-      if ( i != ts.begin() )
-        os << ",";
-      Json<_T>::json(os, *i);
+      os << "{\"first\":"
+         << basic_jsonwriter<Ch, Tr, T1>(p_.first)
+         << ",\"second\":"
+         << basic_jsonwriter<Ch, Tr, T2>(p_.second)
+         << "}";
     }
-    os << "]";
-  }
+
+  private:
+    const std::pair<T1, T2>& p_;
 };
 
-template <typename _T>
-struct Json<std::vector<_T>>
+template <typename Ch, typename Tr, typename T>
+class basic_jsonwriter<Ch, Tr, T, typename std::enable_if<is_stl_container<T>::value>::type>
 {
-  static void json(std::ostream& os, const std::vector<_T>& ts)
-  {
-    os << "[";
-    for ( auto i = ts.begin(), ie = ts.end(); i != ie; ++i )
+  public:
+    basic_jsonwriter(const T& t) : t_(t) {}
+    void operator()(std::basic_ostream<Ch, Tr>& os) const
     {
-      if ( i != ts.begin() )
-        os << ",";
-      Json<_T>::json(os, *i);
+      os << "[";
+      for ( auto i = t_.begin(), ie = t_.end(); i != ie; ++i )
+      {
+        if ( i != t_.begin() )
+          os << ",";
+        os << basic_jsonwriter<Ch, Tr, typename T::value_type>(*i);
+      } 
+      os << "]";
     }
-    os << "]";
-  }
+
+  private:
+    const T& t_;
 };
 
-template <typename _T>
-void json(std::ostream& os, const _T& t)
+template <typename Ch, typename Tr, typename T>
+std::ostream& operator<<(std::basic_ostream<Ch, Tr>& os, const basic_jsonwriter<Ch, Tr, T>& w)
 {
-  Json<_T>::json(os, t);
+  w(os);
+  return os;
+}
+
+template <typename T>
+inline basic_jsonwriter<char, std::char_traits<char>, T> jsonwriter(const T& t)
+{
+  return basic_jsonwriter<char, std::char_traits<char>, T>(t);
+}
+
+template <typename T>
+inline basic_jsonwriter<wchar_t, std::char_traits<wchar_t>, T> wjsonwriter(const T& t)
+{
+  return basic_jsonwriter<wchar_t, std::char_traits<wchar_t>, T>(t);
 }
 
 }

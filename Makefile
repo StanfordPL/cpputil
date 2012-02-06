@@ -1,7 +1,6 @@
 OBJ=test/bijection.o \
 		test/histogram.o \
 		test/interner.o \
-		test/json.o \
 		test/maputil.o \
 		test/singleton.o \
 		test/Sqlite.o \
@@ -9,6 +8,7 @@ OBJ=test/bijection.o \
 		test/stringutil.o \
 		test/tokenizer.o \
 		\
+		test/io/json.o \
 		test/io/serial.o \
 		test/system/architecture.o \
 		test/stream/delegatestream.o \

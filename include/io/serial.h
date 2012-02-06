@@ -1,7 +1,8 @@
-#ifndef CPPUTIL_IO_SERIALIZE_H
-#define CPPUTIL_IO_SERIALIZE_H
+#ifndef CPPUTIL_IO_SERIAL_H
+#define CPPUTIL_IO_SERIAL_H
 
 #include <iostream>
+#include <string>
 #include <type_traits>
 
 #include <stddef.h>
@@ -230,13 +231,13 @@ std::istream& operator>>(std::basic_istream<Ch, Tr>& is, const basic_serialreade
 }
 
 template <typename T, char Quote = '"'>
-basic_serialreader<char, std::char_traits<char>, T, Quote> serialreader(T& t)
+inline basic_serialreader<char, std::char_traits<char>, T, Quote> serialreader(T& t)
 {
   return basic_serialreader<char, std::char_traits<char>, T, Quote>(t);
 }
 
 template <typename T, wchar_t Quote = '"'>
-basic_serialreader<wchar_t, std::char_traits<wchar_t>, T, Quote> wserialreader(T& t)
+inline basic_serialreader<wchar_t, std::char_traits<wchar_t>, T, Quote> wserialreader(T& t)
 {
   return basic_serialreader<wchar_t, std::char_traits<wchar_t>, T, Quote>(t);
 }
