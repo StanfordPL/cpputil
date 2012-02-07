@@ -51,8 +51,8 @@ class basic_teebuf : public basic_delegatebuf<Ch, Tr>
     {
       const int_type eof = traits_type::eof();
 
-      auto res1 = basic_delegatebuf<Ch, Tr>::overflow(c);
-      auto res2 = buf2_.sputc(c);
+      const auto res1 = basic_delegatebuf<Ch, Tr>::overflow(c);
+      const auto res2 = buf2_.sputc(c);
 
       return traits_type::eq_int_type(res1, eof) || traits_type::eq_int_type(res2, eof) ? eof : c;
     }

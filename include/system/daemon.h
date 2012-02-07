@@ -27,9 +27,9 @@ inline void daemonize(const char* dir, int success, int failure)
   if ( chdir(dir) < 0 )
     exit(failure);
 
-  auto r1 = freopen("/dev/null", "r", stdin);  (void) r1;
-  auto r2 = freopen("/dev/null", "w", stdout); (void) r2;
-  auto r3 = freopen("/dev/null", "w", stderr); (void) r3;
+  const auto r1 = freopen("/dev/null", "r", stdin);  (void) r1;
+  const auto r2 = freopen("/dev/null", "w", stdout); (void) r2;
+  const auto r3 = freopen("/dev/null", "w", stderr); (void) r3;
 } 
 
 }

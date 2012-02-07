@@ -55,8 +55,8 @@ class basic_serialwriter<Ch, Tr, T, Quote, typename std::enable_if<is_stl_contai
       if ( t_.empty() )
         os << " ";
 
-      for ( auto i = t_.begin(), ie = t_.end(); i != ie; ++i )
-        os << " " << basic_serialwriter<Ch, Tr, typename T::value_type, Quote>(*i);
+      for ( auto& i : t_ )
+        os << " " << basic_serialwriter<Ch, Tr, typename T::value_type, Quote>(i);
     }
 
   private: 
