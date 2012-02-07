@@ -4,7 +4,7 @@
 /// @file teestream.h
 /// @brief Templated basic_delegatebuf's and basic_ostream's that copy their inputs to a second basic_delegatebuf.
 
-#include "stream/delegatestream.h"
+#include "cpputil/stream/delegatestream.h"
 
 namespace cpputil
 {

@@ -5,8 +5,8 @@
 #include <iostream>
 #include <map>
 
-#include "bijection.h"
-#include "serialize.h"
+#include "cpputil/bijection.h"
+#include "cpputil/serialize.h"
 
 namespace cpputil
 {

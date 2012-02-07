@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "stream/indentstream.h"
+#include "cpputil/stream/indentstream.h"
 
 using namespace cpputil;
 using namespace std;

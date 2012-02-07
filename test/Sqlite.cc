@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Sqlite.h"
+#include "cpputil/Sqlite.h"
 
 using namespace cpputil;
 using namespace std;

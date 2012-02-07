@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "stream/shuntstream.h"
+#include "cpputil/stream/shuntstream.h"
 
 using namespace cpputil;
 using namespace std;

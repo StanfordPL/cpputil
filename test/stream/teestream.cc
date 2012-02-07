@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "stream/teestream.h"
+#include "cpputil/stream/teestream.h"
 
 using namespace cpputil;
 using namespace std;

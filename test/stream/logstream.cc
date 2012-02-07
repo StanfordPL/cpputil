@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "stream/logstream.h"
+#include "cpputil/stream/logstream.h"
 
 using namespace cpputil;
 using namespace std;

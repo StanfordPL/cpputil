@@ -1,7 +1,7 @@
 #include <iostream>
 #include <map>
 
-#include "maputil.h"
+#include "cpputil/maputil.h"
 
 using namespace cpputil;
 using namespace std;

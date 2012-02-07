@@ -2,7 +2,7 @@
 #include <list>
 #include <string>
 
-#include "stringutil.h"
+#include "cpputil/stringutil.h"
 
 using namespace cpputil;
 using namespace std;

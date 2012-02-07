@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "bijection.h"
+#include "cpputil/bijection.h"
 
 using namespace cpputil;
 using namespace std;

@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include "histogram.h"
+#include "cpputil/histogram.h"
 
 using namespace cpputil;
 using namespace std;

@@ -8,8 +8,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "stream/indentstream.h"
-#include "stream/shuntstream.h"
+#include "cpputil/stream/indentstream.h"
+#include "cpputil/stream/shuntstream.h"
 
 namespace 
 {

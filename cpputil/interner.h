@@ -4,7 +4,7 @@
 #include <iostream>
 #include <set>
 
-#include "serialize.h"
+#include "cpputil/serialize.h"
 
 namespace cpputil
 {

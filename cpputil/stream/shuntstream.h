@@ -4,7 +4,7 @@
 /// @file shuntstream.h
 /// @brief Templated basic_delegatebuf's and basic_ostream's that can selectively ignore output characters.
 
-#include "stream/delegatestream.h"
+#include "cpputil/stream/delegatestream.h"
 
 namespace cpputil
 {

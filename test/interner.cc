@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include "interner.h"
+#include "cpputil/interner.h"
 
 using namespace cpputil;
 using namespace std;

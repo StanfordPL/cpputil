@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <stdexcept>
 
-#include "stream/delegatestream.h"
+#include "cpputil/stream/delegatestream.h"
 
 namespace cpputil
 {

@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 
-#include "traits/traits.h"
+#include "cpputil/traits/traits.h"
 
 namespace cpputil
 {

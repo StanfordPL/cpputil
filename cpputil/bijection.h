@@ -5,8 +5,8 @@
 #include <iostream>
 #include <map>
 
-#include "maputil.h"
-#include "serialize.h"
+#include "cpputil/maputil.h"
+#include "cpputil/serialize.h"
 
 namespace cpputil
 {

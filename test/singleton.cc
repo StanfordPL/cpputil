@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "singleton.h"
+#include "cpputil/singleton.h"
 
 using namespace cpputil;
 using namespace std;

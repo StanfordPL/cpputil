@@ -1,11 +1,10 @@
-#include <unistd.h>
-
 #include <cassert>
 #include <cstdlib>
-
 #include <iostream>
 
-#include "socketstream.h"
+#include <unistd.h>
+
+#include "cpputil/socketstream.h"
 
 using namespace std;
 

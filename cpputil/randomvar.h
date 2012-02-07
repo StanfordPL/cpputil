@@ -5,8 +5,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "Histogram.h"
-#include "serialize.h"
+#include "cpputil/histogram.h"
+#include "cpputil/serialize.h"
 
 namespace cpputil
 {

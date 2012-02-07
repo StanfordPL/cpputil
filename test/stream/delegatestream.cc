@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include "stream/delegatestream.h"
+#include "cpputil/stream/delegatestream.h"
 
 using namespace cpputil;
 using namespace std;

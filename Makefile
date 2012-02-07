@@ -20,7 +20,7 @@ OBJ=test/bijection.o \
 
 CXX=g++
 OPT=-g -Wall -std=c++0x
-INC=-I./include
+INC=-I.
 
 doc: doxyfile
 	doxygen doxyfile
