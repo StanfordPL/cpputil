@@ -94,7 +94,7 @@ class basic_serialwriter<Ch, Tr, std::pair<T1, T2>, Quote>
 };
 
 template <typename Ch, typename Tr, typename T, Ch Quote>
-std::ostream& operator<<(std::basic_ostream<Ch, Tr>& os, const basic_serialwriter<Ch, Tr, T, Quote>& w)
+std::basic_ostream<Ch, Tr>& operator<<(std::basic_ostream<Ch, Tr>& os, const basic_serialwriter<Ch, Tr, T, Quote>& w)
 {
   w(os);
   return os;
@@ -254,7 +254,7 @@ class basic_serialreader<Ch, Tr, std::pair<T1, T2>, Quote>
 };
 
 template <typename Ch, typename Tr, typename T, Ch Quote>
-std::istream& operator>>(std::basic_istream<Ch, Tr>& is, const basic_serialreader<Ch, Tr, T, Quote>& r)
+std::basic_istream<Ch, Tr>& operator>>(std::basic_istream<Ch, Tr>& is, const basic_serialreader<Ch, Tr, T, Quote>& r)
 {
   r(is);
   return is;
