@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "system/architecture.h"
+#include "cpputil/system/architecture.h"
 
 using namespace std;
 

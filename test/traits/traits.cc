@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "traits/traits.h"
+#include "cpputil/traits/traits.h"
 
 using namespace cpputil;
 using namespace std;
