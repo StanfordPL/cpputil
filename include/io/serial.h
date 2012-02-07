@@ -16,13 +16,27 @@ template <typename Ch, typename Tr, typename T, Ch Quote, typename Enable = void
 class basic_serialwriter;
 
 template <typename Ch, typename Tr, typename T, Ch Quote>
-class basic_serialwriter<Ch, Tr, T, Quote, typename std::enable_if<std::is_scalar<T>::value>::type>
+class basic_serialwriter<Ch, Tr, T, Quote, typename std::enable_if<std::is_scalar<T>::value && !std::is_enum<T>::value>::type>
 {
   public:
     basic_serialwriter(const T t) : t_(t) {}
     void operator()(std::basic_ostream<Ch, Tr>& os) const 
     { 
       os << t_; 
+    }
+
+  private:
+    const T t_;  
+};
+
+template <typename Ch, typename Tr, typename T, Ch Quote>
+class basic_serialwriter<Ch, Tr, T, Quote, typename std::enable_if<std::is_enum<T>::value>::type>
+{
+  public:
+    basic_serialwriter(const T t) : t_(t) {}
+    void operator()(std::basic_ostream<Ch, Tr>& os) const 
+    { 
+      os << (int) t_; 
     }
 
   private:
@@ -104,13 +118,29 @@ template <typename Ch, typename Tr, typename T, Ch Quote, typename Enable = void
 class basic_serialreader;
 
 template <typename Ch, typename Tr, typename T, Ch Quote>
-class basic_serialreader<Ch, Tr, T, Quote, typename std::enable_if<std::is_scalar<T>::value>::type>
+class basic_serialreader<Ch, Tr, T, Quote, typename std::enable_if<std::is_scalar<T>::value && !std::is_enum<T>::value>::type>
 {
   public:
     basic_serialreader(T& t) : t_(t) {}
     void operator()(std::basic_istream<Ch, Tr>& is) const
     { 
       is >> t_; 
+    }
+
+  private:
+    T& t_;  
+};
+
+template <typename Ch, typename Tr, typename T, Ch Quote>
+class basic_serialreader<Ch, Tr, T, Quote, typename std::enable_if<std::is_enum<T>::value>::type>
+{
+  public:
+    basic_serialreader(T& t) : t_(t) {}
+    void operator()(std::basic_istream<Ch, Tr>& is) const
+    { 
+      int temp;
+      is >> temp;
+      t_ = (T) temp; 
     }
 
   private:
