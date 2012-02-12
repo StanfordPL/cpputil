@@ -1,4 +1,5 @@
 OBJ=test/bijection.o \
+		test/bits.o \
 		test/histogram.o \
 		test/interner.o \
 		test/maputil.o \
