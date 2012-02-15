@@ -53,6 +53,8 @@ std::array<const int64_t, 64> upper_64_
 namespace cpputil
 {
 
+// TODO: These should move out to traits.h
+
 struct w8   { typedef int8_t   type; };
 struct w16  { typedef int16_t  type; };
 struct w32  { typedef int32_t  type; };
@@ -70,6 +72,36 @@ template <>           struct half_width<int16_t>  : public w8  {};
 template <>           struct half_width<int32_t>  : public w16 {};
 template <>           struct half_width<int64_t>  : public w32 {};
 template <>           struct half_width<__int128> : public w64 {};
+
+struct i8   { typedef int8_t   type; };
+struct i16  { typedef int16_t  type; };
+struct i32  { typedef int32_t  type; };
+struct i64  { typedef int64_t  type; };
+
+template <typename T> struct to_signed {};
+template <>           struct to_signed<int8_t>   : public i8  {};
+template <>           struct to_signed<uint8_t>  : public i8  {};
+template <>           struct to_signed<int16_t>  : public i16 {};
+template <>           struct to_signed<uint16_t> : public i16 {};
+template <>           struct to_signed<int32_t>  : public i32 {};
+template <>           struct to_signed<uint32_t> : public i32 {};
+template <>           struct to_signed<int64_t>  : public i64 {};
+template <>           struct to_signed<uint64_t> : public i64 {};
+
+struct u8   { typedef uint8_t   type; };
+struct u16  { typedef uint16_t  type; };
+struct u32  { typedef uint32_t  type; };
+struct u64  { typedef uint64_t  type; };
+
+template <typename T> struct to_unsigned {};
+template <>           struct to_unsigned<int8_t>   : public u8  {};
+template <>           struct to_unsigned<uint8_t>  : public u8  {};
+template <>           struct to_unsigned<int16_t>  : public u16 {};
+template <>           struct to_unsigned<uint16_t> : public u16 {};
+template <>           struct to_unsigned<int32_t>  : public u32 {};
+template <>           struct to_unsigned<uint32_t> : public u32 {};
+template <>           struct to_unsigned<int64_t>  : public u64 {};
+template <>           struct to_unsigned<uint64_t> : public u64 {};
 
 template <typename Int, uint8_t n>
 inline bool get_bit(Int x)
