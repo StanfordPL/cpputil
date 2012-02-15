@@ -35,16 +35,22 @@ uint8_t count_bits_best(UInt v)
   return (UInt)(v * ((UInt)~(UInt)0/255)) >> (sizeof(UInt) - 1) * CHAR_BIT; 
 }
 
+template <typename Int, uint8_t bit>
+inline bool bit(Int x)
+{
+  return (x >> bit) & 1;
+}
+
 template <typename Int, int CHAR_BIT = 8>
 inline bool msb(Int x)
 {
-  return x & (((Int) 1) << (sizeof(Int) * CHAR_BIT - 1));
+  return bit<Int, sizeof(Int)*CHAR_BIT-1>(x);
 }
 
 template <typename Int>
 inline bool lsb(Int x) 
 { 
-  return x & 0x1; 
+  return bit<Int, 0>(x);
 }
 
 }
