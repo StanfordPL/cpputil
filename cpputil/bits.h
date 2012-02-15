@@ -38,7 +38,7 @@ uint8_t count_bits_best(UInt v)
 template <typename Int, int CHAR_BIT = 8>
 inline bool msb(Int x)
 {
-  return x & (0x1 << (sizeof(Int) * CHAR_BIT - 1));
+  return x & (((Int) 1) << (sizeof(Int) * CHAR_BIT - 1));
 }
 
 template <typename Int>
