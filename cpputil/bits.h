@@ -6,42 +6,31 @@
 namespace cpputil
 {
 
-template <typename UInt = unsigned int>
-uint8_t count_bits_naive(UInt v)
-{
-  uint8_t c = 0;
-  for ( ; v; v >>= 1 )
-    c += v & 1;
+struct w8   { typedef int8_t   type; };
+struct w16  { typedef int16_t  type; };
+struct w32  { typedef int32_t  type; };
+struct w64  { typedef int64_t  type; };
+struct w128 { typedef __int128 type; };
 
-  return c;
-}
+template <typename T> struct double_width {};
+template <>           struct double_width<int8_t>  : public w16 {};
+template <>           struct double_width<int16_t> : public w32 {};
+template <>           struct double_width<int32_t> : public w64 {};
+template <>           struct double_width<int64_t> : public w128 {};
 
-template <typename UInt = unsigned int>
-uint8_t count_bits_kernighan(UInt v)
-{
-  uint8_t c = 0;
-  for ( ; v; c++ )
-    v &= v - 1;
+template <typename T> struct half_width {};
+template <>           struct half_width<int16_t>  : public w8  {};
+template <>           struct half_width<int32_t>  : public w16 {};
+template <>           struct half_width<int64_t>  : public w32 {};
+template <>           struct half_width<__int128> : public w64 {};
 
-  return c;
-}
-
-template <typename UInt = unsigned int, int CHAR_BIT = 8>
-uint8_t count_bits_best(UInt v)
-{
-  v = v - ((v >> 1) & (UInt)~(UInt)0/3);                         
-  v = (v & (UInt)~(UInt)0/15*3) + ((v >> 2) & (UInt)~(UInt)0/15*3);     
-  v = (v + (v >> 4)) & (UInt)~(UInt)0/255*15;                      
-  return (UInt)(v * ((UInt)~(UInt)0/255)) >> (sizeof(UInt) - 1) * CHAR_BIT; 
-}
-
-template <typename Int, uint8_t bit>
+template <typename Int, uint8_t n>
 inline bool bit(Int x)
 {
-  return (x >> bit) & 1;
+  return (x >> n) & 1;
 }
 
-template <typename Int, int CHAR_BIT = 8>
+template <typename Int, unsigned int CHAR_BIT = 8>
 inline bool msb(Int x)
 {
   return bit<Int, sizeof(Int)*CHAR_BIT-1>(x);
@@ -51,6 +40,47 @@ template <typename Int>
 inline bool lsb(Int x) 
 { 
   return bit<Int, 0>(x);
+}
+
+template <typename Int, unsigned int CHAR_BIT = 8>
+inline typename half_width<Int>::type upper(Int x)
+{
+  return x >> (sizeof(typename half_width<Int>::type) * CHAR_BIT); 
+}
+
+template <typename Int>
+inline typename half_width<Int>::type lower(Int x)
+{
+  return (typename half_width<Int>::type) x;
+}
+
+template <typename Int>
+uint8_t count_bits_naive(Int v)
+{
+  uint8_t c = 0;
+  for ( ; v; v >>= 1 )
+    c += v & 1;
+
+  return c;
+}
+
+template <typename Int>
+uint8_t count_bits_kernighan(Int v)
+{
+  uint8_t c = 0;
+  for ( ; v; c++ )
+    v &= v - 1;
+
+  return c;
+}
+
+template <typename Int, unsigned int CHAR_BIT = 8>
+uint8_t count_bits_best(Int v)
+{
+  v = v - ((v >> 1) & (Int)~(Int)0/3);                         
+  v = (v & (Int)~(Int)0/15*3) + ((v >> 2) & (Int)~(Int)0/15*3);     
+  v = (v + (v >> 4)) & (Int)~(Int)0/255*15;                      
+  return (Int)(v * ((Int)~(Int)0/255)) >> (sizeof(Int) - 1) * CHAR_BIT; 
 }
 
 }
