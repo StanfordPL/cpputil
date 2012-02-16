@@ -109,6 +109,12 @@ inline bool get_bit(Int x)
   return (x >> n) & 1;
 }
 
+template <typename Int>
+inline bool get_bit(Int x, uint8_t n)
+{
+  return (x >> n) & 1;
+}
+
 template <typename Int, unsigned int CHAR_BIT = 8>
 inline bool msb(Int x)
 {
