@@ -8,7 +8,7 @@
 namespace 
 {
 
-std::array<const int64_t, 64> lower_64_
+std::array<const int64_t, 64> lower_
 {{
   0x0000000000000001, 0x0000000000000003, 0x0000000000000007, 0x000000000000000f,
   0x000000000000001f, 0x000000000000003f, 0x000000000000007f, 0x00000000000000ff,
@@ -28,7 +28,7 @@ std::array<const int64_t, 64> lower_64_
   0x1fffffffffffffff, 0x3fffffffffffffff, 0x7fffffffffffffff, 0xffffffffffffffff
 }};
 
-std::array<const int64_t, 64> upper_64_
+std::array<const int64_t, 64> upper_
 {{
   0x8000000000000000, 0xc000000000000000, 0xe000000000000000, 0xf000000000000000, 
   0xf800000000000000, 0xfc00000000000000, 0xfe00000000000000, 0xff00000000000000, 
@@ -112,7 +112,7 @@ inline bool get_bit(Int x)
 template <typename Int, unsigned int CHAR_BIT = 8>
 inline bool msb(Int x)
 {
-  return get_bit<Int, sizeof(Int)*CHAR_BIT-1>(x);
+  return get_bit<Int, sizeof(Int) * CHAR_BIT - 1>(x);
 }
 
 template <typename Int>
@@ -122,26 +122,26 @@ inline bool lsb(Int x)
 }
 
 template <typename Int, unsigned int CHAR_BIT = 8>
-inline typename half_width<Int>::type upper(Int x)
+inline typename half_width<Int>::type get_upper_half(Int x)
 {
   return x >> (sizeof(typename half_width<Int>::type) * CHAR_BIT); 
 }
 
 template <typename Int>
-inline typename half_width<Int>::type lower(Int x)
+inline typename half_width<Int>::type get_lower_half(Int x)
 {
   return (typename half_width<Int>::type) x;
 }
 
-inline int64_t lower_64(int n) { return           lower_64_[n-1];    }
-inline int32_t lower_32(int n) { return (int32_t) lower_64_[n-1];    }
-inline int16_t lower_16(int n) { return (int16_t) lower_64_[n-1];    }
-inline int8_t  lower_8 (int n) { return (int8_t)  lower_64_[n-1];    }
+inline void set_upper_n(int8_t&  x, uint8_t  n) { x |= (int8_t)  upper_[n-1+56]; }
+inline void set_upper_n(int16_t& x, uint16_t n) { x |= (int16_t) upper_[n-1+48]; }
+inline void set_upper_n(int32_t& x, uint32_t n) { x |= (int32_t) upper_[n-1+32]; }
+inline void set_upper_n(int64_t& x, uint64_t n) { x |= (int64_t) upper_[n-1];    }
 
-inline int64_t upper_64(int n) { return           upper_64_[n-1];    }
-inline int32_t upper_32(int n) { return (int32_t) upper_64_[n-1+32]; }
-inline int16_t upper_16(int n) { return (int16_t) upper_64_[n-1+48]; }
-inline int8_t  upper_8 (int n) { return (int8_t)  upper_64_[n-1+56]; }
+inline void set_lower_n(int8_t&  x, uint8_t  n) { x |= (int8_t)  lower_[n-1]; }
+inline void set_lower_n(int16_t& x, uint16_t n) { x |= (int16_t) lower_[n-1]; }
+inline void set_lower_n(int32_t& x, uint32_t n) { x |= (int32_t) lower_[n-1]; }
+inline void set_lower_n(int64_t& x, uint64_t n) { x |= (int64_t) lower_[n-1]; }
 
 template <typename Int>
 uint8_t count_bits_naive(Int v)
