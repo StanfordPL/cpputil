@@ -150,8 +150,8 @@ inline void set_lower_n(int16_t& x, uint16_t n) { x |= (int16_t) lower_[n-1]; }
 inline void set_lower_n(int32_t& x, uint32_t n) { x |= (int32_t) lower_[n-1]; }
 inline void set_lower_n(int64_t& x, uint64_t n) { x |= (int64_t) lower_[n-1]; }
 
-template <typename Int>
-uint8_t count_bits_naive(Int v)
+template <typename UInt = uint64_t>
+uint8_t count_bits_naive(UInt v)
 {
   uint8_t c = 0;
   for ( ; v; v >>= 1 )
@@ -160,8 +160,8 @@ uint8_t count_bits_naive(Int v)
   return c;
 }
 
-template <typename Int>
-uint8_t count_bits_kernighan(Int v)
+template <typename UInt = uint64_t>
+uint8_t count_bits_kernighan(UInt v)
 {
   uint8_t c = 0;
   for ( ; v; c++ )
@@ -170,13 +170,13 @@ uint8_t count_bits_kernighan(Int v)
   return c;
 }
 
-template <typename Int>
-uint8_t count_bits_best(Int v)
+template <typename UInt = uint64_t>
+uint8_t count_bits_best(UInt v)
 {
-  v = v - ((v >> 1) & (Int)~(Int)0/3);                         
-  v = (v & (Int)~(Int)0/15*3) + ((v >> 2) & (Int)~(Int)0/15*3);     
-  v = (v + (v >> 4)) & (Int)~(Int)0/255*15;                      
-  return (Int)(v * ((Int)~(Int)0/255)) >> (sizeof(Int) - 1) * CHAR_BIT; 
+  v = v - ((v >> 1) & (UInt)~(UInt)0/3);                         
+  v = (v & (UInt)~(UInt)0/15*3) + ((v >> 2) & (UInt)~(UInt)0/15*3);     
+  v = (v + (v >> 4)) & (UInt)~(UInt)0/255*15;                      
+  return (UInt)(v * ((UInt)~(UInt)0/255)) >> (sizeof(UInt) - 1) * CHAR_BIT; 
 }
 
 }
