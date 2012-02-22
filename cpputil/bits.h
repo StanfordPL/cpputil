@@ -1,7 +1,7 @@
 #ifndef CPPUTIL_BITS_H
 #define CPPUTIL_BITS_H
 
-#include <climit>
+#include <climits>
 #include <array>
 
 #include <stdint.h>
