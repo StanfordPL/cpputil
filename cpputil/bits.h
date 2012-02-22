@@ -1,6 +1,7 @@
 #ifndef CPPUTIL_BITS_H
 #define CPPUTIL_BITS_H
 
+#include <climit>
 #include <array>
 
 #include <stdint.h>
@@ -115,7 +116,7 @@ inline bool get_bit(Int x, uint8_t n)
   return (x >> n) & 1;
 }
 
-template <typename Int, unsigned int CHAR_BIT = 8>
+template <typename Int>
 inline bool msb(Int x)
 {
   return get_bit<Int, sizeof(Int) * CHAR_BIT - 1>(x);
@@ -127,7 +128,7 @@ inline bool lsb(Int x)
   return get_bit<Int, 0>(x);
 }
 
-template <typename Int, unsigned int CHAR_BIT = 8>
+template <typename Int>
 inline typename half_width<Int>::type get_upper_half(Int x)
 {
   return x >> (sizeof(typename half_width<Int>::type) * CHAR_BIT); 
@@ -169,7 +170,7 @@ uint8_t count_bits_kernighan(Int v)
   return c;
 }
 
-template <typename Int, unsigned int CHAR_BIT = 8>
+template <typename Int>
 uint8_t count_bits_best(Int v)
 {
   v = v - ((v >> 1) & (Int)~(Int)0/3);                         
