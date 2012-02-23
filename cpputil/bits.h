@@ -249,10 +249,20 @@ inline void set_upper_n(int16_t& x, uint16_t n) { x |= (int16_t) upper_[n-1+48];
 inline void set_upper_n(int32_t& x, uint32_t n) { x |= (int32_t) upper_[n-1+32]; }
 inline void set_upper_n(int64_t& x, uint64_t n) { x |= (int64_t) upper_[n-1];    }
 
+inline void set_upper_n(uint8_t&  x, uint8_t  n) { x |= (uint8_t)  upper_[n-1+56]; }
+inline void set_upper_n(uint16_t& x, uint16_t n) { x |= (uint16_t) upper_[n-1+48]; }
+inline void set_upper_n(uint32_t& x, uint32_t n) { x |= (uint32_t) upper_[n-1+32]; }
+inline void set_upper_n(uint64_t& x, uint64_t n) { x |= (uint64_t) upper_[n-1];    }
+
 inline void set_lower_n(int8_t&  x, uint8_t  n) { x |= (int8_t)  lower_[n-1]; }
 inline void set_lower_n(int16_t& x, uint16_t n) { x |= (int16_t) lower_[n-1]; }
 inline void set_lower_n(int32_t& x, uint32_t n) { x |= (int32_t) lower_[n-1]; }
 inline void set_lower_n(int64_t& x, uint64_t n) { x |= (int64_t) lower_[n-1]; }
+
+inline void set_lower_n(uint8_t&  x, uint8_t  n) { x |= (uint8_t)  lower_[n-1]; }
+inline void set_lower_n(uint16_t& x, uint16_t n) { x |= (uint16_t) lower_[n-1]; }
+inline void set_lower_n(uint32_t& x, uint32_t n) { x |= (uint32_t) lower_[n-1]; }
+inline void set_lower_n(uint64_t& x, uint64_t n) { x |= (uint64_t) lower_[n-1]; }
 
 // Bit counting
 
