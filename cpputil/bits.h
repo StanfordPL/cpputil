@@ -1,13 +1,16 @@
 #ifndef CPPUTIL_BITS_H
 #define CPPUTIL_BITS_H
 
-#include <climits>
 #include <array>
+#include <climits>
+#include <type_traits>
 
 #include <stdint.h>
 
 namespace 
 {
+
+// Static arrays with the lower n bits set to true
 
 std::array<const int64_t, 64> lower_
 {{
@@ -28,6 +31,8 @@ std::array<const int64_t, 64> lower_
   0x01ffffffffffffff, 0x03ffffffffffffff, 0x07ffffffffffffff, 0x0fffffffffffffff,
   0x1fffffffffffffff, 0x3fffffffffffffff, 0x7fffffffffffffff, 0xffffffffffffffff
 }};
+
+// Static arrays with the upper n bits set to true
 
 std::array<const int64_t, 64> upper_
 {{
@@ -56,53 +61,146 @@ namespace cpputil
 
 // TODO: These should move out to traits.h
 
-struct w8   { typedef int8_t   type; };
-struct w16  { typedef int16_t  type; };
-struct w32  { typedef int32_t  type; };
-struct w64  { typedef int64_t  type; };
-struct w128 { typedef __int128 type; };
+// Is this an signed type?
+
+template <typename T> 
+struct is_signed : public std::false_type {};
+
+template <> struct is_signed<int8_t>     : public std::true_type {};
+template <> struct is_signed<int16_t>    : public std::true_type {};
+template <> struct is_signed<int32_t>    : public std::true_type {};
+template <> struct is_signed<int64_t>    : public std::true_type {};
+template <> struct is_signed<__int128_t> : public std::true_type {};
+
+// Is this an unsigned type?
+
+template <typename T>
+struct is_unsigned : public std::false_type {};
+
+template <> struct is_unsigned<uint8_t>     : public std::true_type {};
+template <> struct is_unsigned<uint16_t>    : public std::true_type {};
+template <> struct is_unsigned<uint32_t>    : public std::true_type {};
+template <> struct is_unsigned<uint64_t>    : public std::true_type {};
+template <> struct is_unsigned<__uint128_t> : public std::true_type {};
+
+// Structs holding the basic signed/unsigned integer types
+
+struct i8   { typedef int8_t     type; };
+struct i16  { typedef int16_t    type; };
+struct i32  { typedef int32_t    type; };
+struct i64  { typedef int64_t    type; };
+struct i128 { typedef __int128_t type; };
+
+struct u8   { typedef uint8_t     type; };
+struct u16  { typedef uint16_t    type; };
+struct u32  { typedef uint32_t    type; };
+struct u64  { typedef uint64_t    type; };
+struct u128 { typedef __uint128_t type; };
+
+// Twice the width of a type (preserves signedness)
 
 template <typename T> struct double_width {};
-template <>           struct double_width<int8_t>  : public w16 {};
-template <>           struct double_width<int16_t> : public w32 {};
-template <>           struct double_width<int32_t> : public w64 {};
-template <>           struct double_width<int64_t> : public w128 {};
+
+template <>           struct double_width<int8_t>   : public i16  {};
+template <>           struct double_width<int16_t>  : public i32  {};
+template <>           struct double_width<int32_t>  : public i64  {};
+template <>           struct double_width<int64_t>  : public i128 {};
+
+template <>           struct double_width<uint8_t>  : public u16  {};
+template <>           struct double_width<uint16_t> : public u32  {};
+template <>           struct double_width<uint32_t> : public u64  {};
+template <>           struct double_width<uint64_t> : public u128 {};
+
+// Half the width of a type (preserves signedness)
 
 template <typename T> struct half_width {};
-template <>           struct half_width<int16_t>  : public w8  {};
-template <>           struct half_width<int32_t>  : public w16 {};
-template <>           struct half_width<int64_t>  : public w32 {};
-template <>           struct half_width<__int128> : public w64 {};
 
-struct i8   { typedef int8_t   type; };
-struct i16  { typedef int16_t  type; };
-struct i32  { typedef int32_t  type; };
-struct i64  { typedef int64_t  type; };
+template <>           struct half_width<int16_t>     : public i8  {};
+template <>           struct half_width<int32_t>     : public i16 {};
+template <>           struct half_width<int64_t>     : public i32 {};
+template <>           struct half_width<__int128_t>  : public i64 {};
+
+template <>           struct half_width<uint16_t>    : public u8  {};
+template <>           struct half_width<uint32_t>    : public u16 {};
+template <>           struct half_width<uint64_t>    : public u32 {};
+template <>           struct half_width<__uint128_t> : public u64 {};
+
+// The signed equivalent of a type
 
 template <typename T> struct to_signed {};
-template <>           struct to_signed<int8_t>   : public i8  {};
-template <>           struct to_signed<uint8_t>  : public i8  {};
-template <>           struct to_signed<int16_t>  : public i16 {};
-template <>           struct to_signed<uint16_t> : public i16 {};
-template <>           struct to_signed<int32_t>  : public i32 {};
-template <>           struct to_signed<uint32_t> : public i32 {};
-template <>           struct to_signed<int64_t>  : public i64 {};
-template <>           struct to_signed<uint64_t> : public i64 {};
 
-struct u8   { typedef uint8_t   type; };
-struct u16  { typedef uint16_t  type; };
-struct u32  { typedef uint32_t  type; };
-struct u64  { typedef uint64_t  type; };
+template <>           struct to_signed<int8_t>      : public i8    {};
+template <>           struct to_signed<int16_t>     : public i16   {};
+template <>           struct to_signed<int32_t>     : public i32   {};
+template <>           struct to_signed<int64_t>     : public i64   {};
+template <>           struct to_signed<__int128_t>  : public i128  {};
+
+template <>           struct to_signed<uint8_t>      : public i8   {};
+template <>           struct to_signed<uint16_t>     : public i16  {};
+template <>           struct to_signed<uint32_t>     : public i32  {};
+template <>           struct to_signed<uint64_t>     : public i64  {};
+template <>           struct to_signed<__uint128_t>  : public i128 {};
+
+// The unsigned equivalent of a type
 
 template <typename T> struct to_unsigned {};
-template <>           struct to_unsigned<int8_t>   : public u8  {};
-template <>           struct to_unsigned<uint8_t>  : public u8  {};
-template <>           struct to_unsigned<int16_t>  : public u16 {};
-template <>           struct to_unsigned<uint16_t> : public u16 {};
-template <>           struct to_unsigned<int32_t>  : public u32 {};
-template <>           struct to_unsigned<uint32_t> : public u32 {};
-template <>           struct to_unsigned<int64_t>  : public u64 {};
-template <>           struct to_unsigned<uint64_t> : public u64 {};
+
+template <>           struct to_unsigned<int8_t>      : public u8    {};
+template <>           struct to_unsigned<int16_t>     : public u16   {};
+template <>           struct to_unsigned<int32_t>     : public u32   {};
+template <>           struct to_unsigned<int64_t>     : public u64   {};
+template <>           struct to_unsigned<__int128_t>  : public u128  {};
+
+template <>           struct to_unsigned<uint8_t>      : public u8   {};
+template <>           struct to_unsigned<uint16_t>     : public u16  {};
+template <>           struct to_unsigned<uint32_t>     : public u32  {};
+template <>           struct to_unsigned<uint64_t>     : public u64  {};
+template <>           struct to_unsigned<__uint128_t>  : public u128 {};
+
+
+// Sign extend from one type to another
+// TODO: Add checks for To being wider than From
+
+template <typename To, typename From>
+inline typename std::enable_if<is_signed<To>::value && is_signed<From>::value, To>::type sign_extend(From from)
+{
+  return (To) from;
+}
+
+template <typename To, typename From>
+inline typename std::enable_if<is_signed<To>::value && is_unsigned<From>::value, To>::type sign_extend(From from)
+{
+  return (To) ((typename to_signed<From>::type) from);
+}
+
+template <typename To, typename From>
+inline typename std::enable_if<is_unsigned<To>::value && is_signed<From>::value, To>::type sign_extend(From from)
+{
+  return (To) ((typename to_signed<To>::type) from);
+}
+
+template <typename To, typename From>
+inline typename std::enable_if<is_unsigned<To>::value && is_unsigned<From>::value, To>::type sign_extend(From from)
+{
+  return (To) ((typename to_signed<To>::type) ((typename to_signed<From>::type) from));
+}
+
+// Zero extend from one type to another
+// TODO: Add checks for To being wider than From
+
+template <typename To, typename From>
+inline typename std::enable_if<is_signed<From>::value, To>::type zero_extend(From from)
+{
+  return (To) ((typename to_unsigned<From>::type) from);
+}
+
+template <typename To, typename From>
+inline typename std::enable_if<is_unsigned<From>::value, To>::type zero_extend(From from)
+{
+  return (To) from;
+}
+
+// Access the nth bit (static and dynamic versions)
 
 template <typename Int, uint8_t n>
 inline bool get_bit(Int x)
@@ -116,6 +214,8 @@ inline bool get_bit(Int x, uint8_t n)
   return (x >> n) & 1;
 }
 
+// Most/least signficant bits
+
 template <typename Int>
 inline bool msb(Int x)
 {
@@ -127,6 +227,8 @@ inline bool lsb(Int x)
 { 
   return get_bit<Int, 0>(x);
 }
+
+// Upper / lower halves
 
 template <typename Int>
 inline typename half_width<Int>::type get_upper_half(Int x)
@@ -140,6 +242,8 @@ inline typename half_width<Int>::type get_lower_half(Int x)
   return (typename half_width<Int>::type) x;
 }
 
+// Bit masking
+
 inline void set_upper_n(int8_t&  x, uint8_t  n) { x |= (int8_t)  upper_[n-1+56]; }
 inline void set_upper_n(int16_t& x, uint16_t n) { x |= (int16_t) upper_[n-1+48]; }
 inline void set_upper_n(int32_t& x, uint32_t n) { x |= (int32_t) upper_[n-1+32]; }
@@ -149,6 +253,8 @@ inline void set_lower_n(int8_t&  x, uint8_t  n) { x |= (int8_t)  lower_[n-1]; }
 inline void set_lower_n(int16_t& x, uint16_t n) { x |= (int16_t) lower_[n-1]; }
 inline void set_lower_n(int32_t& x, uint32_t n) { x |= (int32_t) lower_[n-1]; }
 inline void set_lower_n(int64_t& x, uint64_t n) { x |= (int64_t) lower_[n-1]; }
+
+// Bit counting
 
 template <typename UInt = uint64_t>
 uint8_t count_bits_naive(UInt v)
