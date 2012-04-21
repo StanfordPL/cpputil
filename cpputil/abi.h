@@ -8,7 +8,7 @@
 namespace cpputil
 {
 
-std::string unmangle(const char* mangled)
+inline std::string unmangle(const char* mangled)
 {
   int status;
   char* original = abi::__cxa_demangle(mangled, 0, 0, &status);
