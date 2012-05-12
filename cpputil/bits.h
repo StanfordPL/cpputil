@@ -310,7 +310,7 @@ uint8_t pop_ref(T x)
 {
   uint8_t c = 0;
   for ( ; x; >>= 1 )
-    c += v & 1;
+    c += x & 1;
 
   return c;
 }
