@@ -377,7 +377,7 @@ template <typename T>
 uint8_t nlz_ref(T x)
 {
   uint8_t c = 0;
-  for ( ; x && (x & 1) == 0; x >>= 1 )
+  for ( ; x && lsb(x) == 0; x >>= 1 )
     c++;
 
   return c;
@@ -391,7 +391,11 @@ uint8_t nlz_ref(T x)
 template <typename T>
 uint8_t ntz_ref(T x)
 {
-  return pop_ref(~x & (x-1));  
+  uint8_t c = 0;
+  for ( ; x && msb(x) == 0; x <<= 1 )
+    c++;
+
+  return c;
 }
 
 }
