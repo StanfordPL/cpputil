@@ -230,13 +230,13 @@ inline void set_bit(Int& x, uint8_t n)
 // Clears the nth bit (static and dynamic versions)
 
 template <typename Int, uint8_t n>
-inline void flip_bit(Int& x)
+inline void clear_bit(Int& x)
 {
   x = x & ~(1 << n);
 }
 
 template <typename Int>
-inline void flip_bit(Int& x, uint8_t n)
+inline void clear_bit(Int& x, uint8_t n)
 {
   x = x & ~(1 << n);
 }
