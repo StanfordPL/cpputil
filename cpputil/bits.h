@@ -157,7 +157,6 @@ template <>           struct to_unsigned<uint32_t>     : public u32  {};
 template <>           struct to_unsigned<uint64_t>     : public u64  {};
 template <>           struct to_unsigned<__uint128_t>  : public u128 {};
 
-
 // Sign extend from one type to another
 // TODO: Add checks for To being wider than From
 
@@ -293,6 +292,64 @@ uint8_t count_bits_best(UInt v)
   v = (v & (UInt)~(UInt)0/15*3) + ((v >> 2) & (UInt)~(UInt)0/15*3);     
   v = (v + (v >> 4)) & (UInt)~(UInt)0/255*15;                      
   return (UInt)(v * ((UInt)~(UInt)0/255)) >> (sizeof(UInt) - 1) * CHAR_BIT; 
+}
+
+// NOTE: Below this point begins the structure of what I'd like this header to ultimate look like.
+//       First a reference implementation, and then successive refinements.
+//       A test harness can verify that all implementations produce identical values.
+//
+//       Where possible, I'd like to include references to the hacker's delight book in the documentation.
+
+// pop -- Population count (number of one bits)
+// Hacker's Delight chapter 5
+
+// Reference implementation 
+
+template <typename T>
+uint8_t pop_ref(T x)
+{
+  uint8_t c = 0;
+  for ( ; x; >>= 1 )
+    c += v & 1;
+
+  return c;
+}
+
+// parity 
+// Hacker's Delight chapter 5
+
+// Reference implementation
+
+template <typename T>
+uint8_t parity_ref(T x)
+{
+  return pop_ref(x) % 2;
+}
+
+// nlz -- number of leading zeros
+// Hacker's Delight chapter 5
+
+// Reference implementation
+
+template <typename T>
+uint8_t nlz_ref(T x)
+{
+  uint8_t c = 0;
+  for ( ; x && (x & 1) == 0; x >>= 1 )
+    c++;
+
+  return c;
+}
+
+// ntz -- number of trailing zeros
+// Hacker's Delight chapter 5
+
+// Reference implementation
+
+template <typename T>
+uint8_t ntz_ref(T x)
+{
+  return pop_ref(~x & (x-1));  
 }
 
 }
