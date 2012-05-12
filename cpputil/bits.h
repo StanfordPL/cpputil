@@ -213,6 +213,34 @@ inline bool get_bit(Int x, uint8_t n)
   return (x >> n) & 1;
 }
 
+// Set the nth bit (static and dynamic versions)
+
+template <typename Int, uint8_t n>
+inline void set_bit(Int& x)
+{
+  x = x | (1 << n);
+}
+
+template <typename Int>
+inline void set_bit(Int& x, uint8_t n)
+{
+  x = x | (1 << n);
+}
+
+// Flip the nth bit (static and dynamic versions)
+
+template <typename Int, uint8_t n>
+inline void flip_bit(Int& x)
+{
+  x = x ^ (1 << n);
+}
+
+template <typename Int>
+inline void flip_bit(Int& x, uint8_t n)
+{
+  x = x ^ (1 << n);
+}
+
 // Most/least signficant bits
 
 template <typename Int>
