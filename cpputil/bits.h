@@ -398,6 +398,27 @@ uint8_t ntz_ref(T x)
   return c;
 }
 
+// byte_reverse
+// Hacker's Delight chapter 7
+
+// Reference implementation
+
+template <typename T>
+void byte_reverse_ref(T& x)
+{
+  for ( size_t i = 0; i < sizeof(T)/2; ++i )
+  {
+    T rmask = 0xff << i*CHAR_BIT;
+    T lmask = 0xff << (sizeof(T)-i-1)*CHAR_BIT;
+
+    T rbyte = (x & rmask) << (sizeof(T)-2*i-1)*CHAR_BIT;
+    T lbyte = (x & lmask) >> (sizeof(T)-2*i-1)*CHAR_BIT;
+
+    x = x & ~(lmask | rmask);
+    x = x |  (lbyte | rbyte);
+  }
+}
+
 }
 
 /*
