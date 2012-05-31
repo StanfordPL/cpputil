@@ -419,6 +419,37 @@ void byte_reverse_ref(T& x)
   }
 }
 
+// bit_reverse
+// Hacker's Delight chapter 7
+
+// Reference implementation
+
+template <typename T>
+void bit_reverse_ref(T& x)
+{
+  typename to_unsigned<T>::type rmask = 0x1;
+  typename to_unsigned<T>::type lmask = 0x1 << (sizeof(T)*8-1);
+  
+  for ( size_t i = 0; i < sizeof(T)*8/2; ++i )
+  {
+    bool r = x & rmask;
+    bool l = x & lmask;
+
+    if ( r )
+      x |= lmask;
+    else
+      x &= ~lmask;
+
+    if ( l )
+      x |= rmask;
+    else
+      x &= ~rmask;
+
+    rmask <<= 1;
+    lmask >>= 1;
+  }
+}
+
 }
 
 /*
