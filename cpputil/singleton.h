@@ -1,14 +1,14 @@
-#ifndef SINGLETON_H
-#define SINGLETON_H
+#ifndef CPPUTIL_SINGLETON_H
+#define CPPUTIL_SINGLETON_H
 
 namespace cpputil
 {
 
-template <typename _T>
+template <typename T>
 struct singleton
 {
   // Member types
-  typedef _T& reference;
+  typedef T& reference;
 
   // Constructors
   singleton() = delete;
@@ -16,7 +16,7 @@ struct singleton
   singleton& operator=(singleton s) = delete;
 
   // Element access
-  static reference get()
+  static inline reference get()
   {
     static _T instance;
     return instance;
