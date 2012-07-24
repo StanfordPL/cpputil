@@ -9,6 +9,9 @@ namespace cpputil
 template <typename Ch, typename Tr>
 struct basic_inoopstream : std::basic_istream<Ch, Tr>
 {
+	// Convenience Constructor
+	inline explicit basic_inoopstream(std::basic_istream<Ch, Tr>& is) : std::basic_istream<Ch, Tr>(is.rdbuf()) { }
+
 	// Constructor
 	inline explicit basic_inoopstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_istream<Ch, Tr>(sb) { }
 	// Destructor
@@ -57,6 +60,9 @@ typedef basic_inoopstream<wchar_t, std::char_traits<wchar_t>> winoopstream;
 template <typename Ch, typename Tr>
 struct basic_onoopstream : std::basic_ostream<Ch, Tr>
 {
+	// Convenience Constructor
+	inline explicit basic_onoopstream(std::basic_ostream<Ch, Tr>& os) : std::basic_ostream<Ch, Tr>(os.rdbuf()) { }
+
 	// Constructor
 	inline explicit basic_onoopstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(sb) { }
 	// Destructor
@@ -105,7 +111,12 @@ typedef basic_onoopstream<wchar_t, std::char_traits<wchar_t>> wonoopstream;
 template <typename Ch, typename Tr>
 struct basic_ionoopstream : public basic_inoopstream<Ch, Tr>, public basic_onoopstream<Ch, Tr> 
 {
+	// Convenience Constructor
+	explicit inline basic_ionoopstream(std::basic_iostream<Ch, Tr>& ios) : basic_inoopstream<Ch, Tr>(ios), basic_onoopstream<Ch, Tr>(ios) { }
+
+	// Constructor
 	explicit inline basic_ionoopstream(std::basic_streambuf<Ch, Tr>* sb) : basic_inoopstream<Ch, Tr>(sb), basic_onoopstream<Ch, Tr>(sb) { }
+	// Destructor
 	virtual inline ~basic_ionoopstream() { }
 };
 
