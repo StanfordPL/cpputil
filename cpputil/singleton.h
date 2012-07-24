@@ -16,12 +16,15 @@ struct singleton
   singleton& operator=(singleton s) = delete;
 
   // Element access
-  static inline reference get()
-  {
-    static _T instance;
-    return instance;
-  }
+  static reference get();
 };
+
+template <typename T>
+inline typename singleton<T>::reference singleton<T>::get()
+{
+  static T instance;
+  return instance;
+}
 
 }
 

@@ -1,5 +1,7 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef CPPUTIL_TIMER_H
+#define CPPUTIL_TIMER_H
+
+#include <ctime>
 
 namespace cpputil
 {
@@ -9,23 +11,41 @@ class Timer
   public:
 
     // Member types
-    typedef time_t time_type;  
+    typedef long sec_type;
+    typedef long nsec_type;
 
     // Modifiers
-    void start() { began_ = time(0); }
-    time_type stop() { elapsed_ += time(0) - began_; }
-    void wind(time_type timeup) { timeup_ = timeup; }     
-    void clear() { elapsed_ = 0; }
+    void start();
+    void stop(); 
 
     // State functions
-    time_type elapsed() const { return elapsed_; }
-    bool timeup const { return elapsed_ >= timeup_; }
+    sec_type  sec() const;
+    nsec_type nsec() const;
 
   private:
-    time_type began_;
-    time_type elapsed_;
-    time_type timeup_;
+    timespec begin_;
+    timespec end_;
 };
+
+inline void Timer::start()
+{
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &begin_);
+}
+
+inline void Timer::stop()
+{
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_);
+}
+
+inline Timer::sec_type Timer::sec() const
+{
+  return end_.tv_sec - begin_.tv_sec;
+}
+
+inline Timer::nsec_type Timer::nsec() const
+{
+  return 1e9 * sec() + end_.tv_nsec - begin_.tv_nsec;
+}
 
 }
 
