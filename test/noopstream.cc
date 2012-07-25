@@ -11,7 +11,7 @@ struct C
 	int x_, y_, z_;
 };
 istream& operator>>(istream& is, C& c) { is >> c.x_ >> c.y_ >> c.z_; return is; }
-ostream& operator<<(ostream& os, const C& c) { os << c.x_ << c.y_ << c.z_ << endl; }
+ostream& operator<<(ostream& os, const C& c) { os << c.x_ << c.y_ << c.z_ << endl; return os; }
 
 int main()
 {
@@ -65,27 +65,7 @@ int main()
 	t1.stop();
 
 	t2.start();
-	for ( int itr = 0; itr < 1e9; ++itr )
-	{
-		bool b;
-		short s;
-		unsigned short us;
-		int i;
-		unsigned int ui;
-		long l;
-		unsigned long ul;
-		float f;
-		double d;
-		long double ld;
-		void* v;
-		char c;
-		signed char sc;
-		unsigned char uc;
-		char* ch;
-		signed char* scp;
-		unsigned char* ucp;
-		C udt;
-	}
+	for ( int itr = 0; itr < 1e9; ++itr );
 	t2.stop();
 
 	onoopstream ons(cout.rdbuf());
@@ -138,31 +118,12 @@ int main()
 	t3.stop();
 
 	t4.start();
-	for ( int itr = 0; itr < 1e9; ++itr )
-	{
-		bool b;
-		short s;
-		unsigned short us;
-		int i;
-		unsigned int ui;
-		long l;
-		unsigned long ul;
-		float f;
-		double d;
-		long double ld;
-		void* v;
-		char c;
-		signed char sc;
-		unsigned char uc;
-		char* ch;
-		signed char* scp;
-		unsigned char* ucp;
-		C udt;
-	}
+	for ( int itr = 0; itr < 1e9; ++itr );
 	t4.stop();
 
-	cout << "If you didn't have to type anything, input works in principle." << endl;
-	cout << "If you didn't see any crazy values printed, output works in principle." << endl;
+	cout << "-> If you didn't have to type anything, input works in principle." << endl;
+	cout << "-> If you didn't see any crazy values printed, output works in principle." << endl;
+	cout << "-> If these times look about the same, the compiler is eliminating basically everything." << endl;
 	cout << endl;
 	cout << "Input Runtime: " << t1.nsec() << " ns" << endl;
 	cout << "Input Control: " << t2.nsec() << " ns" << endl;
