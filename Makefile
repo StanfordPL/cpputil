@@ -4,10 +4,12 @@ OBJ=test/bijection.o \
 		test/interner.o \
 		test/maputil.o \
 		test/singleton.o \
-		test/Sqlite.o \
 		test/socketstream.o \
 		test/stringutil.o \
 		test/tokenizer.o \
+    test/timer.o \
+		test/Log.o \
+		test/noopstream.o \
 		\
 		test/io/json.o \
 		test/io/serial.o \
@@ -20,14 +22,14 @@ OBJ=test/bijection.o \
 		test/traits/traits.o
 
 CXX=g++
-OPT=-g -Wall -std=c++0x
+OPT=-g -Wall -std=c++0x -O3
 INC=-I.
 
 doc: doxyfile
 	doxygen doxyfile
 
 .cc.o:
-	$(CXX) $(OPT) $(INC) $< -o $@
+	$(CXX) $(OPT) $(INC) $< -o $@ -lrt
 
 test/Sqlite.o: test/Sqlite.cc
 	$(CXX) $(OPT) $(INC) $< -o $@ -lsqlite3
