@@ -14,11 +14,13 @@ OBJ=test/bijection.o \
 		test/io/json.o \
 		test/io/serial.o \
 		test/system/architecture.o \
-		test/stream/delegatestream.o \
-		test/stream/indentstream.o \
-		test/stream/logstream.o \
+		\
+		test/stream/nullstream.o \
+		test/stream/redactstream.o \
+		test/stream/redirectstream.o \
 		test/stream/shuntstream.o \
 		test/stream/teestream.o \
+		\
 		test/traits/traits.o
 
 CXX=g++

@@ -5,15 +5,26 @@
 using namespace cpputil;
 using namespace std;
 
+void print_nonsense(ostream& os)
+{
+	os << "Are you jaking me sideways while pumping my gas!?" << endl;
+}
+
 int main()
 {
   oshuntstream os(cout);
 
   os << "You should see this" << endl;
-  os.buf()->close();
+  os << close << open << close;
+
   os << "You shouldn't see this" << endl;
-  os.buf()->open();
+	print_nonsense(os);
+
+  os << open;
   os << "You should see this" << endl;
+
+	os << close;
+	cout << "You should see this" << endl;
 
   return 0;
 }
