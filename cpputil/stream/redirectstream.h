@@ -12,8 +12,11 @@ class basic_redirectbuf : public std::basic_streambuf<Ch, Tr>
 {
   public:
 
-    typedef typename std::basic_streambuf<Ch, Tr>::traits_type traits_type; 
+		typedef typename std::basic_streambuf<Ch, Tr>::char_type   char_type;
     typedef typename std::basic_streambuf<Ch, Tr>::int_type    int_type;   
+		typedef typename std::basic_streambuf<Ch, Tr>::off_type    off_type;
+		typedef typename std::basic_streambuf<Ch, Tr>::pos_type    pos_type;
+    typedef typename std::basic_streambuf<Ch, Tr>::traits_type traits_type; 
 
     inline explicit basic_redirectbuf(std::basic_streambuf<Ch, Tr>* buf) : std::basic_streambuf<Ch, Tr>(), buf_(buf) { }
 		inline virtual ~basic_redirectbuf() { }
@@ -63,7 +66,7 @@ class basic_iredirectstream : public std::basic_istream<Ch, Tr>
 {
   public:
 
-		inline explicit basic_iredirectstream(std::basic_istream<Ch, Tr>& is) : std::basic_istream<Ch, Tr>(&buf_), buf_(is.rdbuf()) { }
+		inline explicit basic_iredirectstream(std::basic_istream<Ch, Tr>& is)   : std::basic_istream<Ch, Tr>(&buf_), buf_(is.rdbuf()) { }
 		inline explicit basic_iredirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_istream<Ch, Tr>(sb), buf_(sb) { }
 		inline virtual ~basic_iredirectstream() { }
 
@@ -72,7 +75,7 @@ class basic_iredirectstream : public std::basic_istream<Ch, Tr>
     basic_redirectbuf<Ch, Tr> buf_; 
 };
 
-typedef basic_iredirectstream<char, std::char_traits<char>> iredirectstream;        
+typedef basic_iredirectstream<char, std::char_traits<char>>       iredirectstream;        
 typedef basic_iredirectstream<wchar_t, std::char_traits<wchar_t>> wiredirectstream; 
 
 template <typename Ch, typename Tr>
@@ -80,7 +83,7 @@ class basic_oredirectstream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
-		inline explicit basic_oredirectstream(std::basic_ostream<Ch, Tr>& os) : std::basic_ostream<Ch, Tr>(&buf_), buf_(os.rdbuf()) { }
+		inline explicit basic_oredirectstream(std::basic_ostream<Ch, Tr>& os)   : std::basic_ostream<Ch, Tr>(&buf_), buf_(os.rdbuf()) { }
 		inline explicit basic_oredirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(sb), buf_(sb) { }
 		inline virtual ~basic_oredirectstream() { }
 
@@ -89,7 +92,7 @@ class basic_oredirectstream : public std::basic_ostream<Ch, Tr>
     basic_redirectbuf<Ch, Tr> buf_; 
 };
 
-typedef basic_oredirectstream<char, std::char_traits<char>> oredirectstream;        
+typedef basic_oredirectstream<char, std::char_traits<char>>       oredirectstream;        
 typedef basic_oredirectstream<wchar_t, std::char_traits<wchar_t>> woredirectstream; 
 
 template <typename Ch, typename Tr>
@@ -106,7 +109,7 @@ class basic_redirectstream : public std::basic_iostream<Ch, Tr>
     basic_redirectbuf<Ch, Tr> buf_; 
 };
 
-typedef basic_redirectstream<char, std::char_traits<char>> redirectstream;        
+typedef basic_redirectstream<char, std::char_traits<char>>       redirectstream;        
 typedef basic_redirectstream<wchar_t, std::char_traits<wchar_t>> wredirectstream; 
 
 }
