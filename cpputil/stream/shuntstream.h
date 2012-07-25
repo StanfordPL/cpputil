@@ -1,109 +1,62 @@
 #ifndef CPPUTIL_STREAM_SHUNTSTREAM_H
 #define CPPUTIL_STREAM_SHUNTSTREAM_H
 
-/// @file shuntstream.h
-/// @brief Templated basic_delegatebuf's and basic_ostream's that can selectively ignore output characters.
-
-#include "cpputil/stream/delegatestream.h"
+#include <iostream>
+#include <streambuf>
 
 namespace cpputil
 {
 
-/// @brief A basic_delegatebuf that can selectively ignore output characters.
 template <typename Ch, typename Tr>
-class basic_shuntbuf : public basic_delegatebuf<Ch, Tr>
+class basic_shuntbuf : public std::basic_streambuf<Ch, Tr>
 {
   public:
 
-    typedef typename basic_delegatebuf<Ch, Tr>::char_type   char_type;   ///< Redefinition of the underlying char_type.
-    typedef typename basic_delegatebuf<Ch, Tr>::traits_type traits_type; ///< Redefinition of the underlying traits_type.
-    typedef typename basic_delegatebuf<Ch, Tr>::int_type    int_type;    ///< Redefinition of the underlying int_type.
-    typedef typename basic_delegatebuf<Ch, Tr>::pos_type    pos_type;    ///< Redefinition of the underlying pos_type.
-    typedef typename basic_delegatebuf<Ch, Tr>::off_type    off_type;    ///< Redefinition of the underlying off_type.
+    typedef typename std::basic_streambuf<Ch, Tr>::traits_type traits_type; 
+    typedef typename std::basic_streambuf<Ch, Tr>::int_type    int_type;   
 
-    /// @cond DELETED_METHODS
-    basic_shuntbuf() = delete;
-    /// @endcond
-
-    /// @brief The default copy constructor provided by the compiler.
-    basic_shuntbuf(const basic_shuntbuf& rhs) = default;
-    /// @brief The default move constructor provided by the compiler.
-    basic_shuntbuf(basic_shuntbuf&& rhs) = default;
-    /// @brief The default assignment operator provided by the compiler.
-    basic_shuntbuf& operator=(const basic_shuntbuf& rhs) = default;
-
-    /// @brief Constructs a basic_delegatebuf from a basic_streambuf.
-    basic_shuntbuf(std::basic_streambuf<Ch, Tr>* buf /**< [in,out] The streambuf to which methods are delegated; must outlast the lifetime of this object. */
-                  ) : 
-      basic_delegatebuf<Ch, Tr>(buf),
-      open_(true)
-    {
-      // Does nothing.
-    }
-
-    /// @brief Opens the shunt to output characters
-    void open()
-    {
-      open_ = true;
-    }
-
-    /// @brief Closes the shunt to output characters
-    void close()
-    {
-      open_ = false;
-    }
+    inline explicit basic_shuntbuf(std::basic_streambuf<Ch, Tr>* buf, bool open = true) : std::basic_streambuf<Ch, Tr>(), buf_(buf), open_(open) { }
+		inline virtual ~basic_shuntbuf() { }
 
   protected:
 
-    /// @brief Passes the input character to the underlying basic_streambuf iff the shunt is open.
-    ///
-    /// @return the input character if the shunt is closed, or the result of the delegated invocation of overflow.
-    virtual int_type overflow(int_type c = traits_type::eof())
-    {
-      return open_ ? basic_delegatebuf<Ch, Tr>::overflow(c) : c;
-    }
+    inline virtual int sync() 
+		{ 
+			return buf_->pubsync(); 
+		}
+    inline virtual int_type overflow(int_type c = traits_type::eof()) 
+		{ 
+			return open_ ? buf_->sputc(traits_type::to_char_type(c)) : c;
+		}
+
+		inline void open() { open_ = true; }
+		inline void close() { open_ = false; }
 
   private:
 
-    bool open_; /**< Is the shunt open? */
+    std::basic_streambuf<Ch, Tr>* buf_; 
+		bool open_;
 };
 
-/// @brief A basic_ostream backed by a basic_shuntbuf.
-/// @sa http://www.cplusplus.com/reference/ostream
 template <typename Ch, typename Tr>
 class basic_oshuntstream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
-    /// @cond DELETED_METHODS
-    basic_oshuntstream() = delete;
-    basic_oshuntstream(basic_oshuntstream&& rhs) = delete;
-    basic_oshuntstream& operator=(const basic_oshuntstream& rhs) = delete;
-    /// @endcond
+		inline explicit basic_oshuntstream(std::basic_ostream<Ch, Tr>& os, bool open = true) : std::basic_ostream<Ch, Tr>(&buf_), buf_(os.rdbuf(), open) { }
+		inline explicit basic_oshuntstream(std::basic_streambuf<Ch, Tr>* sb, bool open = true) : std::basic_ostream<Ch, Tr>(sb), buf_(sb, open) { }
+		inline virtual ~basic_oshuntstream() { }
 
-    /// @brief Constructs a basic_oshuntstream from a basic_ostream.
-    basic_oshuntstream(std::basic_ostream<Ch, Tr>& os /**< A basic_ostream from which to co-opt a basic_streambuf to delegate to. */
-                      ) :
-      std::basic_ostream<Ch, Tr>(&buf_),
-      buf_(os.rdbuf()) 
-    {
-      // Does nothing.
-    }
-
-    /// @brief Returns a pointer to the underlying basic_shuntbuf.
-    /// @return the underlying basic_shuntbuf
-    basic_shuntbuf<Ch, Tr>* buf() 
-    {
-      return &buf_;
-    }
+		inline void open() { buf_->open(); }
+		inline void close() { buf_->close(); }
 
   private:
 
-    basic_shuntbuf<Ch, Tr> buf_; /**< The default implementation of ostream will redirect all write methods to this object. */
+    basic_shuntbuf<Ch, Tr> buf_; 
 };
 
-typedef basic_oshuntstream<char, std::char_traits<char>> oshuntstream;        ///< Convenience typedef for chars.
-typedef basic_oshuntstream<wchar_t, std::char_traits<wchar_t>> woshuntstream; ///< Convenience typedef for wide chars.
+typedef basic_oshuntstream<char, std::char_traits<char>> oshuntstream;        
+typedef basic_oshuntstream<wchar_t, std::char_traits<wchar_t>> woshuntstream; 
 
 }
 

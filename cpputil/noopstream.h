@@ -109,20 +109,20 @@ typedef basic_onoopstream<char, std::char_traits<char>> onoopstream;
 typedef basic_onoopstream<wchar_t, std::char_traits<wchar_t>> wonoopstream;
 
 template <typename Ch, typename Tr>
-struct basic_ionoopstream : public basic_inoopstream<Ch, Tr>, public basic_onoopstream<Ch, Tr> 
+struct basic_noopstream : public basic_inoopstream<Ch, Tr>, public basic_onoopstream<Ch, Tr> 
 {
 	// Convenience Constructor
-	explicit inline basic_ionoopstream(std::basic_iostream<Ch, Tr>& ios) : basic_inoopstream<Ch, Tr>(ios), basic_onoopstream<Ch, Tr>(ios) { }
+	explicit inline basic_noopstream(std::basic_iostream<Ch, Tr>& ios) : basic_inoopstream<Ch, Tr>(ios), basic_onoopstream<Ch, Tr>(ios) { }
 
 	// Constructor
-	explicit inline basic_ionoopstream(std::basic_streambuf<Ch, Tr>* sb) : basic_inoopstream<Ch, Tr>(sb), basic_onoopstream<Ch, Tr>(sb) { }
+	explicit inline basic_noopstream(std::basic_streambuf<Ch, Tr>* sb) : basic_inoopstream<Ch, Tr>(sb), basic_onoopstream<Ch, Tr>(sb) { }
 	// Destructor
-	virtual inline ~basic_ionoopstream() { }
+	virtual inline ~basic_noopstream() { }
 };
 
 // Convenience typedefs
-typedef basic_ionoopstream<char, std::char_traits<char>> ionoopstream;
-typedef basic_ionoopstream<wchar_t, std::char_traits<wchar_t>> wionoopstream;
+typedef basic_noopstream<char, std::char_traits<char>> noopstream;
+typedef basic_noopstream<wchar_t, std::char_traits<wchar_t>> wnoopstream;
 
 }
 

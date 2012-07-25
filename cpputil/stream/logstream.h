@@ -1,98 +1,37 @@
 #ifndef CPPUTIL_STREAM_LOGSTREAM_H
 #define CPPUTIL_STREAM_LOGSTREAM_H
 
-/// @file logstream.h
-/// @brief A templated basic_ostream for filtering log messages based on severity level.
-
-#include <array>
-#include <stdexcept>
-#include <string>
+#include <iostream>
 
 #include "cpputil/stream/indentstream.h"
+#include "cpputil/stream/noopstream.h"
 #include "cpputil/stream/shuntstream.h"
-
-namespace 
-{
-
-/// @brief Logger filtering level labels
-std::array<std::string, 8> labels  
-{{
-  "    [OFF] ",
-  " [SEVERE] ",
-  "[WARNING] ",
-  "   [INFO] ",
-  " [CONFIG] ",
-  "   [FINE] ",
-  "  [FINER] ",
-  " [FINEST] "
-}};
-
-}
 
 namespace cpputil
 {
 
-/// @brief A basic_ostream backed by a basic_shuntbuf.
-/// @sa http://www.cplusplus.com/reference/ostream
+enum LogLevel { SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST };
+
 template <typename Ch, typename Tr>
 class basic_ologstream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
-    /// @brief Log filtering levels.
-    enum Level
+		inline explicit basic_ologstream(std::basic_ostream<Ch, Tr>& os, LogLevel level = INFO) : std::basic_ostream<Ch, Tr>(&shunt_), shunt_(&indent_), indent_(os.rdbuf()), level_(level) { }
+		inline explicit basic_ologstream(std::basic_streambuf<Ch, Tr>* sb, LogLevel level = INFO) : std::basic_ostream<Ch, Tr>(&shunt_), shunt_(&indent_), indent_(sb), level_(level) { }
+		inline virtual ~basic_ologstream() { }
+
+		inline void set_level(LogLevel level) { level_ = level; }
+
+    basic_ologstream& operator<<(LogLevel level)
     {
-      OFF     = 0,
-      SEVERE  = 1,
-      WARNING = 2,
-      INFO    = 3,
-      CONFIG  = 4,
-      FINE    = 5,
-      FINER   = 6,
-      FINEST  = 7
-    };
-
-    /// @cond DELETED_METHODS
-    basic_ologstream() = delete;
-    basic_ologstream(basic_ologstream&& rhs) = delete;
-    basic_ologstream& operator=(const basic_ologstream& rhs) = delete;
-    /// @endcond
-
-    /// @brief Constructs a basic_ologstream from a basic_ostream, and an optional default filtering level.
-    basic_ologstream(std::basic_ostream<Ch, Tr>& os, /**< A basic_ostream to which log messages should be directed. */
-                     Level level = INFO              /**< The initial filtering level. */
-                    ) :
-      std::basic_ostream<Ch, Tr>(&shunt_),
-      shunt_(&indent_),
-      indent_(os.rdbuf(), 10),
-      level_(level)
-    {
-      // Does nothing.
-    }
-
-    /// @briefs Resets the logger's filtering level.
-    void setLevel(Level level /**< The new filtering level. */
-                 )
-    {
-      level_ = level;
-    }
-
-    /// @brief Sets the filtering level of all subsequent stream insertions.
-    ///
-    /// Log messages above the current filtering level will be ignored.
-    /// Throws invalid_argument if level is OFF.
-    basic_ologstream& operator<<(Level level)
-    {
-      if ( level == OFF )
-        throw std::invalid_argument("Cannot emit messages with filtering level OFF!");
-
       if ( level <= level_ )
       {
         shunt_.open();
 
-        indent_.reset();
+        indent_.indent(10);
         *this << labels[level];
-        indent_.indent();
+        indent_.reset();
       }
       else
         shunt_.close();
@@ -102,13 +41,19 @@ class basic_ologstream : public std::basic_ostream<Ch, Tr>
 
   private:
 
-    basic_shuntbuf<Ch, Tr> shunt_;   ///< Controls whether log messages are emitted.
-    basic_indentbuf<Ch, Tr> indent_; ///< Controls log message indenting.
-    Level level_;                    ///< The current filtering level.
+    basic_shuntbuf<Ch, Tr> shunt_;   
+    basic_indentbuf<Ch, Tr> indent_; 
+    LogLevel level_;                    
 };
 
-typedef basic_ologstream<char, std::char_traits<char>> ologstream;        ///< Convenience typedef for chars.
-typedef basic_ologstream<wchar_t, std::char_traits<wchar_t>> wologstream; ///< Convenience typedef for wide chars.
+
+#ifndef CPPUTIL_NO_LOG
+typedef basic_ologstream<char, std::char_traits<char>> ologstream;        
+typedef basic_ologstream<wchar_t, std::char_traits<wchar_t>> wologstream; 
+#else
+typedef basic_onoopstream<char, std::char_traits<char>> ologstream;
+typedef basic_onoopstream<wchar_t, std::char_traits<wchar_t>> ologstream;
+#endif
 
 }
 #endif
