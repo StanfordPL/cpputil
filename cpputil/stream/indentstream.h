@@ -41,7 +41,7 @@ class basic_indentbuf : public std::basic_streambuf<Ch, Tr>
 			{
 				const auto eof = traits_type::eof();
 				for ( long i = 0, ie = ios_.iword(indentbuf_i()); i < ie; ++i )
-					if ( buf_->sputc(' ') == eof )
+					if ( traits_type::eq_int_type(buf_->sputc(' '), eof) )
 						return eof;
 
 				pending_ = false;
