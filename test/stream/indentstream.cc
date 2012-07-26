@@ -7,23 +7,16 @@ using namespace std;
 
 int main()
 {
-  oindentstream os1(cout);
-  os1.buf()->indent(2);
-  oindentstream os(os1);
+  oindentstream os(cout);
+	os << "Hello world" << endl;
+	os << indent(2) << "Hello world (2)" << endl;
+	os << indent(2) << "Hello world (4)" << endl;
+	os << "Hello world (4)" << endl;
+	os << unindent(4) << "Hello world (0)" << endl;
+	os << indent(5) << unindent(10) << "Hello world (0)" << endl;
+	os << indent(2) << "Hello world (2)" << endl;
 
-  os << "indent = 0";
-  os.buf()->indent(1);
-
-  os << endl << "indent = 1";
-  os.buf()->indent(2);
-
-  os << endl << "indent = 3";
-  os.buf()->unindent(1);
-
-  os << endl << "indent = 2";
-  os.buf()->reset();
-
-  os << endl << "indent = 0" << endl;
+	cout << "Hello world (0)" << endl;
 
   return 0;
 }

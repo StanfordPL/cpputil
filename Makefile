@@ -8,13 +8,12 @@ OBJ=test/bijection.o \
 		test/stringutil.o \
 		test/tokenizer.o \
     test/timer.o \
-		test/Log.o \
-		test/noopstream.o \
 		\
 		test/io/json.o \
 		test/io/serial.o \
 		test/system/architecture.o \
 		\
+		test/stream/indentstream.o \
 		test/stream/nullstream.o \
 		test/stream/redactstream.o \
 		test/stream/redirectstream.o \

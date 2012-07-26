@@ -8,7 +8,7 @@ namespace cpputil
 {
 
 template <typename Ch, typename Tr>
-class basic_teebuf : public basic_streambuf<Ch, Tr>
+class basic_teebuf : public std::basic_streambuf<Ch, Tr>
 {
   public:
 
@@ -25,15 +25,16 @@ class basic_teebuf : public basic_streambuf<Ch, Tr>
 
 		inline virtual int_type sync()
 		{
-			const auto res1 = buf1_->sync();
-			const auto res2 = buf2_->sync();
+			const auto res1 = buf1_->pubsync();
+			const auto res2 = buf2_->pubsync();
 
 			return ( res1 == 0 && res2 == 0 ) ? 0 : -1;
 		}
     inline virtual int_type overflow(int_type c = traits_type::eof())
     {
-      const auto res1 = buf1_->overflow(c); 
-      const auto res2 = buf2_->overflow(c);
+			const auto ch   = traits_type::to_char_type(c);
+      const auto res1 = buf1_->sputc(ch); 
+      const auto res2 = buf2_->sputc(ch);
       const auto eof  = traits_type::eof();
 
       return traits_type::eq_int_type(res1, eof) || traits_type::eq_int_type(res2, eof) ? eof : c;
@@ -41,8 +42,8 @@ class basic_teebuf : public basic_streambuf<Ch, Tr>
 
   private:
 
-    basic_streambuf<Ch, Tr> buf1_;
-    basic_streambuf<Ch, Tr> buf2_;
+		std::basic_streambuf<Ch, Tr>* buf1_;
+		std::basic_streambuf<Ch, Tr>* buf2_;
 };
 
 template <typename Ch, typename Tr>
@@ -50,8 +51,8 @@ class basic_oteestream : public std::basic_ostream<Ch, Tr>
 {
   public:
 
-		inline explicit basic_oteestream(std::basic_ostream<Ch, Tr> os1, std::basic_ostream<Ch, Tr> os2)       : std::basic_ostream<Ch, Tr>(buf_), buf_(os1.rdbuf(), os2.rdbuf()) { }
-		inline explicit basic_oteestream(std::basic_streambuf<Ch, Tr> buf1, std::basic_streambuf<Ch, Tr> buf2) : std::basic_ostream<Ch, Tr>(buf_), buf_(buf1, buf2) { }
+		inline explicit basic_oteestream(std::basic_ostream<Ch, Tr>& os1, std::basic_ostream<Ch, Tr>& os2)       : std::basic_ostream<Ch, Tr>(&buf_), buf_(os1.rdbuf(), os2.rdbuf()) { }
+		inline explicit basic_oteestream(std::basic_streambuf<Ch, Tr>* buf1, std::basic_streambuf<Ch, Tr>* buf2) : std::basic_ostream<Ch, Tr>(&buf_), buf_(buf1, buf2) { }
 		inline virtual ~basic_oteestream() { }
 
   private:

@@ -26,5 +26,8 @@ int main()
 	os << close;
 	cout << "You should see this" << endl;
 
+	oshuntstream os2(cout);
+	cout << "You should see this" << endl;
+
   return 0;
 }
