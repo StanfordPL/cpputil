@@ -7,7 +7,7 @@
 namespace cpputil
 {
 
-inline static int indentbuf_i()
+inline int indentbuf_i()
 {
 	static int i = std::ios_base::xalloc();
 	return i;
@@ -69,7 +69,7 @@ class basic_oindentstream : public std::basic_ostream<Ch, Tr>
 		{ 
 			this->iword(indentbuf_i()) = 0;	
 		}
-		inline explicit basic_oindentstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(sb), buf_(sb, *this) 
+		inline explicit basic_oindentstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(&buf_), buf_(sb, *this) 
 		{ 
 			this->iword(indentbuf_i()) = 0;	
 		}
@@ -105,10 +105,7 @@ class unindent
 		inline std::basic_ostream<Ch, Tr>& operator()(std::basic_ostream<Ch, Tr>& os) const
 		{
 			auto& l = os.iword(indentbuf_i());
-			l -= ui_;
-			if ( l < 0 )
-				l = 0;
-
+			l = ui_ >= l ? 0 : l - ui_;
 			return os;	
 		}
 

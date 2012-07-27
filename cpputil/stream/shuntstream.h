@@ -7,7 +7,7 @@
 namespace cpputil
 {
 
-inline static int shuntbuf_i()
+inline int shuntbuf_i()
 {
 	static int i = std::ios_base::xalloc();
 	return i;
@@ -53,7 +53,7 @@ class basic_oshuntstream : public std::basic_ostream<Ch, Tr>
 		{ 
 			this->iword(shuntbuf_i()) = 1;
 		}
-		inline explicit basic_oshuntstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(sb), buf_(sb, *this)
+		inline explicit basic_oshuntstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(&buf_), buf_(sb, *this)
 		{
 			this->iword(shuntbuf_i()) = 1;
 		}

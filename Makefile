@@ -14,11 +14,13 @@ OBJ=test/bijection.o \
 		test/system/architecture.o \
 		\
 		test/stream/indentstream.o \
+		test/stream/logstream.o \
 		test/stream/nullstream.o \
 		test/stream/redactstream.o \
 		test/stream/redirectstream.o \
 		test/stream/shuntstream.o \
 		test/stream/teestream.o \
+		test/stream/noopstream.o \
 		\
 		test/traits/traits.o
 

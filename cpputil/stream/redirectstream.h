@@ -67,7 +67,7 @@ class basic_iredirectstream : public std::basic_istream<Ch, Tr>
   public:
 
 		inline explicit basic_iredirectstream(std::basic_istream<Ch, Tr>& is)   : std::basic_istream<Ch, Tr>(&buf_), buf_(is.rdbuf()) { }
-		inline explicit basic_iredirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_istream<Ch, Tr>(sb), buf_(sb) { }
+		inline explicit basic_iredirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_istream<Ch, Tr>(&buf_), buf_(sb) { }
 		inline virtual ~basic_iredirectstream() { }
 
   private:
@@ -84,7 +84,7 @@ class basic_oredirectstream : public std::basic_ostream<Ch, Tr>
   public:
 
 		inline explicit basic_oredirectstream(std::basic_ostream<Ch, Tr>& os)   : std::basic_ostream<Ch, Tr>(&buf_), buf_(os.rdbuf()) { }
-		inline explicit basic_oredirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(sb), buf_(sb) { }
+		inline explicit basic_oredirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_ostream<Ch, Tr>(&buf_), buf_(sb) { }
 		inline virtual ~basic_oredirectstream() { }
 
   private:
@@ -101,7 +101,7 @@ class basic_redirectstream : public std::basic_iostream<Ch, Tr>
   public:
 
 		inline explicit basic_redirectstream(std::basic_iostream<Ch, Tr>& ios) : std::basic_iostream<Ch, Tr>(&buf_), buf_(ios.rdbuf()) { }
-		inline explicit basic_redirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_iostream<Ch, Tr>(sb), buf_(sb) { }
+		inline explicit basic_redirectstream(std::basic_streambuf<Ch, Tr>* sb) : std::basic_iostream<Ch, Tr>(&buf_), buf_(sb) { }
 		inline virtual ~basic_redirectstream() { }
 
   private:
