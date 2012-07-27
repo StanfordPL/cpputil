@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "cpputil/noopstream.h"
+#include "cpputil/stream/noopstream.h"
 #include "cpputil/timer.h"
 
 using namespace cpputil;
