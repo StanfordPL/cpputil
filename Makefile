@@ -1,43 +1,45 @@
-OBJ=test/bijection.o \
-		test/bits.o \
-		test/histogram.o \
-		test/interner.o \
-		test/maputil.o \
-		test/singleton.o \
-		test/socketstream.o \
-		test/stringutil.o \
-		test/tokenizer.o \
-    test/timer.o \
-		\
-		test/io/json.o \
-		test/io/serial.o \
-		test/system/architecture.o \
-		\
-		test/stream/indentstream.o \
-		test/stream/logstream.o \
-		test/stream/nullstream.o \
-		test/stream/redactstream.o \
-		test/stream/redirectstream.o \
-		test/stream/shuntstream.o \
-		test/stream/teestream.o \
-		test/stream/noopstream.o \
-		\
-		test/traits/traits.o
+# Copyright 2013 eric schkufza
 
-CXX=g++
-OPT=-g -Wall -std=c++0x -O3
-INC=-I.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 
-doc: doxyfile
-	doxygen doxyfile
+#     http://www.apache.org/licenses/LICENSE-2.0
 
-.cc.o:
-	$(CXX) $(OPT) $(INC) $< -o $@ -lrt
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-test/Sqlite.o: test/Sqlite.cc
-	$(CXX) $(OPT) $(INC) $< -o $@ -lsqlite3
+##### CONSTANT DEFINITIONS
 
-all: doc $(OBJ)
+GCC=ccache g++-4.6 -std=c++0x
+
+INC=-I./
+		
+OPT=-Werror -g -O3 -std=c++0x
+
+DOC=doc/html
+
+##### TOP LEVEL TARGETS
+
+all: $(DOC)
+
+##### DOCUMENTATION TARGETS
+
+doc/html: src/doxyfile src/* src/mainpage.dox
+	doxygen src/doxyfile
+
+src/mainpage.dox: README.txt	
+	echo "/**" > src/mainpage.dox &&\
+	echo \\mainpage >> src/mainpage.dox &&\
+	echo "\\\verbatim" >> src/mainpage.dox &&\
+	cat README.txt >> src/mainpage.dox &&\
+	echo \\endverbatim >> src/mainpage.dox &&\
+	echo "*/" >> src/mainpage.dox
+
+##### CLEAN TARGETS
 
 clean:
-	rm -rf $(OBJ) documentation
+	rm -rf $(DOC)

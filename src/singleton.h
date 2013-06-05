@@ -4,14 +4,15 @@
 namespace cpputil {
 
 template <typename T>
-struct Singleton {
-  typedef T& reference;
+class Singleton {
+	public:
+		typedef T& reference;
 
-  Singleton() = delete;
-  Singleton(const Singleton& s) = delete;
-  Singleton& operator=(Singleton s) = delete;
+		Singleton() = delete;
+		Singleton(const Singleton& s) = delete;
+		Singleton& operator=(Singleton s) = delete;
 
-  static reference get();
+		static reference get();
 };
 
 template <typename T>
