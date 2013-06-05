@@ -1,31 +1,25 @@
-#ifndef CPPUTIL_SINGLETON_H
-#define CPPUTIL_SINGLETON_H
+#ifndef CPPUTIL_SRC_SINGLETON_H
+#define CPPUTIL_SRC_SINGLETON_H
 
-namespace cpputil
-{
+namespace cpputil {
 
 template <typename T>
-struct singleton
-{
-  // Member types
+struct Singleton {
   typedef T& reference;
 
-  // Constructors
-  singleton() = delete;
-  singleton(const singleton& s) = delete;
-  singleton& operator=(singleton s) = delete;
+  Singleton() = delete;
+  Singleton(const Singleton& s) = delete;
+  Singleton& operator=(Singleton s) = delete;
 
-  // Element access
   static reference get();
 };
 
 template <typename T>
-inline typename singleton<T>::reference singleton<T>::get()
-{
+inline typename Singleton<T>::reference Singleton<T>::get() {
   static T instance;
   return instance;
 }
 
-}
+} // namespace cpputil
 
 #endif
