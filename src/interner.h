@@ -12,7 +12,6 @@ class Interner {
     typedef const T& const_reference; 
     typedef typename Set::size_type size_type;
     typedef typename Set::const_iterator const_iterator;
-    typedef typename Set::const_reverse_iterator const_reverse_iterator;
 
     const_reference intern(const_reference t);
 
@@ -20,11 +19,6 @@ class Interner {
     const_iterator cbegin() const;
     const_iterator end() const; 
     const_iterator cend() const;
-
-    const_reverse_iterator rbegin() const;
-    const_reverse_iterator crbegin() const;
-    const_reverse_iterator rend() const;
-    const_reverse_iterator crend() const;
 
     bool empty() const;
     size_type size() const;
@@ -37,58 +31,34 @@ class Interner {
 };
 
 template <typename T, typename Set>
-inline Interner<T, Set>::const_reference 
+inline typename Interner<T, Set>::const_reference 
 Interner<T, Set>::intern(const_reference t) {
-	auto res = vals_.insert(t);
+	const auto res = vals_.insert(t);
 	return *(res.first);
 }
 
 template <typename T, typename Set>
-inline Interner<T, Set>::const_iterator
+inline typename Interner<T, Set>::const_iterator
 Interner<T, Set>::begin() const { 
 	return vals_.begin(); 
 }
 
 template <typename T, typename Set>
-inline Interner<T, Set>::const_iterator
+inline typename Interner<T, Set>::const_iterator
 Interner<T, Set>::cbegin() const { 
 	return begin(); 
 }
 
 template <typename T, typename Set>
-inline Interner<T, Set>::const_iterator
+inline typename Interner<T, Set>::const_iterator
 Interner<T, Set>::end() const { 
 	return vals_.end(); 
 }
 
 template <typename T, typename Set>
-inline Interner<T, Set>::const_iterator
+inline typename Interner<T, Set>::const_iterator
 Interner<T, Set>::cend() const { 
-	return end(); 
-}
-
-template <typename T, typename Set>
-inline Interner<T, Set>::const_reverse_iterator
-Interner<T, Set>::rbegin() const { 
-	return vals_.rbegin(); 
-}
-
-template <typename T, typename Set>
-inline Interner<T, Set>::const_reverse_iterator
-Interner<T, Set>::crbegin() const { 
-	return rbegin(); 
-}
-
-template <typename T, typename Set>
-inline Interner<T, Set>::const_reverse_iterator
-Interner<T, Set>::rend() const { 
-	return vals_.rend(); 
-}
-
-template <typename T, typename Set>
-inline Interner<T, Set>::const_reverse_iterator
-Interner<T, Set>::crend() const { 
-	return rend(); 
+	return vals_.end(); 
 }
 
 template <typename T, typename Set>
@@ -97,7 +67,7 @@ inline bool Interner<T, Set>::empty() const {
 }
 
 template <typename T, typename Set>
-inline Interner<T, Set>::size_type Interner<T, Set>::size() const { 
+inline typename Interner<T, Set>::size_type Interner<T, Set>::size() const { 
 	return vals_.size(); 
 }
 

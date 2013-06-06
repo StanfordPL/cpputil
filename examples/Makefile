@@ -14,32 +14,21 @@
 
 ##### CONSTANT DEFINITIONS
 
-GCC=ccache g++-4.6 -std=c++0x
-
-INC=-I./
-		
-OPT=-Werror -g -O3 -std=c++0x
-
-DOC=doc/html
+GCC = g++ 
+OPT = -Werror -g -O3 -std=c++0x 
+INC = "-I../"
+EX = interner maputil singleton timer #tokenizer
 
 ##### TOP LEVEL TARGETS
 
-all: $(DOC)
+all: $(EX)
 
-##### DOCUMENTATION TARGETS
+##### BUILD TARGETS
 
-doc/html: src/doxyfile src/* src/mainpage.dox
-	doxygen src/doxyfile
-
-src/mainpage.dox: README.txt	
-	echo "/**" > src/mainpage.dox &&\
-	echo \\mainpage >> src/mainpage.dox &&\
-	echo "\\\verbatim" >> src/mainpage.dox &&\
-	cat README.txt >> src/mainpage.dox &&\
-	echo \\endverbatim >> src/mainpage.dox &&\
-	echo "*/" >> src/mainpage.dox
+%: %.cc 
+	$(GCC) $(OPT) $< -o $@ $(INC)
 
 ##### CLEAN TARGETS
 
 clean:
-	rm -rf $(DOC) src/mainpage.dox
+	rm -f $(EX)
