@@ -1,16 +1,15 @@
 #ifndef CPPUTIL_SRC_TOKENIZER_H
 #define CPPUTIL_SRC_TOKENIZER_H
 
-#include <cassert>
 #include <stdint.h>
-#include <unordered_map>
 
-#include "src/maputil.h"
+#include "src/bijection.h"
 
 namespace cpputil {
 
 template <typename T, typename Token = uint64_t, 
-				  typename Map = std::unordered_map<Token, T>>
+				  typename TokenMap = std::unordered_map<Token, T>,
+					typename TMap = std::unordered_map<T, Token>>
 class Tokenizer {
 	public:
     typedef T value_type;
@@ -20,7 +19,7 @@ class Tokenizer {
     typedef typename CppUtilMap<Map>::const_value_iterator const_iterator;
 
 		token_type tokenize(const_reference t);
-		const_iterator untokenize(token_type token) const;
+		void untokenize(token_type token) const;
 
 		const_iterator begin() const;
 		const_iterator cbegin() const;
@@ -34,7 +33,7 @@ class Tokenizer {
 		void swap(Tokenizer& rhs);
 
 	private:
-		CppUtilMap<Map> contents_;
+		Bijection<TokenMap, TMap> contents_;
 		Token next_token_;
 };
 

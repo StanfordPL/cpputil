@@ -22,7 +22,7 @@ class Bijection {
 
 		typedef typename CppUtilMap<DMap>::map_type::const_iterator const_iterator;
 		typedef typename CppUtilMap<DMap>::map_type::value_type value_type;
-		typedef const typename CppUtilMap<DMap>::map_type::value_type& const_reference;
+		typedef const value_type& const_reference;
 		typedef typename CppUtilMap<DMap>::map_type::size_type size_type;
 
 		const_iterator begin() const { return d2r_.begin(); }
