@@ -17,7 +17,7 @@
 GCC = g++ 
 OPT = -Werror -g -O3 -std=c++0x 
 INC = "-I../"
-EX = bijection interner maputil singleton timer tokenizer
+EX = bijection interner maputil singleton thread timer tokenizer
 
 ##### TOP LEVEL TARGETS
 
@@ -26,7 +26,7 @@ all: $(EX)
 ##### BUILD TARGETS
 
 %: %.cc 
-	$(GCC) $(OPT) $< -o $@ $(INC)
+	$(GCC) $(OPT) $< -o $@ $(INC) -lpthread
 
 ##### CLEAN TARGETS
 
