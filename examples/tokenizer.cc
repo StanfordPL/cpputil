@@ -11,13 +11,10 @@ int main() {
 	t.tokenize("Hello");
 	t.tokenize("world");
 
-	cout << "Should print \"Hello world\": ";
-	cout << *t.untokenize(0) << " " << *t.untokenize(1) << endl;
-
 	for ( int n = 0; n < 2; ++n ) {
-		cout << "Tokenized strings: (" << t.size() << ") [";
+		cout << "Tokenized strings: (" << t.size() << ") [ ";
 			for ( const auto& itr : t )
-				cout << itr << " ";
+				cout << "(" << itr.first << " " << itr.second << ") ";
 		cout << "]" << endl;
 
 		t.clear();

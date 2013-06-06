@@ -1,25 +1,29 @@
 #ifndef CPPUTIL_SRC_TOKENIZER_H
 #define CPPUTIL_SRC_TOKENIZER_H
 
+#include <algorithm>
 #include <stdint.h>
+#include <unordered_map>
 
 #include "src/bijection.h"
 
 namespace cpputil {
 
 template <typename T, typename Token = uint64_t, 
-				  typename TokenMap = std::unordered_map<Token, T>,
-					typename TMap = std::unordered_map<T, Token>>
+				  typename TMap = std::unordered_map<T, Token>,
+					typename TokenMap = std::unordered_map<Token, T>>
 class Tokenizer {
 	public:
     typedef T value_type;
     typedef const T& const_reference; 
 		typedef Token token_type;
-    typedef typename CppUtilMap<Map>::size_type size_type;
-    typedef typename CppUtilMap<Map>::const_value_iterator const_iterator;
+    typedef typename Bijection<T, Token, TMap, TokenMap>::size_type size_type;
+    typedef typename Bijection<T, Token, TMap, TokenMap>::const_iterator const_iterator;
 
-		token_type tokenize(const_reference t);
-		void untokenize(token_type token) const;
+		Tokenizer();
+
+		const_iterator tokenize(const_reference t);
+		const_iterator untokenize(token_type token) const;
 
 		const_iterator begin() const;
 		const_iterator cbegin() const;
@@ -33,69 +37,76 @@ class Tokenizer {
 		void swap(Tokenizer& rhs);
 
 	private:
-		Bijection<TokenMap, TMap> contents_;
+		Bijection<T, Token, TMap, TokenMap> contents_;
 		Token next_token_;
 };
 
-template <typename T, typename Token, typename Map>
-inline typename Tokenizer<T, Token, Map>::token_type 
-Tokenizer<T, Token, Map>::tokenize(const_reference t) {
-	if ( contents_.find(t) == contents_.end() ) {
-		return contents_.insert(next_token_++, t).first->first;
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline Tokenizer<T, Token, TMap, TokenMap>::Tokenizer() 
+		: next_token_{Token()} {
+}
+
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline typename Tokenizer<T, Token, TMap, TokenMap>::const_iterator
+Tokenizer<T, Token, TMap, TokenMap>::tokenize(const_reference t) {
+	const auto itr = contents_.domain_find(t);
+	if ( itr == contents_.end() ) {
+		return contents_.insert(std::make_pair(t, next_token_++)).first;
 	} else {
-		return contents_.at(t);
+		return itr;
 	}
 }
 
-template <typename T, typename Token, typename Map>
-inline typename Tokenizer<T, Token, Map>::const_iterator 
-Tokenizer<T, Token, Map>::untokenize(token_type token) const { 
-	return contents_.find(token); 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline typename Tokenizer<T, Token, TMap, TokenMap>::const_iterator 
+Tokenizer<T, Token, TMap, TokenMap>::untokenize(token_type token) const { 
+	return contents_.range_find(token); 
 }
 
-template <typename T, typename Token, typename Map>
-inline typename Tokenizer<T, Token, Map>::const_iterator 
-Tokenizer<T, Token, Map>::begin() const { 
-	return contents_.vbegin(); 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline typename Tokenizer<T, Token, TMap, TokenMap>::const_iterator 
+Tokenizer<T, Token, TMap, TokenMap>::begin() const { 
+	return contents_.begin(); 
 }
 
-template <typename T, typename Token, typename Map>
-inline typename Tokenizer<T, Token, Map>::const_iterator 
-Tokenizer<T, Token, Map>::cbegin() const { 
-	return contents_.cvbegin(); 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline typename Tokenizer<T, Token, TMap, TokenMap>::const_iterator 
+Tokenizer<T, Token, TMap, TokenMap>::cbegin() const { 
+	return contents_.cbegin(); 
 }
 
-template <typename T, typename Token, typename Map>
-inline typename Tokenizer<T, Token, Map>::const_iterator 
-Tokenizer<T, Token, Map>::end() const { 
-	return contents_.vend(); 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline typename Tokenizer<T, Token, TMap, TokenMap>::const_iterator 
+Tokenizer<T, Token, TMap, TokenMap>::end() const { 
+	return contents_.end(); 
 }
 
-template <typename T, typename Token, typename Map>
-inline typename Tokenizer<T, Token, Map>::const_iterator 
-Tokenizer<T, Token, Map>::cend() const { 
-	return contents_.cvend(); 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline typename Tokenizer<T, Token, TMap, TokenMap>::const_iterator 
+Tokenizer<T, Token, TMap, TokenMap>::cend() const { 
+	return contents_.cend(); 
 }
 
-template <typename T, typename Token, typename Map>
-inline bool Tokenizer<T, Token, Map>::empty() const { 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline bool Tokenizer<T, Token, TMap, TokenMap>::empty() const { 
 	return contents_.empty(); 
 }
 
-template <typename T, typename Token, typename Map>
-inline typename Tokenizer<T, Token, Map>::size_type 
-Tokenizer<T, Token, Map>::size() const { 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline typename Tokenizer<T, Token, TMap, TokenMap>::size_type 
+Tokenizer<T, Token, TMap, TokenMap>::size() const { 
 	return contents_.size(); 
 }
 
-template <typename T, typename Token, typename Map>
-inline void Tokenizer<T, Token, Map>::clear() { 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline void Tokenizer<T, Token, TMap, TokenMap>::clear() { 
 	contents_.clear(); 
 }
 
-template <typename T, typename Token, typename Map>
-inline void Tokenizer<T, Token, Map>::swap(Tokenizer& rhs) { 
+template <typename T, typename Token, typename TMap, typename TokenMap>
+inline void Tokenizer<T, Token, TMap, TokenMap>::swap(Tokenizer& rhs) { 
 	contents_.swap(rhs.contents_); 
+	std::swap(next_token_, rhs.next_token);		
 }
 
 } // namespace cpputil

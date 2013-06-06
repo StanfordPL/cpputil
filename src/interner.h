@@ -14,7 +14,6 @@ class Interner {
     typedef typename Set::const_iterator const_iterator;
 
     const_reference intern(const_reference t);
-		void unintern(const_reference t); // TODO
 
     const_iterator begin() const;
     const_iterator cbegin() const;
