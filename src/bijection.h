@@ -15,11 +15,14 @@ class Bijection {
 		typedef D domain_type;
 		typedef const D& const_domain_reference;
 		typedef typename CppUtilMap<DMap>::const_key_iterator const_domain_iterator;
+
 		typedef R range_type;
 		typedef const R& const_range_reference;
 		typedef typename CppUtilMap<RMap>::const_key_iterator const_range_iterator;
+
 		typedef typename CppUtilMap<DMap>::map_type::const_iterator const_iterator;
 		typedef typename CppUtilMap<DMap>::map_type::value_type value_type;
+		typedef const typename CppUtilMap<DMap>::map_type::value_type& const_reference;
 		typedef typename CppUtilMap<DMap>::map_type::size_type size_type;
 
 		const_iterator begin() const { return d2r_.begin(); }
@@ -47,7 +50,7 @@ class Bijection {
 		}
 
 		std::pair<const_iterator, bool> insert(const value_type& val) {
-			if ( find(val) == end() ) {
+			if ( find(val) != end() ) {
 				return std::make_pair(end(), false);
 			} else {
 				r2d_.insert(std::make_pair(val.second, val.first));
@@ -56,7 +59,7 @@ class Bijection {
 		} 
 		template <class InputIterator>
 	  void insert(InputIterator first, InputIterator last) {
-			for ( ; first != list; ++first )
+			for ( ; first != last; ++first )
 				insert(*first);
 		}
 		void insert(std::initializer_list<value_type> il) {
@@ -65,8 +68,8 @@ class Bijection {
 		}
 
 		const_iterator erase(const_iterator position) {
-			r2d_.erase(itr->second);
-			return d2r_.erase(itr);
+			r2d_.erase(position->second);
+			return d2r_.erase(position);
 		}
 		size_type erase(const value_type& val) {
 			erase(find(val));
@@ -78,13 +81,13 @@ class Bijection {
 		}
 
 		const_iterator find(const value_type& val) const {
-			const auto itr = domain_find(val.first);
-			return itr != end() && r2d_.find(val.second) != range_end() ? itr : end();
+			const auto itr = d2r_.find(val.first);
+			return itr != d2r_.end() && r2d_.find(val.second) != r2d_.end() ? itr : end();
 		}
 		const_iterator domain_find(const_domain_reference d) const { return d2r_.find(d); }
 		const_iterator range_find(const_range_reference r) const { 
 			const auto itr = r2d_.find(r);
-	 		return itr != range_end() ? domain_find(itr->second) : end();
+	 		return itr != r2d_.end() ? d2r_.find(itr->second) : end();
 		}
 
 		const_reference domain_at(const_domain_reference d) const { return d2r_.at(d); }

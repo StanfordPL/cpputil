@@ -17,7 +17,7 @@
 GCC = g++ 
 OPT = -Werror -g -O3 -std=c++0x 
 INC = "-I../"
-EX = interner maputil singleton timer #tokenizer
+EX = bijection interner maputil singleton timer tokenizer
 
 ##### TOP LEVEL TARGETS
 
