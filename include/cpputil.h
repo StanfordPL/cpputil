@@ -1,6 +1,7 @@
 #ifndef CPPUTIL_INCLUDE_CPPUTIL_H
 #define CPPUTIL_INCLUDE_CPPUTIL_H
 
+#include "src/args.h"
 #include "src/bijection.h"
 #include "src/interner.h"
 #include "src/maputil.h"
