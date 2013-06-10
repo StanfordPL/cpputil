@@ -102,6 +102,8 @@ class FlagArg : public Arg {
 template <typename T>
 class ValueArg : public Arg {
 	public:
+		typedef void (*ParseFxn)(std::istream& is, T& t);
+
 		virtual ~ValueArg();
 
 		static ValueArg& create(char opt);
@@ -113,6 +115,7 @@ class ValueArg : public Arg {
 		ValueArg& usage(const std::string& u);
 
 		ValueArg& default_val(const T& def);
+		ValueArg& parse_function(ParseFxn f);
 		ValueArg& parse_error(const std::string& parse);
 
 	protected:
@@ -120,6 +123,7 @@ class ValueArg : public Arg {
 
 	private:
 		T val_;
+		ParseFxn fxn_;
 		std::string parse_;	
 
 		ValueArg(char opt);
@@ -128,6 +132,8 @@ class ValueArg : public Arg {
 template <typename T>
 class FileArg : public Arg {
 	public:
+		typedef void (*ParseFxn)(std::istream& is, T& t);
+
 		virtual ~FileArg();
 
 		static FileArg& create(char opt);
@@ -138,14 +144,16 @@ class FileArg : public Arg {
 		FileArg& alternate(const std::string& alt);
 		FileArg& usage(const std::string& u);
 
-		FileArg& default_val(const T& def);
 		FileArg& default_path(const std::string& path);
+		FileArg& default_val(const T& def);
+		FileArg& parse_function(ParseFxn f);
 		FileArg& parse_error(const std::string& parse);
 		FileArg& file_error(const std::string& file);
 
 	private:
-		T val_;
 		std::string path_;
+		T val_;
+		ParseFxn fxn_;
 		std::string parse_;
 		std::string file_;
 
@@ -396,6 +404,12 @@ inline ValueArg<T>& ValueArg<T>::default_val(const T& t) {
 }
 
 template <typename T>
+inline ValueArg<T>& ValueArg<T>::parse_function(ParseFxn f) {
+	fxn_ = f;
+	return *this;
+}
+
+template <typename T>
 inline ValueArg<T>& ValueArg<T>::parse_error(const std::string& parse) { 
 	parse_ = parse; 
 	return *this; 
@@ -422,7 +436,11 @@ inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 	T temp;
 	std::istringstream iss(res);
-	iss >> temp;
+	if ( fxn_ != 0 )
+		fxn_(iss, temp);
+	else
+		iss >> temp;
+
 	if ( iss.fail() ) {
 		os << parse_;
 		return false;
@@ -434,7 +452,7 @@ inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 template <typename T>
 inline ValueArg<T>::ValueArg(char opt) 
-		: Arg{opt} {
+		: Arg{opt}, fxn_{0} {
 }
 
 template <typename T>
@@ -482,14 +500,20 @@ inline FileArg<T>& FileArg<T>::usage(const std::string& u) {
 }
 
 template <typename T>
+inline FileArg<T>& FileArg<T>::default_path(const std::string& path) {
+	path_ = path;
+	return *this;
+}
+
+template <typename T>
 inline FileArg<T>& FileArg<T>::default_val(const T& def) {
 	val_ = def;
 	return *this;
 }
 
 template <typename T>
-inline FileArg<T>& FileArg<T>::default_path(const std::string& path) {
-	path_ = path;
+inline FileArg<T>& FileArg<T>::parse_function(ParseFxn f) {
+	fxn_ = f;
 	return *this;
 }
 
@@ -531,7 +555,11 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 	}
 
 	T temp;
-	ifs >> temp;
+	if ( fxn_ != 0 )
+		fxn_(ifs, temp);
+	else
+		ifs >> temp;
+
 	if ( ifs.fail() ) {
 		os << parse_;
 		return false;
@@ -543,7 +571,7 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 template <typename T>
 inline FileArg<T>::FileArg(char opt) 
-		: Arg{opt} {
+		: Arg{opt}, fxn_{0} {
 }
 
 } // namespace cpputil
