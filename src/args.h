@@ -1,8 +1,9 @@
 #ifndef CPPUTIL_SRC_ARGS_H
 #define CPPUTIL_SRC_ARGS_H
 
+#include <cstring>
+
 #include <algorithm>
-#include <cstdio>
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
@@ -25,8 +26,8 @@ class Args {
 		typedef std::vector<std::string>::const_iterator unrecognized_iterator;
 		typedef std::vector<std::string>::const_iterator anonymous_iterator;
 
-		static bool read(int argc, char** argv, std::ostream& os = std::cout);
-		static std::string usage();
+		static void read(int argc, char** argv, std::ostream& os = std::cout);
+		static std::string usage(size_t indent = 0);
 
 		static bool error();
 		static error_iterator error_begin();
@@ -73,7 +74,7 @@ class Arg {
 		std::string desc_;
 		std::string usage_;
 
-		size_t width() const;
+		size_t width(size_t indent) const;
 };
 
 class FlagArg : public Arg {
@@ -149,30 +150,61 @@ class FileArg : public ValueArg<std::string> {
 		FileArg(char opt);
 };
 
-inline bool Args::read(int argc, char** argv, std::ostream& os) {
-	auto args = Singleton<Args>::get();
-	for ( const auto& arg : args.args_ )
+inline void Args::read(int argc, char** argv, std::ostream& os) {
+	auto& args = Singleton<Args>::get();
+
+	// getopt_long permutes argv. Option checking will always work.
+	// But this pass to check anonymous and unrecognized args must come first.
+	std::vector<option> longopts;
+	std::string opts;
+	for ( auto arg : args.args_ ) {
+		option o;
+		o.name = arg->alt_.c_str();
+		o.has_arg = dynamic_cast<FlagArg*>(arg) != 0 ? no_argument : required_argument;
+		o.flag = 0;
+		o.val = arg->opt_;
+		longopts.push_back(o);
+		
+		opts += arg->opt_;
+		if ( dynamic_cast<FlagArg*>(arg) == 0 )
+			opts += ':';
+	}
+	longopts.push_back(option{0,0,0,0});
+
+	auto c = 0;
+	optind = 1;
+	opterr = 0;
+	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts.data(), 0)) != -1 )
+		if ( c == '?' )
+			args.unrecognized_.push_back(std::string(argv[optind-1]));
+	for ( ; optind < argc; ++optind )
+		args.anonymous_.push_back(std::string(argv[optind]));
+
+	// Now check individual args
+	for ( auto arg : args.args_ )
 		if ( !arg->read(argc, argv, os) )
 			args.errors_.push_back(arg);
 }
 
-inline std::string Args::usage() {
-	auto args = Singleton<Args>::get();
+inline std::string Args::usage(size_t indent) {
+	auto& args = Singleton<Args>::get();
 
 	size_t max_width = 0;
 	for ( const auto arg : args.args_ )
-		max_width = std::max(max_width, arg->width());
+		max_width = std::max(max_width, arg->width(indent));
 
 	std::ostringstream oss;
 	for ( size_t i = 0, ie = args.args_.size(); i < ie; ++i ) {
 		const auto arg = args.args_[i];
 
-		oss << "  -" << arg->opt_ << " ";
+		for ( size_t j = 0; j < indent; ++j )
+			oss << " ";
+		oss << "-" << arg->opt_ << " ";
 		if ( arg->alt_ != "" )
 			oss << "--" << arg->alt_ << " ";
 		oss << arg->usage_ << " ";
 	
-		for ( size_t j = arg->width(); j < max_width; ++j )
+		for ( size_t j = arg->width(indent); j < max_width; ++j )
 			oss << ".";
 
 		oss << "... ";
@@ -214,7 +246,7 @@ inline Args::anonymous_iterator Args::anonymous_begin() {
 }
 
 inline Args::anonymous_iterator Args::anonymous_end() {
-	return Singleton<Args>::get().anonymous_end();
+	return Singleton<Args>::get().anonymous_.end();
 }
 
 inline bool Args::good() {
@@ -248,9 +280,9 @@ inline Arg& Arg::usage(const std::string& u) {
 	return *this; 
 }
 
-inline size_t Arg::width() const {
-	// "  -c "
-	size_t w = 5; 
+inline size_t Arg::width(size_t indent) const {
+	// "<indent>-c "
+	size_t w = indent+3; 
 	// "--alt "
 	if ( alt_ != "" )
 		w += (2+alt_.length()+1);
@@ -296,16 +328,13 @@ inline bool FlagArg::read(int argc, char** argv, std::ostream& os) {
 	const auto opts = std::string("") + opt_;
 
 	auto c = 0;
-
-	const auto ignore1 = freopen("/dev/null", "w", stderr);
 	optind = 1;
-	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 ) {
+	opterr = 0;
+	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 )
 		if ( c == opt_ ) {
 			val_ = true;
 			break;
 		}
-	}
-	const auto ignore2 = freopen("/dev/tty", "w", stderr);
 
 	return true; 
 }
@@ -376,26 +405,26 @@ inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 	auto c = 0;
 	char* res = 0;
-
-	const auto ignore1 = freopen("/dev/null", "w", stderr);
 	optind = 1;
-	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 ) {
+	opterr = 0;
+	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 )
 		if ( c == opt_ ) {
 			res = optarg;
 			break;
 		}
-	}
-	const auto ignore2 = freopen("/dev/tty", "w", stderr);
-
 	if ( res == 0 )
 		return true;
 
+	T temp;
 	std::istringstream iss(res);
-	iss >> val_;
-	if ( iss.fail() )
+	iss >> temp;
+	if ( iss.fail() ) {
 		os << parse_;
+		return false;
+	}
 
-	return !iss.fail();
+	val_ = temp;
+	return true;
 }
 
 template <typename T>
@@ -469,7 +498,6 @@ template <typename T>
 inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 	if ( !ValueArg<std::string>::read(argc, argv, os) )
 		return false;
-
 	if ( val_ == "" )
 		return true;
 
@@ -479,12 +507,14 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 		return false;
 	}
 
-	ifs >> file_val_;
+	T temp;
+	ifs >> temp;
 	if ( ifs.fail() ) {
 		os << parse_;
 		return false;
 	}
 
+	file_val_ = temp;
 	return true;
 }
 
