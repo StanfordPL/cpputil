@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <fstream>
 #include <getopt.h>
 #include <iostream>
 #include <sstream>
@@ -20,13 +21,16 @@ class Args {
 	friend class Arg;
 
 	public:
+		typedef std::vector<Arg*>::iterator error_iterator;
 		typedef std::vector<std::string>::const_iterator unrecognized_iterator;
 		typedef std::vector<std::string>::const_iterator anonymous_iterator;
 
-		static bool read(int argc, char** argv);
+		static bool read(int argc, char** argv, std::ostream& os = std::cout);
 		static std::string usage();
 
-		static bool errors();
+		static bool error();
+		static error_iterator error_begin();
+		static error_iterator error_end();
 
 		static bool unrecognized();
 		static unrecognized_iterator unrecognized_begin();
@@ -58,15 +62,16 @@ class Arg {
 
 		Arg& description(const std::string& desc);
 		Arg& alternate(const std::string& alt);
+		Arg& usage(const std::string& u);
 
-		virtual bool read(int argc, char** argv) = 0;
-		virtual std::string usage() const = 0;
+		virtual bool read(int argc, char** argv, std::ostream& os = std::cout) = 0;
 
 		char opt_;
 		std::string alt_;
 
 	private:
 		std::string desc_;
+		std::string usage_;
 
 		size_t width() const;
 };
@@ -77,14 +82,14 @@ class FlagArg : public Arg {
 
 		static FlagArg& create(char opt);
 
-		operator bool() const;
+		operator bool();
 
 		FlagArg& description(const std::string& desc);
 		FlagArg& alternate(const std::string& alt);
+		FlagArg& usage(const std::string& u);
 
 	protected:
-		virtual bool read(int argc, char** argv);
-		virtual std::string usage() const;
+		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 	private:
 		bool val_;
@@ -99,57 +104,55 @@ class ValueArg : public Arg {
 
 		static ValueArg& create(char opt);
 
-		operator T() const;
+		operator T&();
 
 		ValueArg& description(const std::string& desc);
 		ValueArg& alternate(const std::string& alt);
+		ValueArg& usage(const std::string& u);
 
-		ValueArg& default_val(const T& t);
+		ValueArg& default_val(const T& def);
 		ValueArg& parse_error(const std::string parse);
 
 	protected:
 		T val_;
+		std::string parse_;	
 
-		virtual bool read(int argc, char** argv);
-		virtual std::string usage() const;
+		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		ValueArg(char opt);
-
-	private:	
-		std::string parse_;	
 };
 
 template <typename T>
-class RangeArg : public ValueArg<T> {
+class FileArg : public ValueArg<std::string> {
 	public:
-		virtual ~RangeArg();
+		virtual ~FileArg();
 
-		static RangeArg& create(char opt);
+		static FileArg& create(char opt);
 
-		RangeArg& description(const std::string& desc);
-		RangeArg& alternate(const std::string& alt);
-		RangeArg& default_val(const T& def);
-		RangeArg& parse_error(const std::string parse);
+		operator T&();
 
-		RangeArg& range(const T& l, const T& u);
-		RangeArg& range_error(const std::string range);
+		FileArg& description(const std::string& desc);
+		FileArg& alternate(const std::string& alt);
+		FileArg& usage(const std::string& u);
+
+		FileArg& default_val(const T& def);
+		FileArg& parse_error(const std::string parse);
+		FileArg& file_error(const std::string file);
 
 	protected:
-		virtual bool read(int argc, char** argv);
-		virtual std::string usage() const;
+		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 	private:
-		T lower_;
-		T upper_;
-		std::string range_;	
+		std::string file_;
+		T file_val_;
 
-		RangeArg(char opt);
+		FileArg(char opt);
 };
 
-inline bool Args::read(int argc, char** argv) {
+inline bool Args::read(int argc, char** argv, std::ostream& os) {
 	auto args = Singleton<Args>::get();
 	for ( const auto& arg : args.args_ )
-		if ( !arg->read(argc, argv) )
+		if ( !arg->read(argc, argv, os) )
 			args.errors_.push_back(arg);
 }
 
@@ -167,7 +170,7 @@ inline std::string Args::usage() {
 		oss << "  -" << arg->opt_ << " ";
 		if ( arg->alt_ != "" )
 			oss << "--" << arg->alt_ << " ";
-		oss << arg->usage() << " ";
+		oss << arg->usage_ << " ";
 	
 		for ( size_t j = arg->width(); j < max_width; ++j )
 			oss << ".";
@@ -182,8 +185,16 @@ inline std::string Args::usage() {
 	return oss.str();
 }
 
-inline bool Args::errors() {
+inline bool Args::error() {
 	return !Singleton<Args>::get().errors_.empty();
+}
+
+inline Args::error_iterator Args::error_begin() {
+	return Singleton<Args>::get().errors_.begin();
+}
+
+inline Args::error_iterator Args::error_end() {
+	return Singleton<Args>::get().errors_.end();
 }
 
 inline bool Args::unrecognized() {
@@ -207,7 +218,7 @@ inline Args::anonymous_iterator Args::anonymous_end() {
 }
 
 inline bool Args::good() {
-	return !errors() && !unrecognized();
+	return !error() && !unrecognized();
 }
 
 inline bool Args::fail() {
@@ -218,7 +229,7 @@ inline Arg::~Arg() {
 }
 
 inline Arg::Arg(char opt) 
-		: opt_{opt}, alt_{""}, desc_{"???"} { 
+		: opt_{opt}, alt_{""}, desc_{"???"}, usage_{"???"} { 
 	Singleton<Args>::get().args_.push_back(this);
 }
 
@@ -232,6 +243,11 @@ inline Arg& Arg::alternate(const std::string& alt) {
 	return *this; 
 }
 
+inline Arg& Arg::usage(const std::string& u) { 
+	usage_ = u;
+	return *this; 
+}
+
 inline size_t Arg::width() const {
 	// "  -c "
 	size_t w = 5; 
@@ -239,7 +255,7 @@ inline size_t Arg::width() const {
 	if ( alt_ != "" )
 		w += (2+alt_.length()+1);
 	// "usage "
-	w += (usage().length()+1);
+	w += (usage_.length()+1);
 
 	return w;
 }
@@ -248,10 +264,13 @@ inline FlagArg::~FlagArg() {
 }
 
 inline FlagArg& FlagArg::create(char opt) {
-	return *(new FlagArg{opt});
+	auto fa = new FlagArg{opt};
+	fa->usage("");
+	fa->description("Flag Arg");
+	return *fa;
 }
 
-inline FlagArg::operator bool() const { 
+inline FlagArg::operator bool() { 
 	return val_; 
 }
 
@@ -265,29 +284,30 @@ inline FlagArg& FlagArg::alternate(const std::string& alt) {
 	return *this; 
 }
 
-inline bool FlagArg::read(int argc, char** argv) { 
+inline FlagArg& FlagArg::usage(const std::string& u) { 
+	Arg::usage(u); 
+	return *this; 
+}
+
+inline bool FlagArg::read(int argc, char** argv, std::ostream& os) { 
 	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
 	if ( alt_ != "" )
 		longopts[0] = option{alt_.c_str(), no_argument, 0, opt_};
-	const auto os = std::string("") + opt_;
+	const auto opts = std::string("") + opt_;
 
 	auto c = 0;
 
-	freopen("/dev/null", "w", stderr);
+	const auto ignore1 = freopen("/dev/null", "w", stderr);
 	optind = 1;
-	while ( (c = getopt_long(argc, argv, os.c_str(), longopts, 0)) != -1 ) {
+	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 ) {
 		if ( c == opt_ ) {
 			val_ = true;
 			break;
 		}
 	}
-	freopen("/dev/tty", "w", stderr);
+	const auto ignore2 = freopen("/dev/tty", "w", stderr);
 
 	return true; 
-}
-
-inline std::string FlagArg::usage() const { 
-	return ""; 
 }
 
 inline FlagArg::FlagArg(char opt) 
@@ -300,11 +320,20 @@ inline ValueArg<T>::~ValueArg() {
 
 template <typename T>
 inline ValueArg<T>& ValueArg<T>::create(char opt) {
-	return *(new ValueArg{opt});
+	auto va = new ValueArg{opt};
+
+	std::ostringstream oss;
+	oss << "Error (-" << opt << "): Unable to parse input value!" << std::endl;
+
+	va->usage("<arg>");
+	va->description("Value Arg");
+	va->parse_error(oss.str());
+
+	return *va;
 }
 
 template <typename T>
-inline ValueArg<T>::operator T() const { 
+inline ValueArg<T>::operator T&() { 
 	return val_; 
 }
 
@@ -321,6 +350,12 @@ inline ValueArg<T>& ValueArg<T>::alternate(const std::string& alt) {
 }
 
 template <typename T>
+inline ValueArg<T>& ValueArg<T>::usage(const std::string& u) { 
+	Arg::usage(u); 
+	return *this; 
+}
+
+template <typename T>
 inline ValueArg<T>& ValueArg<T>::default_val(const T& t) { 
 	val_ = t; 
 	return *this; 
@@ -333,24 +368,24 @@ inline ValueArg<T>& ValueArg<T>::parse_error(const std::string parse) {
 }
 
 template <typename T>
-inline bool ValueArg<T>::read(int argc, char** argv) { 
+inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) { 
 	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
 	if ( alt_ != "" )
 		longopts[0] = option{alt_.c_str(), required_argument, 0, opt_};
-	const auto os = std::string("") + opt_ + std::string(":");
+	const auto opts = std::string("") + opt_ + std::string(":");
 
 	auto c = 0;
 	char* res = 0;
 
-	freopen("/dev/null", "w", stderr);
+	const auto ignore1 = freopen("/dev/null", "w", stderr);
 	optind = 1;
-	while ( (c = getopt_long(argc, argv, os.c_str(), longopts, 0)) != -1 ) {
+	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 ) {
 		if ( c == opt_ ) {
 			res = optarg;
 			break;
 		}
 	}
-	freopen("/dev/tty", "w", stderr);
+	const auto ignore2 = freopen("/dev/tty", "w", stderr);
 
 	if ( res == 0 )
 		return true;
@@ -358,88 +393,104 @@ inline bool ValueArg<T>::read(int argc, char** argv) {
 	std::istringstream iss(res);
 	iss >> val_;
 	if ( iss.fail() )
-		std::cout << "Error (-" << opt_ << "): " << parse_ << std::endl;
+		os << parse_;
 
 	return !iss.fail();
 }
 
 template <typename T>
-inline std::string ValueArg<T>::usage() const { 
-	return "<arg>";
-}
-
-template <typename T>
 inline ValueArg<T>::ValueArg(char opt) 
-		: Arg{opt}, parse_{"Unable to parse input argument!"} { 
+		: Arg{opt} {
 }
 
 template <typename T>
-inline RangeArg<T>::~RangeArg() { 
+inline FileArg<T>::~FileArg() {
 }
 
 template <typename T>
-inline RangeArg<T>& RangeArg<T>::create(char opt) {
-	return *(new RangeArg{opt});
+inline FileArg<T>& FileArg<T>::create(char opt) {
+	auto fa = new FileArg{opt};
+
+	std::ostringstream oss1;
+	oss1 << "Error (-" << opt << "): Unable to read input value!" << std::endl;
+	std::ostringstream oss2;
+	oss2 << "Error (-" << opt << "): Unable to read input file!" << std::endl;
+
+	fa->usage("<path>");
+	fa->description("File Arg");
+	fa->parse_error(oss1.str());
+	fa->file_error(oss2.str());
+
+	return *fa;
 }
 
 template <typename T>
-inline RangeArg<T>& RangeArg<T>::description(const std::string& desc) { 
-	ValueArg<T>::description(desc); 
-	return *this; 
+inline FileArg<T>::operator T&() {
+	return file_val_;
 }
 
 template <typename T>
-inline RangeArg<T>& RangeArg<T>::alternate(const std::string& alt) { 
-	ValueArg<T>::alternate(alt); 
-	return *this; 
+inline FileArg<T>& FileArg<T>::description(const std::string& desc) {
+	ValueArg<std::string>::description(desc);
+	return *this;
 }
 
 template <typename T>
-inline RangeArg<T>& RangeArg<T>::default_val(const T& def) { 
-	ValueArg<T>::default_val(def); 
-	return *this; 
+inline FileArg<T>& FileArg<T>::alternate(const std::string& alt) {
+	ValueArg<std::string>::alternate(alt);
+	return *this;
 }
 
 template <typename T>
-inline RangeArg<T>& RangeArg<T>::parse_error(const std::string parse) { 
-	ValueArg<T>::parse_error(parse); 
-	return *this; 
+inline FileArg<T>& FileArg<T>::usage(const std::string& u) {
+	ValueArg<std::string>::usage(u);
+	return *this;
 }
 
 template <typename T>
-inline RangeArg<T>& RangeArg<T>::range(const T& l, const T& u) { 
-	lower_ = l; 
-	upper_ = u; 
-	return *this; 
+inline FileArg<T>& FileArg<T>::parse_error(const std::string parse) {
+	ValueArg<std::string>::parse_error(parse);
+	return *this;
 }
 
 template <typename T>
-inline RangeArg<T>& RangeArg<T>::range_error(const std::string range) { 
-	range_ = range; 
-	return *this; 
+inline FileArg<T>& FileArg<T>::default_val(const T& def) {
+	file_val_ = def;
+	return *this;
 }
 
 template <typename T>
-inline bool RangeArg<T>::read(int argc, char** argv) { 
-	if ( !ValueArg<T>::read(argc, argv) )
+inline FileArg<T>& FileArg<T>::file_error(const std::string file) {
+	file_ = file;
+	return *this;
+}
+
+template <typename T>
+inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
+	if ( !ValueArg<std::string>::read(argc, argv, os) )
 		return false;
-	if ( ValueArg<T>::val_ < lower_ || ValueArg<T>::val_ > upper_ ) {
-		std::cout << "Error (-" << ValueArg<T>::opt_ << "): " << range_ << std::endl;
+
+	if ( val_ == "" )
+		return true;
+
+	std::ifstream ifs(val_);
+	if ( !ifs.is_open() ) {
+		os << file_;
 		return false;
 	}
+
+	ifs >> file_val_;
+	if ( ifs.fail() ) {
+		os << parse_;
+		return false;
+	}
+
 	return true;
 }
 
 template <typename T>
-inline std::string RangeArg<T>::usage() const { 
-	std::ostringstream oss;
-	oss << "<" << lower_ << " - " << upper_ << ">";
-	return oss.str();
-}
-
-template <typename T>
-inline RangeArg<T>::RangeArg(char opt) 
-		: ValueArg<T>{opt}, range_{"Input argument out of range!"} { 
+inline FileArg<T>::FileArg(char opt) 
+		: ValueArg<std::string>{opt} {
 }
 
 } // namespace cpputil
