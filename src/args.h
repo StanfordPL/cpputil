@@ -7,6 +7,7 @@
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -44,7 +45,7 @@ class Args {
 		static bool fail();
 
 	private:
-		std::vector<Arg*> args_;
+		std::map<char, Arg*> args_;
 		std::vector<Arg*> errors_;
 		std::vector<std::string> unrecognized_;
 		std::vector<std::string> anonymous_;
@@ -115,16 +116,17 @@ class ValueArg : public Arg {
 		ValueArg& parse_error(const std::string parse);
 
 	protected:
+		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
+
+	private:
 		T val_;
 		std::string parse_;	
-
-		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		ValueArg(char opt);
 };
 
 template <typename T>
-class FileArg : public ValueArg<std::string> {
+class FileArg : public Arg {
 	public:
 		virtual ~FileArg();
 
@@ -140,12 +142,12 @@ class FileArg : public ValueArg<std::string> {
 		FileArg& parse_error(const std::string parse);
 		FileArg& file_error(const std::string file);
 
-	protected:
-		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
-
 	private:
+		T val_;
+		std::string parse_;
 		std::string file_;
-		T file_val_;
+
+		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		FileArg(char opt);
 };
@@ -157,16 +159,19 @@ inline void Args::read(int argc, char** argv, std::ostream& os) {
 	// But this pass to check anonymous and unrecognized args must come first.
 	std::vector<option> longopts;
 	std::string opts;
-	for ( auto arg : args.args_ ) {
+	for ( auto& arg : args.args_ ) {
 		option o;
-		o.name = arg->alt_.c_str();
-		o.has_arg = dynamic_cast<FlagArg*>(arg) != 0 ? no_argument : required_argument;
+		o.name = arg.second->alt_.c_str();
+		if ( dynamic_cast<FlagArg*>(arg.second) != 0 )
+			o.has_arg = no_argument;
+		else
+			o.has_arg = required_argument;
 		o.flag = 0;
-		o.val = arg->opt_;
+		o.val = arg.second->opt_;
 		longopts.push_back(o);
 		
-		opts += arg->opt_;
-		if ( dynamic_cast<FlagArg*>(arg) == 0 )
+		opts += arg.second->opt_;
+		if ( dynamic_cast<FlagArg*>(arg.second) == 0 )
 			opts += ':';
 	}
 	longopts.push_back(option{0,0,0,0});
@@ -181,37 +186,34 @@ inline void Args::read(int argc, char** argv, std::ostream& os) {
 		args.anonymous_.push_back(std::string(argv[optind]));
 
 	// Now check individual args
-	for ( auto arg : args.args_ )
-		if ( !arg->read(argc, argv, os) )
-			args.errors_.push_back(arg);
+	for ( auto& arg : args.args_ )
+		if ( !arg.second->read(argc, argv, os) )
+			args.errors_.push_back(arg.second);
 }
 
 inline std::string Args::usage(size_t indent) {
 	auto& args = Singleton<Args>::get();
 
 	size_t max_width = 0;
-	for ( const auto arg : args.args_ )
-		max_width = std::max(max_width, arg->width(indent));
+	for ( const auto& arg : args.args_ )
+		max_width = std::max(max_width, arg.second->width(indent));
 
 	std::ostringstream oss;
-	for ( size_t i = 0, ie = args.args_.size(); i < ie; ++i ) {
-		const auto arg = args.args_[i];
-
+	for ( const auto& arg : args.args_ ) {
 		for ( size_t j = 0; j < indent; ++j )
 			oss << " ";
-		oss << "-" << arg->opt_ << " ";
-		if ( arg->alt_ != "" )
-			oss << "--" << arg->alt_ << " ";
-		oss << arg->usage_ << " ";
+		oss << "-" << arg.second->opt_ << " ";
+		if ( arg.second->alt_ != "" )
+			oss << "--" << arg.second->alt_ << " ";
+		oss << arg.second->usage_ << " ";
 	
-		for ( size_t j = arg->width(indent); j < max_width; ++j )
+		for ( size_t j = arg.second->width(indent); j < max_width; ++j )
 			oss << ".";
 
 		oss << "... ";
-		oss << arg->desc_;
+		oss << arg.second->desc_;
 
-		if ( i+1 != ie )
-			oss << std::endl;
+		oss << std::endl;
 	}
 
 	return oss.str();
@@ -262,7 +264,7 @@ inline Arg::~Arg() {
 
 inline Arg::Arg(char opt) 
 		: opt_{opt}, alt_{""}, desc_{"???"}, usage_{"???"} { 
-	Singleton<Args>::get().args_.push_back(this);
+	Singleton<Args>::get().args_[opt_] = this;
 }
 
 inline Arg& Arg::description(const std::string& desc) { 
@@ -299,6 +301,7 @@ inline FlagArg& FlagArg::create(char opt) {
 	auto fa = new FlagArg{opt};
 	fa->usage("");
 	fa->description("Flag Arg");
+
 	return *fa;
 }
 
@@ -455,36 +458,36 @@ inline FileArg<T>& FileArg<T>::create(char opt) {
 
 template <typename T>
 inline FileArg<T>::operator T&() {
-	return file_val_;
+	return val_;
 }
 
 template <typename T>
 inline FileArg<T>& FileArg<T>::description(const std::string& desc) {
-	ValueArg<std::string>::description(desc);
+	Arg::description(desc);
 	return *this;
 }
 
 template <typename T>
 inline FileArg<T>& FileArg<T>::alternate(const std::string& alt) {
-	ValueArg<std::string>::alternate(alt);
+	Arg::alternate(alt);
 	return *this;
 }
 
 template <typename T>
 inline FileArg<T>& FileArg<T>::usage(const std::string& u) {
-	ValueArg<std::string>::usage(u);
+	Arg::usage(u);
 	return *this;
 }
 
 template <typename T>
 inline FileArg<T>& FileArg<T>::parse_error(const std::string parse) {
-	ValueArg<std::string>::parse_error(parse);
+	parse_ = parse;
 	return *this;
 }
 
 template <typename T>
 inline FileArg<T>& FileArg<T>::default_val(const T& def) {
-	file_val_ = def;
+	val_ = def;
 	return *this;
 }
 
@@ -496,12 +499,24 @@ inline FileArg<T>& FileArg<T>::file_error(const std::string file) {
 
 template <typename T>
 inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
-	if ( !ValueArg<std::string>::read(argc, argv, os) )
-		return false;
-	if ( val_ == "" )
+	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
+	if ( alt_ != "" )
+		longopts[0] = option{alt_.c_str(), required_argument, 0, opt_};
+	const auto opts = std::string("") + opt_ + std::string(":");
+
+	auto c = 0;
+	char* res = 0;
+	optind = 1;
+	opterr = 0;
+	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 )
+		if ( c == opt_ ) {
+			res = optarg;
+			break;
+		}
+	if ( res == 0 )
 		return true;
 
-	std::ifstream ifs(val_);
+	std::ifstream ifs(res);
 	if ( !ifs.is_open() ) {
 		os << file_;
 		return false;
@@ -514,13 +529,13 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 		return false;
 	}
 
-	file_val_ = temp;
+	val_ = temp;
 	return true;
 }
 
 template <typename T>
 inline FileArg<T>::FileArg(char opt) 
-		: ValueArg<std::string>{opt} {
+		: Arg{opt} {
 }
 
 } // namespace cpputil
