@@ -113,7 +113,7 @@ class ValueArg : public Arg {
 		ValueArg& usage(const std::string& u);
 
 		ValueArg& default_val(const T& def);
-		ValueArg& parse_error(const std::string parse);
+		ValueArg& parse_error(const std::string& parse);
 
 	protected:
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
@@ -139,11 +139,13 @@ class FileArg : public Arg {
 		FileArg& usage(const std::string& u);
 
 		FileArg& default_val(const T& def);
-		FileArg& parse_error(const std::string parse);
-		FileArg& file_error(const std::string file);
+		FileArg& default_path(const std::string& path);
+		FileArg& parse_error(const std::string& parse);
+		FileArg& file_error(const std::string& file);
 
 	private:
 		T val_;
+		std::string path_;
 		std::string parse_;
 		std::string file_;
 
@@ -394,7 +396,7 @@ inline ValueArg<T>& ValueArg<T>::default_val(const T& t) {
 }
 
 template <typename T>
-inline ValueArg<T>& ValueArg<T>::parse_error(const std::string parse) { 
+inline ValueArg<T>& ValueArg<T>::parse_error(const std::string& parse) { 
 	parse_ = parse; 
 	return *this; 
 }
@@ -480,19 +482,25 @@ inline FileArg<T>& FileArg<T>::usage(const std::string& u) {
 }
 
 template <typename T>
-inline FileArg<T>& FileArg<T>::parse_error(const std::string parse) {
-	parse_ = parse;
-	return *this;
-}
-
-template <typename T>
 inline FileArg<T>& FileArg<T>::default_val(const T& def) {
 	val_ = def;
 	return *this;
 }
 
 template <typename T>
-inline FileArg<T>& FileArg<T>::file_error(const std::string file) {
+inline FileArg<T>& FileArg<T>::default_path(const std::string& path) {
+	path_ = path;
+	return *this;
+}
+
+template <typename T>
+inline FileArg<T>& FileArg<T>::parse_error(const std::string& parse) {
+	parse_ = parse;
+	return *this;
+}
+
+template <typename T>
+inline FileArg<T>& FileArg<T>::file_error(const std::string& file) {
 	file_ = file;
 	return *this;
 }
@@ -513,10 +521,10 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 			res = optarg;
 			break;
 		}
-	if ( res == 0 )
-		return true;
+	if ( res != 0 )
+		path_ = res;
 
-	std::ifstream ifs(res);
+	std::ifstream ifs(path_);
 	if ( !ifs.is_open() ) {
 		os << file_;
 		return false;
