@@ -14,10 +14,11 @@
 
 ##### CONSTANT DEFINITIONS
 
-GCC = g++ 
+GCC = ccache g++ 
 OPT = -Werror -g -O3 -std=c++0x 
 INC = "-I../"
-EX = bijection interner maputil singleton thread timer tokenizer
+LIB = -lpthread
+EX = args bijection interner maputil singleton thread timer tokenizer
 
 ##### TOP LEVEL TARGETS
 
@@ -26,7 +27,7 @@ all: $(EX)
 ##### BUILD TARGETS
 
 %: %.cc 
-	$(GCC) $(OPT) $< -o $@ $(INC) -lpthread
+	$(GCC) $(OPT) $< -o $@ $(INC) $(LIB)
 
 ##### CLEAN TARGETS
 
