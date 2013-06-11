@@ -433,7 +433,7 @@ inline bool ValueArg<T, P>::read(int argc, char** argv, std::ostream& os) {
 	if ( res == 0 )
 		return true;
 
-	T temp;
+	T temp = T();
 	std::istringstream iss(res);
 	parser_(iss, temp);
 
@@ -544,7 +544,7 @@ inline bool FileArg<T, P>::read(int argc, char** argv, std::ostream& os) {
 		return false;
 	}
 
-	T temp;
+	T temp = T();
 	parser_(ifs, temp);
 
 	if ( ifs.fail() ) {
