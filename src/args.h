@@ -127,6 +127,8 @@ class ValueArg : public Arg {
 		std::string parse_;	
 
 		ValueArg(char opt);
+
+		static void default_parse(std::istream& is, T& t);
 };
 
 template <typename T>
@@ -160,6 +162,8 @@ class FileArg : public Arg {
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		FileArg(char opt);
+
+		static void default_parse(std::istream& is, T& t);
 };
 
 inline void Args::read(int argc, char** argv, std::ostream& os) {
@@ -405,7 +409,7 @@ inline ValueArg<T>& ValueArg<T>::default_val(const T& t) {
 
 template <typename T>
 inline ValueArg<T>& ValueArg<T>::parse_function(ParseFxn f) {
-	fxn_ = f;
+	fxn_ = f; 
 	return *this;
 }
 
@@ -436,10 +440,7 @@ inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 	T temp;
 	std::istringstream iss(res);
-	if ( fxn_ != 0 )
-		fxn_(iss, temp);
-	else
-		iss >> temp;
+	fxn_(iss, temp);
 
 	if ( iss.fail() ) {
 		os << parse_;
@@ -452,7 +453,12 @@ inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 template <typename T>
 inline ValueArg<T>::ValueArg(char opt) 
-		: Arg{opt}, fxn_{0} {
+		: Arg{opt}, fxn_(default_parse) {
+}
+
+template <typename T>
+inline void ValueArg<T>::default_parse(std::istream& is, T& t) {
+	is >> t;
 }
 
 template <typename T>
@@ -555,10 +561,7 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 	}
 
 	T temp;
-	if ( fxn_ != 0 )
-		fxn_(ifs, temp);
-	else
-		ifs >> temp;
+	fxn_(ifs, temp);
 
 	if ( ifs.fail() ) {
 		os << parse_;
@@ -571,7 +574,12 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 template <typename T>
 inline FileArg<T>::FileArg(char opt) 
-		: Arg{opt}, fxn_{0} {
+		: Arg{opt}, fxn_{default_parse} {
+}
+
+template <typename T>
+inline void FileArg<T>::default_parse(std::istream& is, T& t) {
+	is >> t;
 }
 
 } // namespace cpputil
