@@ -53,6 +53,12 @@ class Args {
 		Args() = default;
 };
 
+template <typename T>
+class ArgParser {
+	public:
+		void operator()(std::istream& is, T& t);
+};
+
 class Arg {
 	friend class Args;
 
@@ -99,11 +105,9 @@ class FlagArg : public Arg {
 		FlagArg(char opt); 
 };
 
-template <typename T>
+template <typename T, typename P = ArgParser<T>>
 class ValueArg : public Arg {
 	public:
-		typedef void (*ParseFxn)(std::istream& is, T& t);
-
 		virtual ~ValueArg();
 
 		static ValueArg& create(char opt);
@@ -115,27 +119,22 @@ class ValueArg : public Arg {
 		ValueArg& usage(const std::string& u);
 
 		ValueArg& default_val(const T& def);
-		ValueArg& parse_function(ParseFxn f);
-		ValueArg& parse_error(const std::string& parse);
+		ValueArg& parse_error(const std::string& pe);
 
 	protected:
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 	private:
 		T val_;
-		ParseFxn fxn_;
-		std::string parse_;	
+		std::string parse_error_;	
+		P parser_;
 
 		ValueArg(char opt);
-
-		static void default_parse(std::istream& is, T& t);
 };
 
-template <typename T>
+template <typename T, typename P = ArgParser<T>>
 class FileArg : public Arg {
 	public:
-		typedef void (*ParseFxn)(std::istream& is, T& t);
-
 		virtual ~FileArg();
 
 		static FileArg& create(char opt);
@@ -148,22 +147,19 @@ class FileArg : public Arg {
 
 		FileArg& default_path(const std::string& path);
 		FileArg& default_val(const T& def);
-		FileArg& parse_function(ParseFxn f);
-		FileArg& parse_error(const std::string& parse);
-		FileArg& file_error(const std::string& file);
+		FileArg& parse_error(const std::string& pe);
+		FileArg& file_error(const std::string& fe);
 
 	private:
 		std::string path_;
 		T val_;
-		ParseFxn fxn_;
-		std::string parse_;
-		std::string file_;
+		P parser_;
+		std::string parse_error_;
+		std::string file_error_;
 
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		FileArg(char opt);
-
-		static void default_parse(std::istream& is, T& t);
 };
 
 inline void Args::read(int argc, char** argv, std::ostream& os) {
@@ -361,11 +357,16 @@ inline FlagArg::FlagArg(char opt)
 }
 
 template <typename T>
-inline ValueArg<T>::~ValueArg() { 
+void ArgParser<T>::operator()(std::istream& is, T& t) {
+	is >> t;
 }
 
-template <typename T>
-inline ValueArg<T>& ValueArg<T>::create(char opt) {
+template <typename T, typename P>
+inline ValueArg<T, P>::~ValueArg() { 
+}
+
+template <typename T, typename P>
+inline ValueArg<T, P>& ValueArg<T, P>::create(char opt) {
 	auto va = new ValueArg{opt};
 
 	std::ostringstream oss;
@@ -378,49 +379,43 @@ inline ValueArg<T>& ValueArg<T>::create(char opt) {
 	return *va;
 }
 
-template <typename T>
-inline ValueArg<T>::operator T&() { 
+template <typename T, typename P>
+inline ValueArg<T, P>::operator T&() { 
 	return val_; 
 }
 
-template <typename T>
-inline ValueArg<T>& ValueArg<T>::description(const std::string& desc) { 
+template <typename T, typename P>
+inline ValueArg<T, P>& ValueArg<T, P>::description(const std::string& desc) { 
 	Arg::description(desc); 
 	return *this; 
 }
 
-template <typename T>
-inline ValueArg<T>& ValueArg<T>::alternate(const std::string& alt) { 
+template <typename T, typename P>
+inline ValueArg<T, P>& ValueArg<T, P>::alternate(const std::string& alt) { 
 	Arg::alternate(alt); 
 	return *this; 
 }
 
-template <typename T>
-inline ValueArg<T>& ValueArg<T>::usage(const std::string& u) { 
+template <typename T, typename P>
+inline ValueArg<T, P>& ValueArg<T, P>::usage(const std::string& u) { 
 	Arg::usage(u); 
 	return *this; 
 }
 
-template <typename T>
-inline ValueArg<T>& ValueArg<T>::default_val(const T& t) { 
+template <typename T, typename P>
+inline ValueArg<T, P>& ValueArg<T, P>::default_val(const T& t) { 
 	val_ = t; 
 	return *this; 
 }
 
-template <typename T>
-inline ValueArg<T>& ValueArg<T>::parse_function(ParseFxn f) {
-	fxn_ = f; 
-	return *this;
-}
-
-template <typename T>
-inline ValueArg<T>& ValueArg<T>::parse_error(const std::string& parse) { 
-	parse_ = parse; 
+template <typename T, typename P>
+inline ValueArg<T, P>& ValueArg<T, P>::parse_error(const std::string& pe) { 
+	parse_error_ = pe; 
 	return *this; 
 }
 
-template <typename T>
-inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) { 
+template <typename T, typename P>
+inline bool ValueArg<T, P>::read(int argc, char** argv, std::ostream& os) { 
 	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
 	if ( alt_ != "" )
 		longopts[0] = option{alt_.c_str(), required_argument, 0, opt_};
@@ -440,10 +435,10 @@ inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 	T temp;
 	std::istringstream iss(res);
-	fxn_(iss, temp);
+	parser_(iss, temp);
 
 	if ( iss.fail() ) {
-		os << parse_;
+		os << parse_error_;
 		return false;
 	}
 
@@ -451,22 +446,17 @@ inline bool ValueArg<T>::read(int argc, char** argv, std::ostream& os) {
 	return true;
 }
 
-template <typename T>
-inline ValueArg<T>::ValueArg(char opt) 
-		: Arg{opt}, fxn_(default_parse) {
+template <typename T, typename P>
+inline ValueArg<T, P>::ValueArg(char opt) 
+		: Arg{opt} {
 }
 
-template <typename T>
-inline void ValueArg<T>::default_parse(std::istream& is, T& t) {
-	is >> t;
+template <typename T, typename P>
+inline FileArg<T, P>::~FileArg() {
 }
 
-template <typename T>
-inline FileArg<T>::~FileArg() {
-}
-
-template <typename T>
-inline FileArg<T>& FileArg<T>::create(char opt) {
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::create(char opt) {
 	auto fa = new FileArg{opt};
 
 	std::ostringstream oss1;
@@ -482,61 +472,55 @@ inline FileArg<T>& FileArg<T>::create(char opt) {
 	return *fa;
 }
 
-template <typename T>
-inline FileArg<T>::operator T&() {
+template <typename T, typename P>
+inline FileArg<T, P>::operator T&() {
 	return val_;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::description(const std::string& desc) {
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::description(const std::string& desc) {
 	Arg::description(desc);
 	return *this;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::alternate(const std::string& alt) {
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::alternate(const std::string& alt) {
 	Arg::alternate(alt);
 	return *this;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::usage(const std::string& u) {
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::usage(const std::string& u) {
 	Arg::usage(u);
 	return *this;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::default_path(const std::string& path) {
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::default_path(const std::string& path) {
 	path_ = path;
 	return *this;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::default_val(const T& def) {
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::default_val(const T& def) {
 	val_ = def;
 	return *this;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::parse_function(ParseFxn f) {
-	fxn_ = f;
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::parse_error(const std::string& pe) {
+	parse_error_ = pe;
 	return *this;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::parse_error(const std::string& parse) {
-	parse_ = parse;
+template <typename T, typename P>
+inline FileArg<T, P>& FileArg<T, P>::file_error(const std::string& fe) {
+	file_error_ = fe;
 	return *this;
 }
 
-template <typename T>
-inline FileArg<T>& FileArg<T>::file_error(const std::string& file) {
-	file_ = file;
-	return *this;
-}
-
-template <typename T>
-inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
+template <typename T, typename P>
+inline bool FileArg<T, P>::read(int argc, char** argv, std::ostream& os) {
 	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
 	if ( alt_ != "" )
 		longopts[0] = option{alt_.c_str(), required_argument, 0, opt_};
@@ -556,15 +540,15 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 
 	std::ifstream ifs(path_);
 	if ( !ifs.is_open() ) {
-		os << file_;
+		os << file_error_;
 		return false;
 	}
 
 	T temp;
-	fxn_(ifs, temp);
+	parser_(ifs, temp);
 
 	if ( ifs.fail() ) {
-		os << parse_;
+		os << parse_error_;
 		return false;
 	}
 
@@ -572,14 +556,9 @@ inline bool FileArg<T>::read(int argc, char** argv, std::ostream& os) {
 	return true;
 }
 
-template <typename T>
-inline FileArg<T>::FileArg(char opt) 
-		: Arg{opt}, fxn_{default_parse} {
-}
-
-template <typename T>
-inline void FileArg<T>::default_parse(std::istream& is, T& t) {
-	is >> t;
+template <typename T, typename P>
+inline FileArg<T, P>::FileArg(char opt) 
+		: Arg{opt} {
 }
 
 } // namespace cpputil
