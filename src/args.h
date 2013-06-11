@@ -110,6 +110,7 @@ class FlagArg : public Arg {
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		operator bool();
+		bool value();
 
 		FlagArg& description(const std::string& desc);
 		FlagArg& alternate(const std::string& alt);
@@ -131,6 +132,7 @@ class ValueArg : public Arg {
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		operator T&();
+		T& value();
 
 		ValueArg& description(const std::string& desc);
 		ValueArg& alternate(const std::string& alt);
@@ -157,6 +159,7 @@ class FileArg : public Arg {
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout);
 
 		operator T&();
+		T& value();
 
 		FileArg& description(const std::string& desc);
 		FileArg& alternate(const std::string& alt);
@@ -349,6 +352,10 @@ inline FlagArg::operator bool() {
 	return val_; 
 }
 
+inline bool FlagArg::value() {
+	return val_;
+}
+
 inline FlagArg& FlagArg::description(const std::string& desc) { 
 	Arg::description(desc); 
 	return *this; 
@@ -426,6 +433,11 @@ inline bool ValueArg<T, P>::read(int argc, char** argv, std::ostream& os) {
 template <typename T, typename P>
 inline ValueArg<T, P>::operator T&() { 
 	return val_; 
+}
+
+template <typename T, typename P>
+inline T& ValueArg<T, P>::value() {
+	return val_;
 }
 
 template <typename T, typename P>
@@ -523,6 +535,11 @@ inline bool FileArg<T, P>::read(int argc, char** argv, std::ostream& os) {
 
 template <typename T, typename P>
 inline FileArg<T, P>::operator T&() {
+	return val_;
+}
+
+template <typename T, typename P>
+inline T& FileArg<T, P>::value() {
 	return val_;
 }
 
