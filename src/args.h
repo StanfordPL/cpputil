@@ -17,13 +17,13 @@ limitations under the License.
 #ifndef CPPUTIL_SRC_ARGS_H
 #define CPPUTIL_SRC_ARGS_H
 
-#include <cstring>
-
 #include <algorithm>
+#include <cstring>
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -43,7 +43,6 @@ class Args {
 		typedef std::vector<std::string>::const_iterator unrecognized_iterator;
 		typedef std::vector<std::string>::const_iterator anonymous_iterator;
 
-		/** @todo This isn't correctly populated unrecognized and anonymous. */
 		static void read(int argc, char** argv, std::ostream& os = std::cout);
 		static std::string usage(size_t indent = 0);
 
@@ -66,14 +65,6 @@ class Args {
 		std::vector<Arg*> errors_;
 		std::vector<std::string> unrecognized_;
 		std::vector<std::string> anonymous_;
-
-		Args() = default;
-};
-
-template <typename T>
-class ArgParser {
-	public:
-		void operator()(std::istream& is, T& t);
 };
 
 class Arg {
@@ -84,15 +75,32 @@ class Arg {
 
 		virtual bool read(int argc, char** argv, std::ostream& os = std::cout) = 0;
 
+		template <typename T>
+		class Reader {
+			public:
+				void operator()(std::istream& is, T& t);
+		};
+
+		template <typename T>
+		class Writer {
+			public:
+				void operator()(std::ostream& os, const T& t);
+		};
+
 	protected:
+		char opt_;
+		std::string alt_;
+
 		Arg(char opt);
 
 		Arg& description(const std::string& desc);
 		Arg& alternate(const std::string& alt);
 		Arg& usage(const std::string& u);
 
-		char opt_;
-		std::string alt_;
+		virtual option to_longopt() const = 0;
+		virtual std::string to_optstr() const = 0;
+
+		static char** copy(int argc, char** argv);
 
 	private:
 		std::string desc_;
@@ -116,13 +124,17 @@ class FlagArg : public Arg {
 		FlagArg& alternate(const std::string& alt);
 		FlagArg& usage(const std::string& u);
 
+	protected:	
+		virtual option to_longopt() const;
+		virtual std::string to_optstr() const;
+
 	private:
 		bool val_;
 
 		FlagArg(char opt); 
 };
 
-template <typename T, typename P = ArgParser<T>>
+template <typename T, typename P = Arg::Reader<T>>
 class ValueArg : public Arg {
 	public:
 		virtual ~ValueArg();
@@ -141,6 +153,10 @@ class ValueArg : public Arg {
 		ValueArg& default_val(const T& def);
 		ValueArg& parse_error(const std::string& pe);
 
+	protected:	
+		virtual option to_longopt() const;
+		virtual std::string to_optstr() const;
+
 	private:
 		T val_;
 		std::string parse_error_;	
@@ -149,7 +165,7 @@ class ValueArg : public Arg {
 		ValueArg(char opt);
 };
 
-template <typename T, typename P = ArgParser<T>>
+template <typename T, typename P = Arg::Reader<T>>
 class FileArg : public Arg {
 	public:
 		virtual ~FileArg();
@@ -170,6 +186,10 @@ class FileArg : public Arg {
 		FileArg& parse_error(const std::string& pe);
 		FileArg& file_error(const std::string& fe);
 
+	protected:	
+		virtual option to_longopt() const;
+		virtual std::string to_optstr() const;
+
 	private:
 		std::string path_;
 		T val_;
@@ -182,34 +202,39 @@ class FileArg : public Arg {
 
 inline void Args::read(int argc, char** argv, std::ostream& os) {
 	auto& args = Singleton<Args>::get();
+	const auto argv_copy = Arg::copy(argc, argv);
 
 	std::vector<option> longopts;
-	std::string opts;
-	for ( auto& arg : args.args_ ) {
-		option o;
-		o.name = arg.second->alt_.c_str();
-		if ( dynamic_cast<FlagArg*>(arg.second) != 0 )
-			o.has_arg = no_argument;
-		else
-			o.has_arg = required_argument;
-		o.flag = 0;
-		o.val = arg.second->opt_;
-		longopts.push_back(o);
+	std::string opts = "-";
+	std::set<std::string> known;
+
+	for ( const auto& arg : args.args_ ) {
+		if ( arg.second->alt_ != std::string("") ) {
+			longopts.push_back(arg.second->to_longopt());
+			known.insert(std::string("--") + arg.second->alt_);
+		}
+
+		std::ostringstream oss;
+		oss << "-" << arg.second->opt_;
 		
-		opts += arg.second->opt_;
-		if ( dynamic_cast<FlagArg*>(arg.second) == 0 )
-			opts += ':';
+		known.insert(oss.str());
+		opts += arg.second->to_optstr();
 	}
 	longopts.push_back(option{0,0,0,0});
 
-	auto c = 0;
-	optind = 1;
-	opterr = 0;
-	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts.data(), 0)) != -1 )
-		if ( c == '?' )
-			args.unrecognized_.push_back(std::string(argv[optind-1]));
-	for ( ; optind < argc; ++optind )
-		args.anonymous_.push_back(std::string(argv[optind]));
+	optind = opterr = 0;
+	while ( true ) {
+		const auto next = argv_copy[optind == 0 ? 1 : optind];
+		const auto c = getopt_long(argc, argv_copy, opts.c_str(), 
+				longopts.data(), 0);
+		if ( c == -1 ) {
+			break;
+		} else if ( c == 1 ) {
+			args.anonymous_.push_back(next);
+		} else if ( c == '?' && known.find(next) == known.end() ) {
+			args.unrecognized_.push_back(next);
+		}
+	}
 
 	for ( auto& arg : args.args_ )
 		if ( !arg.second->read(argc, argv, os) )
@@ -287,6 +312,16 @@ inline bool Args::fail() {
 inline Arg::~Arg() {
 }
 
+template <typename T>
+inline void Arg::Reader<T>::operator()(std::istream& is, T& t) {
+	is >> t;
+}
+
+template <typename T>
+inline void Arg::Writer<T>::operator()(std::ostream& os, const T& t) {
+	os << t;
+}
+
 inline Arg::Arg(char opt) 
 		: opt_{opt}, alt_{""}, desc_{"???"}, usage_{"???"} { 
 	Singleton<Args>::get().args_[opt_] = this;
@@ -305,6 +340,17 @@ inline Arg& Arg::alternate(const std::string& alt) {
 inline Arg& Arg::usage(const std::string& u) { 
 	usage_ = u;
 	return *this; 
+}
+
+inline char** Arg::copy(int argc, char** argv) {
+	static std::vector<char*> buffer;
+	for ( auto a : buffer )
+		free(a);
+	buffer.clear();
+
+	for ( auto i = 0; i < argc; ++i )
+		buffer.push_back(strdup(argv[i]));
+	return buffer.data();
 }
 
 inline size_t Arg::width(size_t indent) const {
@@ -331,19 +377,25 @@ inline FlagArg& FlagArg::create(char opt) {
 }
 
 inline bool FlagArg::read(int argc, char** argv, std::ostream& os) { 
-	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
-	if ( alt_ != "" )
-		longopts[0] = option{alt_.c_str(), no_argument, 0, opt_};
-	const auto opts = std::string("") + opt_;
+	const auto argv_copy = Arg::copy(argc, argv);
 
-	auto c = 0;
-	optind = 1;
-	opterr = 0;
-	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 )
-		if ( c == opt_ ) {
+	std::vector<option> longopts;
+	if ( alt_ != std::string("") )
+		longopts.push_back(to_longopt());
+	longopts.push_back({0,0,0,0});
+	const auto optstr = std::string("-") + to_optstr();
+
+	optind = opterr = 0;
+	while ( true ) {
+		const auto c = getopt_long(argc, argv_copy, optstr.c_str(), 
+				longopts.data(), 0);
+		if ( c == -1 ) {
+			break;
+		} else if ( c == opt_ ) {
 			val_ = true;
 			break;
 		}
+	}
 
 	return true; 
 }
@@ -371,13 +423,18 @@ inline FlagArg& FlagArg::usage(const std::string& u) {
 	return *this; 
 }
 
-inline FlagArg::FlagArg(char opt) 
-		: Arg{opt}, val_{false} { 
+inline option FlagArg::to_longopt() const {
+	return {alt_.c_str(), no_argument, 0, opt_};
 }
 
-template <typename T>
-void ArgParser<T>::operator()(std::istream& is, T& t) {
-	is >> t;
+inline std::string FlagArg::to_optstr() const {
+	std::ostringstream oss;
+	oss << opt_;
+	return oss.str();
+}
+
+inline FlagArg::FlagArg(char opt) 
+		: Arg{opt}, val_{false} { 
 }
 
 template <typename T, typename P>
@@ -400,20 +457,29 @@ inline ValueArg<T, P>& ValueArg<T, P>::create(char opt) {
 
 template <typename T, typename P>
 inline bool ValueArg<T, P>::read(int argc, char** argv, std::ostream& os) { 
-	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
-	if ( alt_ != "" )
-		longopts[0] = option{alt_.c_str(), required_argument, 0, opt_};
-	const auto opts = std::string("") + opt_ + std::string(":");
+	const auto argv_copy = Arg::copy(argc, argv);
 
-	auto c = 0;
+	std::vector<option> longopts;
+	if ( alt_ != std::string("") )
+		longopts.push_back(to_longopt());
+	longopts.push_back({0,0,0,0});
+	const auto optstr = std::string("-") + to_optstr();
+
 	char* res = 0;
-	optind = 1;
-	opterr = 0;
-	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 )
-		if ( c == opt_ ) {
+	optind = opterr = 0;
+	while ( true ) {
+		const auto c = getopt_long(argc, argv_copy, optstr.c_str(), 
+				longopts.data(), 0);
+		if ( c == -1 ) {
+			break;
+		} else if ( c == '?' ) {
+			os << parse_error_;
+			return false;
+		} else if ( c == opt_ ) {
 			res = optarg;
 			break;
 		}
+	}
 	if ( res == 0 )
 		return true;
 
@@ -471,6 +537,18 @@ inline ValueArg<T, P>& ValueArg<T, P>::parse_error(const std::string& pe) {
 }
 
 template <typename T, typename P>
+inline option ValueArg<T, P>::to_longopt() const {
+	return {alt_.c_str(), required_argument, 0, opt_};
+}
+
+template <typename T, typename P>
+inline std::string ValueArg<T, P>::to_optstr() const {
+	std::ostringstream oss;
+	oss << opt_ << ":";
+	return oss.str();
+}
+
+template <typename T, typename P>
 inline ValueArg<T, P>::ValueArg(char opt) 
 		: Arg{opt} {
 }
@@ -498,20 +576,26 @@ inline FileArg<T, P>& FileArg<T, P>::create(char opt) {
 
 template <typename T, typename P>
 inline bool FileArg<T, P>::read(int argc, char** argv, std::ostream& os) {
-	option longopts[] =	{option{0,0,0,0}, option{0,0,0,0}};
-	if ( alt_ != "" )
-		longopts[0] = option{alt_.c_str(), required_argument, 0, opt_};
-	const auto opts = std::string("") + opt_ + std::string(":");
+	const auto argv_copy = Arg::copy(argc, argv);
 
-	auto c = 0;
+	std::vector<option> longopts;
+	if ( alt_ != std::string("") )
+		longopts.push_back(to_longopt());
+	longopts.push_back({0,0,0,0});
+	const auto optstr = std::string("-") + to_optstr();
+
 	char* res = 0;
-	optind = 1;
-	opterr = 0;
-	while ( (c = getopt_long(argc, argv, opts.c_str(), longopts, 0)) != -1 )
-		if ( c == opt_ ) {
+	optind = opterr = 0;
+	while ( true ) {
+		const auto c = getopt_long(argc, argv_copy, optstr.c_str(), 
+				longopts.data(), 0);
+		if ( c == -1 || c == '?' ) {
+			break;
+		} else if ( c == opt_ ) {
 			res = optarg;
 			break;
 		}
+	}
 	if ( res != 0 )
 		path_ = res;
 
@@ -583,6 +667,18 @@ template <typename T, typename P>
 inline FileArg<T, P>& FileArg<T, P>::file_error(const std::string& fe) {
 	file_error_ = fe;
 	return *this;
+}
+
+template <typename T, typename P>
+inline option FileArg<T, P>::to_longopt() const {
+	return {alt_.c_str(), required_argument, 0, opt_};
+}
+
+template <typename T, typename P>
+inline std::string FileArg<T, P>::to_optstr() const {
+	std::ostringstream oss;
+	oss << opt_ << ":";
+	return oss.str();
 }
 
 template <typename T, typename P>
