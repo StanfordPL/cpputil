@@ -472,9 +472,6 @@ inline bool ValueArg<T, P>::read(int argc, char** argv, std::ostream& os) {
 				longopts.data(), 0);
 		if ( c == -1 ) {
 			break;
-		} else if ( c == '?' ) {
-			os << parse_error_;
-			return false;
 		} else if ( c == opt_ ) {
 			res = optarg;
 			break;
@@ -589,7 +586,7 @@ inline bool FileArg<T, P>::read(int argc, char** argv, std::ostream& os) {
 	while ( true ) {
 		const auto c = getopt_long(argc, argv_copy, optstr.c_str(), 
 				longopts.data(), 0);
-		if ( c == -1 || c == '?' ) {
+		if ( c == -1 ) {
 			break;
 		} else if ( c == opt_ ) {
 			res = optarg;
