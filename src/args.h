@@ -223,7 +223,7 @@ inline void Args::read(int argc, char** argv) {
 		used[res.first] = used[res.second] = true;
 	}	
 
-	for ( size_t i = 1; i < argc; ++i )
+	for ( int i = 1; i < argc; ++i )
 		if ( !used[i] ) {
 			if ( argv[i][0] == '-' )
 				args.unrecognized_.push_back(argv[i]);
