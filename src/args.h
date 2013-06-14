@@ -449,7 +449,7 @@ inline void Arg::survivable_error(const std::string& error) {
 }
 
 inline void Arg::fatal_error(const std::string& error) const {
-	std::cout << "FATAL ERROR (cpputil/args.h): " << std::endl;
+	std::cout << "FATAL ERROR (cpputil/args.h)" << std::endl;
 	std::cout << error << std::endl;
 	exit(1);
 }
