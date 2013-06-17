@@ -526,7 +526,7 @@ inline std::pair<int, int> ValueArg<T,R,W>::read(int argc, char** argv) {
 		} 
 
 		std::istringstream iss(argv[i+1]);
-		T temp;
+		T temp = T();
 		reader_(iss, temp);
 
 		if ( iss.fail() ) {
