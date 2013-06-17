@@ -648,59 +648,59 @@ inline std::string FileArg<T,R,W>::debug() const {
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>::operator T&() {
+inline FileArg<T,R,W>::operator T&() {
 	return val_;
 }
 
 template <typename T, typename R, typename W>
-T& FileArg<T,R,W>::value() {
+inline T& FileArg<T,R,W>::value() {
 	return val_;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::alternate(const std::string& a) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::alternate(const std::string& a) {
 	Arg::alternate(a);
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::usage(const std::string& u) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::usage(const std::string& u) {
 	Arg::usage(u);
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::description(const std::string& d) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::description(const std::string& d) {
 	Arg::description(d);
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::default_path(const std::string& p) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::default_path(const std::string& p) {
 	path_ = p;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::default_val(const T& t) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::default_val(const T& t) {
 	val_ = t;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::parse_error(const std::string& pe) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::parse_error(const std::string& pe) {
 	parse_error_ = pe;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::file_error(const std::string& fe) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::file_error(const std::string& fe) {
 	file_error_ = fe;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>::FileArg(const std::string& opt) :
+inline FileArg<T,R,W>::FileArg(const std::string& opt) :
 		Arg{opt} {
 	std::ostringstream oss1;
 	oss1 << "Error (" << *(opts_.begin()) << ") Unable to parse input!";
