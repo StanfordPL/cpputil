@@ -245,7 +245,7 @@ inline std::string Args::debug() {
 	return oss.str();
 }
 
-std::string Args::usage(size_t indent) {
+inline std::string Args::usage(size_t indent) {
 	std::vector<std::string> usages;
 	for ( auto a : Singleton<Args>::get().args_ ) {
 		std::ostringstream oss;
