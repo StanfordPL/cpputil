@@ -611,30 +611,34 @@ inline FileArg<T,R,W>& FileArg<T,R,W>::create(const std::string& opt) {
 
 template <typename T, typename R, typename W>
 inline std::pair<int, int> FileArg<T,R,W>::read(int argc, char** argv) {
+	auto res = std::make_pair(0,0);
 	for ( const auto i : get_appearances(argc, argv) ) {
 		if ( i == (argc-1) || argv[i+1][0] == '-' ) {
 			survivable_error(file_error_);
 			return std::make_pair(i,i);
-		} 
-
-		std::ifstream ifs(argv[i+1]);
-		if ( !ifs.is_open() ) {
-			survivable_error(file_error_);
-			return std::make_pair(i,i+1);
-		}
-
-		T temp;
-		reader_(ifs, temp);
-
-		if ( ifs.fail() ) {
-			survivable_error(file_error_);
 		} else {
-			val_ = temp;
+			res = std::make_pair(i,i+1);
+			path_ = argv[i+1];
+			break;
 		}
-
-		return std::make_pair(i,i+1);
 	}
-	return std::make_pair(0,0);
+		
+	std::ifstream ifs(path_);
+	if ( !ifs.is_open() ) {
+		survivable_error(file_error_);
+		return res;
+	}
+
+	T temp;
+	reader_(ifs, temp);
+
+	if ( ifs.fail() ) {
+		survivable_error(file_error_);
+	} else {
+		val_ = temp;
+	}
+
+	return res;;
 }
 
 template <typename T, typename R, typename W>
