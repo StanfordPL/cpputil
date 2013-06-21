@@ -43,3 +43,4 @@ src/mainpage.dox: README.txt
 
 clean:
 	rm -rf $(DOC) src/mainpage.dox
+	make -C examples clean
