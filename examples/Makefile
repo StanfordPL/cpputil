@@ -18,7 +18,7 @@ GCC = ccache g++
 OPT = -Werror -g -O3 -std=c++0x 
 INC = "-I../"
 LIB = -lpthread
-EX = args bijection interner maputil singleton thread timer tokenizer
+EX = args bijection interner maputil sig_handler singleton thread timer tokenizer
 
 ##### TOP LEVEL TARGETS
 
