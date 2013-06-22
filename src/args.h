@@ -223,7 +223,7 @@ inline void Args::read(int argc, char** argv) {
 		used[res.first] = used[res.second] = true;
 	}	
 
-	for ( size_t i = 1; i < argc; ++i )
+	for ( int i = 1; i < argc; ++i )
 		if ( !used[i] ) {
 			if ( argv[i][0] == '-' )
 				args.unrecognized_.push_back(argv[i]);
@@ -245,7 +245,7 @@ inline std::string Args::debug() {
 	return oss.str();
 }
 
-std::string Args::usage(size_t indent) {
+inline std::string Args::usage(size_t indent) {
 	std::vector<std::string> usages;
 	for ( auto a : Singleton<Args>::get().args_ ) {
 		std::ostringstream oss;
@@ -526,7 +526,7 @@ inline std::pair<int, int> ValueArg<T,R,W>::read(int argc, char** argv) {
 		} 
 
 		std::istringstream iss(argv[i+1]);
-		T temp;
+		T temp = T();
 		reader_(iss, temp);
 
 		if ( iss.fail() ) {
@@ -611,30 +611,34 @@ inline FileArg<T,R,W>& FileArg<T,R,W>::create(const std::string& opt) {
 
 template <typename T, typename R, typename W>
 inline std::pair<int, int> FileArg<T,R,W>::read(int argc, char** argv) {
+	auto res = std::make_pair(0,0);
 	for ( const auto i : get_appearances(argc, argv) ) {
 		if ( i == (argc-1) || argv[i+1][0] == '-' ) {
 			survivable_error(file_error_);
 			return std::make_pair(i,i);
-		} 
-
-		std::ifstream ifs(argv[i+1]);
-		if ( !ifs.is_open() ) {
-			survivable_error(file_error_);
-			return std::make_pair(i,i+1);
-		}
-
-		T temp;
-		reader_(ifs, temp);
-
-		if ( ifs.fail() ) {
-			survivable_error(file_error_);
 		} else {
-			val_ = temp;
+			res = std::make_pair(i,i+1);
+			path_ = argv[i+1];
+			break;
 		}
-
-		return std::make_pair(i,i+1);
 	}
-	return std::make_pair(0,0);
+		
+	std::ifstream ifs(path_);
+	if ( !ifs.is_open() ) {
+		survivable_error(file_error_);
+		return res;
+	}
+
+	T temp;
+	reader_(ifs, temp);
+
+	if ( ifs.fail() ) {
+		survivable_error(file_error_);
+	} else {
+		val_ = temp;
+	}
+
+	return res;;
 }
 
 template <typename T, typename R, typename W>
@@ -648,59 +652,59 @@ inline std::string FileArg<T,R,W>::debug() const {
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>::operator T&() {
+inline FileArg<T,R,W>::operator T&() {
 	return val_;
 }
 
 template <typename T, typename R, typename W>
-T& FileArg<T,R,W>::value() {
+inline T& FileArg<T,R,W>::value() {
 	return val_;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::alternate(const std::string& a) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::alternate(const std::string& a) {
 	Arg::alternate(a);
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::usage(const std::string& u) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::usage(const std::string& u) {
 	Arg::usage(u);
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::description(const std::string& d) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::description(const std::string& d) {
 	Arg::description(d);
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::default_path(const std::string& p) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::default_path(const std::string& p) {
 	path_ = p;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::default_val(const T& t) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::default_val(const T& t) {
 	val_ = t;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::parse_error(const std::string& pe) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::parse_error(const std::string& pe) {
 	parse_error_ = pe;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>& FileArg<T,R,W>::file_error(const std::string& fe) {
+inline FileArg<T,R,W>& FileArg<T,R,W>::file_error(const std::string& fe) {
 	file_error_ = fe;
 	return *this;
 }
 
 template <typename T, typename R, typename W>
-FileArg<T,R,W>::FileArg(const std::string& opt) :
+inline FileArg<T,R,W>::FileArg(const std::string& opt) :
 		Arg{opt} {
 	std::ostringstream oss1;
 	oss1 << "Error (" << *(opts_.begin()) << ") Unable to parse input!";
