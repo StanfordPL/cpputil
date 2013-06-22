@@ -12,6 +12,7 @@
 
 namespace cpputil {
 
+/** Common utility code for dumping cpu state. */
 class VerboseHandler {
 	protected:
 		static void print_quad(uint64_t val);
@@ -20,6 +21,7 @@ class VerboseHandler {
 		static void print_cpu(void* context);
 };
 
+/** Verbose SIGSEGV handler. Prints root error cause and dumps cpu state. */
 class VerboseSegvHandler : public VerboseHandler {
 	public:
 		static void install();
@@ -28,6 +30,7 @@ class VerboseSegvHandler : public VerboseHandler {
 		static void handler(int sig, siginfo_t* siginfo, void* context);
 };
 
+/** Verbose SIGILL handler. Prints root error cause and dumps cpu state. */
 class VerboseIllHandler : public VerboseHandler {
 	public:
 		static void install();
