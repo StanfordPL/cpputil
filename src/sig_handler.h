@@ -40,12 +40,12 @@ inline void VerboseSegvHandler::install() {
 }
 
 inline void VerboseSegvHandler::handler(int sig, siginfo_t* siginfo, void* arg) {
-	std::cout << "SIGSEGV" << std::endl;
+	std::cout << "SIGNAL: SIGSEGV" << std::endl;
 	std::cout << std::endl;
 
 	std::cout << "Address: ";
 	std::cout << std::hex << std::showbase << (uint64_t) siginfo->si_addr << std::endl;
-	std::cout << "Cause:   ";
+	std::cout << "Cause: ";
 	if (siginfo->si_code == SEGV_MAPERR)
 		std::cout << "Address not mapped" << std::endl;
 	else
@@ -55,7 +55,7 @@ inline void VerboseSegvHandler::handler(int sig, siginfo_t* siginfo, void* arg) 
 	const auto regs = ((ucontext_t*)arg)->uc_mcontext.gregs;
 	const auto ip = (unsigned char*)regs[REG_RIP];
 
-	std::cout << "\nRegister Status\n" << std::endl;
+	std::cout << "Register Status:" << std::endl;
 	std::cout << "%rip = " << std::showbase << std::hex << (uint64_t)ip << std::endl;
 	std::cout << "%rax = " << std::showbase << std::hex << (uint64_t)regs[REG_RAX] << std::endl;
 	std::cout << "%rdx = " << std::showbase << std::hex << (uint64_t)regs[REG_RDX] << std::endl;
@@ -82,25 +82,25 @@ inline void VerboseSegvHandler::handler(int sig, siginfo_t* siginfo, void* arg) 
 		exit(1);
 	}
 
-	std::cout << "Preceeding 64 bytes of %rip" << std::endl;
 	int count = 0; 
 
+	std::cout << "Preceeding 64 bytes of %rip" << std::endl;
+	count = 0;
 	for ( unsigned char* i = ip - 64; i < ip; ++i ) {
 		if (count++ % 8 == 0)
 			std::cout << std::endl << std::hex << std::setfill('0') << std::showbase << (uint64_t)i << ": ";
-		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::showbase << (uint16_t)*i << " ";
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::noshowbase << (uint16_t)*i << " ";
 		std::cout.flush();
 	}
 	std::cout << std::endl;
 	std::cout << std::endl;
 
 	std::cout << "Next 128 bytes of %rip" << std::endl;
-	std::cout << std::endl;
-
+	count = 0;
 	for( unsigned char* i = ip; i < ip + 128; ++i ) {
 		if (count++ % 8 == 0)
 			std::cout << std::endl << std::hex << std::setfill('0') << std::showbase << (uint64_t)i << ": ";
-		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::showbase << (uint16_t)*i << " ";
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::noshowbase << (uint16_t)*i << " ";
 		std::cout.flush();
 	}
 	std::cout << std::endl;
