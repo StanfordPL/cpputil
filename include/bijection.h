@@ -20,7 +20,7 @@ limitations under the License.
 #include <initializer_list>
 #include <map>
 
-#include "src/maputil.h"
+#include "include/maputil.h"
 
 namespace cpputil {
 
