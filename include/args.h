@@ -26,7 +26,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "src/singleton.h"
+#include "include/singleton.h"
 
 namespace cpputil {
 
