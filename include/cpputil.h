@@ -1,14 +1,14 @@
 #ifndef CPPUTIL_INCLUDE_CPPUTIL_H
 #define CPPUTIL_INCLUDE_CPPUTIL_H
 
-#include "src/args.h"
-#include "src/bijection.h"
-#include "src/hprinter.h"
-#include "src/interner.h"
-#include "src/maputil.h"
-#include "src/singleton.h"
-#include "src/thread.h"
-#include "src/timer.h"
-#include "src/tokenizer.h"
+#include "include/args.h"
+#include "include/bijection.h"
+#include "include/hprinter.h"
+#include "include/interner.h"
+#include "include/maputil.h"
+#include "include/singleton.h"
+#include "include/thread.h"
+#include "include/timer.h"
+#include "include/tokenizer.h"
 
 #endif
