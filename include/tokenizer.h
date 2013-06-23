@@ -21,7 +21,7 @@ limitations under the License.
 #include <stdint.h>
 #include <unordered_map>
 
-#include "src/bijection.h"
+#include "include/bijection.h"
 
 namespace cpputil {
 
