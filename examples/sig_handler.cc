@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "src/sig_handler.h"
+#include "include/sig_handler.h"
 
 using namespace cpputil;
 using namespace std;

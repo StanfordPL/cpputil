@@ -17,7 +17,7 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
-#include "src/interner.h"
+#include "include/interner.h"
 
 using namespace cpputil;
 using namespace std;

@@ -17,7 +17,7 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
-#include "src/tokenizer.h"
+#include "include/tokenizer.h"
 
 using namespace cpputil;
 using namespace std;

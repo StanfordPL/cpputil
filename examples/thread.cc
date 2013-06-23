@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <iostream>
 
-#include "src/thread.h"
+#include "include/thread.h"
 
 using namespace cpputil;
 using namespace std;

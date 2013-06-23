@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <iostream>
 
-#include "src/timer.h"
+#include "include/timer.h"
 
 using namespace cpputil;
 using namespace std;

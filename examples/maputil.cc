@@ -17,7 +17,7 @@ limitations under the License.
 #include <iostream>
 #include <map>
 
-#include "src/maputil.h"
+#include "include/maputil.h"
 
 using namespace cpputil;
 using namespace std;

@@ -17,7 +17,7 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
-#include "src/bijection.h"
+#include "include/bijection.h"
 
 using namespace cpputil;
 using namespace std;

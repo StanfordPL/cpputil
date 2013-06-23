@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <iostream>
 
-#include "src/singleton.h"
+#include "include/singleton.h"
 
 using namespace cpputil;
 using namespace std;
