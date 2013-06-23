@@ -43,6 +43,7 @@ ostream& operator<<(ostream& os, const Sext& s) {
 
 int main() {
 	HPrinter hp(cout);
+	hp.set_vspace(3);
 	
 	Double d{"Hello", "World!!!"};
 	Triple t{1,2,3};
