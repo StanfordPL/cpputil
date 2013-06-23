@@ -53,6 +53,7 @@ inline HPrinter::HPrinter(std::ostream& os) :
 
 inline HPrinter& HPrinter::set_vspace(size_t vspace) {
 	vspace_ = vspace;
+	return *this;
 }
 
 template <typename T>
