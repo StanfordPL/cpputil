@@ -54,6 +54,7 @@ class Args {
 		static unrecognized_iterator unrecognized_begin();
 		static unrecognized_iterator unrecognized_end();
 
+		static bool anonymous();
 		static anonymous_iterator anonymous_begin();
 		static anonymous_iterator anonymous_end();
 
@@ -299,6 +300,10 @@ inline Args::unrecognized_iterator Args::unrecognized_begin() {
 
 inline Args::unrecognized_iterator Args::unrecognized_end() {
 	return Singleton<Args>::get().unrecognized_.end();
+}
+
+inline bool Args::anonymous() {
+	return !Singleton<Args>::get().anonymous_.empty();
 }
 
 inline Args::anonymous_iterator Args::anonymous_begin() {
