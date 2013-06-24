@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "include/hprinter.h"
+#include "include/column_printer.h"
 
 using namespace cpputil;
 using namespace std;
@@ -42,14 +42,14 @@ ostream& operator<<(ostream& os, const Sext& s) {
 }
 
 int main() {
-	HPrinter hp(cout);
-	hp.set_vspace(3);
+	ColumnPrinter cp(cout);
+	cp.set_vspace(3);
 	
 	Double d{"Hello", "World!!!"};
 	Triple t{1,2,3};
 	Sext s{{1,2,3},{4,5,6}};
 
-	hp << t << s << d << s << t << endline;
+	cp << col("Col 1", d) << col("Col 2", t) << col("Col 3", s) << endline;
 
 	return 0;
 }

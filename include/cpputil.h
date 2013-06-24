@@ -3,7 +3,7 @@
 
 #include "include/args.h"
 #include "include/bijection.h"
-#include "include/hprinter.h"
+#include "include/column_printer.h"
 #include "include/interner.h"
 #include "include/maputil.h"
 #include "include/singleton.h"

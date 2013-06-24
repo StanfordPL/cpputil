@@ -14,52 +14,68 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef CPPUTIL_SRC_HPRINTER_H
-#define CPPUTIL_SRC_HPRINTER_H
+#ifndef CPPUTIL_SRC_COLUMN_PRINTER_H
+#define CPPUTIL_SRC_COLUMN_PRINTER_H
 
 #include <algorithm>
-#include <initializer_list>
 #include <iostream>
 #include <sstream>
+#include <tuple>
 #include <vector>
 
 namespace cpputil {
 
-class HPrinter {
+class ColumnPrinter {
 	public:
-		HPrinter(std::ostream& os);
+		ColumnPrinter(std::ostream& os);
 
-		HPrinter& set_vspace(size_t vspace);
+		ColumnPrinter& set_vspace(size_t vspace);
 
-		template <typename T>
-		HPrinter& operator<<(const T& t);
-		HPrinter& operator<<(HPrinter& (*fxn)(HPrinter&));
-		HPrinter& flush();
+		template <typename... Ts>
+		ColumnPrinter& operator<<(const std::tuple<Ts...>& ts);
+		ColumnPrinter& operator<<(ColumnPrinter& (*fxn)(ColumnPrinter&));
+		ColumnPrinter& flush();
 
 	private:
 		typedef std::vector<std::string> col_type;
+
+		template<class Tuple, size_t N>
+		struct VerticalPrinter {
+			static void print(std::ostream& os, const Tuple& t);
+		};
+
+		template<class Tuple>
+		struct VerticalPrinter<Tuple, 1>{
+			static void print(std::ostream& os, const Tuple& t);
+		};
+
+		template<class... Args>
+		void print(std::ostream& os, const std::tuple<Args...>& t);
 
 		std::ostream& os_;
 		std::vector<col_type> cols_;
 		size_t vspace_;
 };
 
-HPrinter& endline(HPrinter& hp);
+ColumnPrinter& endline(ColumnPrinter& hp);
 
-inline HPrinter::HPrinter(std::ostream& os) :
+template <typename... Ts>
+std::tuple<Ts&&...> col(Ts&&... ts);
+
+inline ColumnPrinter::ColumnPrinter(std::ostream& os) :
 		os_(os) {
 	set_vspace(1);
 }
 
-inline HPrinter& HPrinter::set_vspace(size_t vspace) {
+inline ColumnPrinter& ColumnPrinter::set_vspace(size_t vspace) {
 	vspace_ = vspace;
 	return *this;
 }
 
-template <typename T>
-inline HPrinter& HPrinter::operator<<(const T& t) {
+template <typename... Ts>
+inline ColumnPrinter& ColumnPrinter::operator<<(const std::tuple<Ts...>& ts) {
 	std::ostringstream oss;
-	oss << t;
+	print(oss, ts);
 
 	std::istringstream iss(oss.str());
 	std::string s;
@@ -72,11 +88,11 @@ inline HPrinter& HPrinter::operator<<(const T& t) {
 	return *this;
 }
 
-inline HPrinter& HPrinter::operator<<(HPrinter& (*fxn)(HPrinter&)) {
+inline ColumnPrinter& ColumnPrinter::operator<<(ColumnPrinter& (*fxn)(ColumnPrinter&)) {
 	return fxn(*this);
 }
 
-inline HPrinter& HPrinter::flush() {
+inline ColumnPrinter& ColumnPrinter::flush() {
 	if ( cols_.empty() ) {
 		os_ << std::endl;
 		return *this;
@@ -125,8 +141,30 @@ inline HPrinter& HPrinter::flush() {
 	return *this;
 }
 
-inline HPrinter& endline(HPrinter& hp) {
+template<class Tuple, size_t N>
+inline void ColumnPrinter::VerticalPrinter<Tuple, N>::print(std::ostream& os, const Tuple& t) {
+	VerticalPrinter<Tuple, N-1>::print(os, t);
+	os << std::endl;
+	os << std::get<N-1>(t);
+}
+
+template<class Tuple>
+inline void ColumnPrinter::VerticalPrinter<Tuple, 1>::print(std::ostream& os, const Tuple& t) {
+	os << std::get<0>(t);
+}
+
+template<class... Args>
+inline void ColumnPrinter::print(std::ostream& os, const std::tuple<Args...>& t) {
+	VerticalPrinter<decltype(t), sizeof...(Args)>::print(os, t);
+}
+
+inline ColumnPrinter& endline(ColumnPrinter& hp) {
 	return hp.flush();
+}
+
+template <typename... Ts>
+std::tuple<Ts&&...> col(Ts&&... ts) {
+	return std::forward_as_tuple(ts...);
 }
 
 } // namespace cpputil
