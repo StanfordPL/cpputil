@@ -67,7 +67,9 @@ inline typename Tokenizer<T, Token, TMap, TokenMap>::const_iterator
 Tokenizer<T, Token, TMap, TokenMap>::tokenize(const_reference t) {
 	const auto itr = contents_.domain_find(t);
 	if ( itr == contents_.end() ) {
-		return contents_.insert(std::make_pair(t, next_token_++)).first;
+		auto res = contents_.insert(std::make_pair(t, next_token_)).first;
+		next_token_++;
+		return res;
 	} else {
 		return itr;
 	}
