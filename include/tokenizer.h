@@ -117,6 +117,7 @@ Tokenizer<T, Token, TMap, TokenMap>::size() const {
 template <typename T, typename Token, typename TMap, typename TokenMap>
 inline void Tokenizer<T, Token, TMap, TokenMap>::clear() { 
 	contents_.clear(); 
+	next_token_ = Token();
 }
 
 template <typename T, typename Token, typename TMap, typename TokenMap>
