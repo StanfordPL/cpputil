@@ -258,6 +258,8 @@ inline std::string Args::usage(size_t indent) {
 		usages.push_back(oss.str());
 	}
 
+  std::sort(usages.begin(), usages.end());
+
 	size_t max_len = 0;
 	for ( const auto& u : usages )
 		max_len = std::max(max_len, u.length());
