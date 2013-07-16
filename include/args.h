@@ -69,6 +69,10 @@ class Args {
 
 		static void read_from_file(const char* path);
 		static bool exists(const std::string& s);
+
+    struct LtArgPtr {
+      bool operator()(const Arg* a1, const Arg* a2) const;
+    };
 };
 
 class Arg {
@@ -247,8 +251,11 @@ inline std::string Args::debug() {
 }
 
 inline std::string Args::usage(size_t indent) {
+  auto& args = Singleton<Args>::get().args_;
+  std::sort(args.begin(), args.end(), LtArgPtr());
+
 	std::vector<std::string> usages;
-	for ( auto a : Singleton<Args>::get().args_ ) {
+	for ( auto a : args ) {
 		std::ostringstream oss;
 		for ( const auto& opt : a->opts_ )
 			oss << opt << " ";
@@ -257,8 +264,6 @@ inline std::string Args::usage(size_t indent) {
 			oss	<< " ";
 		usages.push_back(oss.str());
 	}
-
-  std::sort(usages.begin(), usages.end());
 
 	size_t max_len = 0;
 	for ( const auto& u : usages )
@@ -272,7 +277,7 @@ inline std::string Args::usage(size_t indent) {
 		for ( size_t j = usages[i].length(); j < max_len; ++j )
 			result << ".";
 		result << "... ";
-		result << Singleton<Args>::get().args_[i]->description_;
+		result << args[i]->description_;
 		if ( i+1 != ie )
 			result << std::endl;
 	}
@@ -353,6 +358,10 @@ inline bool Args::exists(const std::string& opt) {
 		}
 	}
 	return false;
+}
+
+inline bool Args::LtArgPtr::operator()(const Arg* a1, const Arg* a2) const {
+  return a1->usage() < a2->usage();
 }
 
 inline Arg::~Arg() {
