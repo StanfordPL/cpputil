@@ -282,9 +282,11 @@ inline void Args::read(int argc, char** argv) {
 inline std::string Args::debug() {
 	std::ostringstream oss;
 	
-	auto& args = Singleton<Args>::get();
-	for ( size_t i = 0, ie = args.args_.size(); i < ie; ++i ) {
-		oss << args.args_[i]->debug();
+	auto& args = Singleton<Args>::get().args_;
+  std::sort(args.begin(), args.end(), LtArgPtr());
+
+	for ( size_t i = 0, ie = args.size(); i < ie; ++i ) {
+		oss << args[i]->debug();
 		if ( i+1 != ie )
 			oss << std::endl << std::endl;
 	}
