@@ -89,18 +89,6 @@ class Arg {
 		bool error() const;
 		const std::string& reason() const;
 
-		template <typename T>
-		class Reader {
-			public:
-				void operator()(std::istream& is, T& t);
-		};
-
-		template <typename T>
-		class Writer {
-			public:
-				void operator()(std::ostream& os, const T& t) const;
-		};
-
 	protected:
 		std::vector<int> appearances_;
 		std::set<std::string> opts_;
@@ -145,7 +133,61 @@ class FlagArg : public Arg {
 		FlagArg(const std::string& opt); 
 };
 
-template <typename T, typename R = Arg::Reader<T>, typename W = Arg::Writer<T>>
+template <typename T>
+class ArgReader {
+  public:
+    void operator()(std::istream& is, T& t);
+};
+
+template <typename T>
+class ArgWriter {
+  public:
+    void operator()(std::ostream& os, const T& t) const;
+};
+
+template <typename S, char Delim = ',', 
+    typename R = ArgReader<typename S::value_type>>
+class SequenceArgReader {
+  public:
+    void operator()(std::istream& is, S& s);
+};
+
+template <typename S, typename S::value_type Min, typename S::value_type Max,
+    char Delim = ',', typename R = ArgReader<typename S::value_type>>
+class SequenceArgRangeReader {
+  public:
+    void operator()(std::istream& is, S& s);
+};
+
+template <typename S, char Delim = ',', 
+    typename W = ArgWriter<typename S::value_type>>
+class SequenceArgWriter {
+  public:
+    void operator()(std::ostream& os, const S& s) const;
+};
+
+template <typename A, char Delim = ',', 
+    typename R = ArgReader<typename A::value_type>>
+class AssociativeArgReader {
+  public:
+    void operator()(std::istream& is, A& a);
+};
+
+template <typename A, typename A::value_type Min, typename A::value_type Max,
+    char Delim = ',', typename R = ArgReader<typename A::value_type>>
+class AssociativeArgRangeReader {
+  public:
+    void operator()(std::istream& is, A& a);
+};
+
+template <typename A, char Delim = ',', 
+    typename W = ArgWriter<typename A::value_type>>
+class AssociativeArgWriter {
+  public:
+    void operator()(std::ostream& os, const A& a) const;
+};
+
+template <typename T, typename R = ArgReader<T>, typename W = ArgWriter<T>>
 class ValueArg : public Arg {
 	public:
 		virtual ~ValueArg();
@@ -175,7 +217,7 @@ class ValueArg : public Arg {
 		ValueArg(const std::string& opt);
 };
 
-template <typename T, typename R = Arg::Reader<T>, typename W = Arg::Writer<T>>
+template <typename T, typename R = ArgReader<T>, typename W = ArgWriter<T>>
 class FileArg : public Arg {
 	public:
 		virtual ~FileArg();
@@ -393,13 +435,155 @@ inline const std::string& Arg::reason() const {
 }
 
 template <typename T>
-inline void Arg::Reader<T>::operator()(std::istream& is, T& t) {
+inline void ArgReader<T>::operator()(std::istream& is, T& t) {
 	is >> t;
 }
 
 template <typename T>
-inline void Arg::Writer<T>::operator()(std::ostream& os, const T& t) const {
+inline void ArgWriter<T>::operator()(std::ostream& os, const T& t) const {
 	os << t;
+}
+
+template <typename S, char Delim, typename R>
+inline void SequenceArgReader<S,Delim,R>::operator()(std::istream& is, S& s) {
+  s.clear();
+
+  std::string line;
+  typename S::value_type v;
+
+  while ( std::getline(is, line, Delim) ) {
+    std::istringstream iss(line);
+    R()(iss, v);
+
+    if ( iss.fail() ) {
+      is.setstate(std::ios::failbit);
+      return;
+    } else {
+      s.push_back(v);    
+    }
+  }
+  if ( is.eof() )
+    is.clear(std::ios::eofbit);
+}
+
+template <typename S, typename S::value_type Min, typename S::value_type Max, 
+    char Delim, typename R>
+inline void SequenceArgRangeReader<S,Min,Max,Delim,R>::operator()
+    (std::istream& is, S& s) {
+  s.clear();
+
+  std::string line;
+  typename S::value_type v;
+
+  auto range = false;
+  while ( std::getline(is, line, Delim) ) {
+    if ( line == "" ) {
+      range = true;
+      continue;
+    } 
+
+    std::istringstream iss(line);
+    R()(iss, v);
+
+    if ( iss.fail() ) {
+      is.setstate(std::ios::failbit);
+      return;
+    } else {
+      if ( range ) {
+        if ( s.empty() )
+          s.push_back(Min);
+        for ( auto i = s.back()+1; i < v; ++i )
+          s.push_back(i);
+        range = false;
+      }
+      s.push_back(v);    
+    }
+  }
+  if ( is.eof() )
+    is.clear(std::ios::eofbit);
+
+  if ( range ) {
+    if ( s.back() >= Max ) {
+      is.setstate(std::ios::eofbit);
+      return;
+    }
+    for ( auto i = s.back()+1; i < Max; ++i ) 
+      s.push_back(i);
+  }
+}
+
+template <typename S, char Delim, typename W>
+inline void SequenceArgWriter<S,Delim,W>::operator()(std::ostream& os, 
+    const S& s) const {
+  if ( s.empty() )
+    return;
+
+  auto i = s.begin();
+  W()(os, *(i++));
+  for ( const auto ie = s.end(); i != ie; ++i ) {
+    os << Delim;
+    W()(os, *i);
+  }
+}
+
+template <typename A, char Delim, typename R>
+inline void AssociativeArgReader<A,Delim,R>::operator()(std::istream& is, A& a) {
+  a.clear();
+
+  std::string line;
+  typename A::value_type v;
+
+  while ( std::getline(is, line, Delim) ) {
+    std::istringstream iss(line);
+    R()(iss, v);
+
+    if ( iss.fail() ) {
+      is.setstate(std::ios::failbit);
+      return;
+    } else {
+      a.insert(v);    
+    }
+  }
+  if ( is.eof() )
+    is.clear(std::ios::eofbit);
+}
+
+template <typename A, typename A::value_type Min, typename A::value_type Max, 
+    char Delim, typename R>
+inline void AssociativeArgRangeReader<A,Min,Max,Delim,R>::operator()
+    (std::istream& is, A& a) {
+  a.clear();
+
+  std::string line;
+  typename A::value_type v;
+
+  while ( std::getline(is, line, Delim) ) {
+    std::istringstream iss(line);
+    R()(iss, v);
+
+    if ( iss.fail() ) {
+      is.setstate(std::ios::failbit);
+      return;
+    } else {
+      a.insert(v);    
+    }
+  }
+  if ( is.eof() )
+    is.clear(std::ios::eofbit);
+}
+
+template <typename A, char Delim, typename W>
+inline void AssociativeArgWriter<A,Delim,W>::operator()(std::ostream& os, 
+    const A& a) const {
+  if ( a.empty() )
+    return;
+
+  auto i = a.begin();
+  W()(os, *(i++));
+  for ( const auto ie = a.end(); i != ie; ++i ) {
+    os << Delim;
+    W()(os, *i);
+  }
 }
 
 inline Arg::Arg(const std::string& opt) {

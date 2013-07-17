@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "include/args.h"
 
 using namespace cpputil;
@@ -16,6 +17,14 @@ auto& d = FileArg<double>::create("d")
 	.alternate("double")
 	.usage("<double>")
 	.default_val(1.0);
+
+auto& is = ValueArg<vector<int>,SequenceArgReader<vector<int>>, 
+      SequenceArgWriter<vector<int>>>::create("is")
+    .default_val(vector<int>());
+
+auto& cs = ValueArg<vector<char>,SequenceArgRangeReader<vector<char>,'a','z'>,
+      SequenceArgWriter<vector<char>>>::create("cs")
+    .default_val(vector<char>()); 
 
 int main(int argc, char** argv) {
 	Args::read(argc, argv);
