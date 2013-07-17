@@ -378,13 +378,27 @@ inline void Args::read_from_file(const char* path) {
 	if ( !ifs.is_open() )
 		return;
 
+  std::stringstream contents;
+  contents << ifs.rdbuf();
+
+  std::ostringstream stripped;
+  for ( size_t i = 0, ie = contents.str().length(); i < ie; ++i )
+    if ( contents.str()[i] == '#' ) {
+      while ( i < ie && contents.str()[i++] != '\n' );
+      stripped << '\n';
+      --i;
+    } else {
+      stripped << contents.str()[i];
+    }
+
 	std::vector<char*> argv;
 	argv.push_back(strdup("<ignore>"));
 
+  std::istringstream iss(stripped.str());
+	std::string s;
 	while ( true ) {
-		std::string s;
-		ifs >> s;
-		if ( ifs.eof() )
+		iss >> s;
+		if ( iss.eof() )
 			break;
 		argv.push_back(strdup(s.c_str()));
 	}
