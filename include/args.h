@@ -557,7 +557,14 @@ inline void AssociativeArgRangeReader<A,Min,Max,Delim,R>::operator()
   std::string line;
   typename A::value_type v;
 
+  auto range = false;
+  auto last_insert = Min;
   while ( std::getline(is, line, Delim) ) {
+    if ( line == "" ) {
+      range = true;
+      continue;
+    } 
+
     std::istringstream iss(line);
     R()(iss, v);
 
@@ -565,11 +572,28 @@ inline void AssociativeArgRangeReader<A,Min,Max,Delim,R>::operator()
       is.setstate(std::ios::failbit);
       return;
     } else {
+      if ( range ) {
+        if ( a.empty() )
+          a.insert(Min);
+        for ( auto i = last_insert + 1; i < v; ++i )
+          a.insert(i);
+        range = false;
+      }
       a.insert(v);    
+      last_insert = v;
     }
   }
   if ( is.eof() )
     is.clear(std::ios::eofbit);
+
+  if ( range ) {
+    if ( last_insert >= Max ) {
+      is.setstate(std::ios::eofbit);
+      return;
+    }
+    for ( auto i = last_insert + 1; i < Max; ++i ) 
+      a.insert(i);
+  }
 }
 
 template <typename A, char Delim, typename W>

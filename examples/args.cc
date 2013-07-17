@@ -1,4 +1,5 @@
 #include <iostream>
+#include <set>
 #include <vector>
 #include "include/args.h"
 
@@ -22,9 +23,9 @@ auto& is = ValueArg<vector<int>,SequenceArgReader<vector<int>>,
       SequenceArgWriter<vector<int>>>::create("is")
     .default_val(vector<int>());
 
-auto& cs = ValueArg<vector<char>,SequenceArgRangeReader<vector<char>,'a','z'>,
-      SequenceArgWriter<vector<char>>>::create("cs")
-    .default_val(vector<char>()); 
+auto& cs = ValueArg<set<char>,AssociativeArgRangeReader<set<char>,'a','z'>,
+      AssociativeArgWriter<set<char>>>::create("cs")
+    .default_val(set<char>()); 
 
 int main(int argc, char** argv) {
 	Args::read(argc, argv);
