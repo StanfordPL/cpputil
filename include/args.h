@@ -145,7 +145,7 @@ class ArgWriter {
     void operator()(std::ostream& os, const T& t) const;
 };
 
-template <typename S, char Delim = ',', 
+template <typename S, char Delim = '.', 
     typename R = ArgReader<typename S::value_type>>
 class SequenceArgReader {
   public:
@@ -153,20 +153,20 @@ class SequenceArgReader {
 };
 
 template <typename S, typename S::value_type Min, typename S::value_type Max,
-    char Delim = ',', typename R = ArgReader<typename S::value_type>>
+    char Delim = '.', typename R = ArgReader<typename S::value_type>>
 class SequenceArgRangeReader {
   public:
     void operator()(std::istream& is, S& s);
 };
 
-template <typename S, char Delim = ',', 
+template <typename S, char Delim = '.', 
     typename W = ArgWriter<typename S::value_type>>
 class SequenceArgWriter {
   public:
     void operator()(std::ostream& os, const S& s) const;
 };
 
-template <typename A, char Delim = ',', 
+template <typename A, char Delim = '.', 
     typename R = ArgReader<typename A::value_type>>
 class AssociativeArgReader {
   public:
@@ -174,13 +174,13 @@ class AssociativeArgReader {
 };
 
 template <typename A, typename A::value_type Min, typename A::value_type Max,
-    char Delim = ',', typename R = ArgReader<typename A::value_type>>
+    char Delim = '.', typename R = ArgReader<typename A::value_type>>
 class AssociativeArgRangeReader {
   public:
     void operator()(std::istream& is, A& a);
 };
 
-template <typename A, char Delim = ',', 
+template <typename A, char Delim = '.', 
     typename W = ArgWriter<typename A::value_type>>
 class AssociativeArgWriter {
   public:
