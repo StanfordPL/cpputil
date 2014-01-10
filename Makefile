@@ -14,11 +14,11 @@
 
 ##### CONSTANT DEFINITIONS
 
-GCC=ccache g++ 
+GCC=ccache g++ -std=c++0x
 
 INC=-I./
 		
-OPT=-Werror -g -O3 -std=c++0x
+OPT=-Werror -g -O3
 
 DOC=doc/html
 
