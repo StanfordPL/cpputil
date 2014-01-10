@@ -41,6 +41,22 @@ class Interner {
       return *(res.first);
     }
 
+    const_iterator begin() const {
+      return vals_.begin();
+    }
+
+    const_iterator cbegin() const {
+      return begin();
+    }
+
+    const_iterator end() const {
+      return vals_.end();
+    }
+
+    const_iterator cend() const {
+      return end();
+    }
+
     bool empty() const {
       return vals_.empty();
     }
