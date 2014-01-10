@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef CPPUTIL_SRC_SINGLETON_H
-#define CPPUTIL_SRC_SINGLETON_H
+#ifndef CPPUTIL_INCLUDE_PATTERNS_SINGLETON_H
+#define CPPUTIL_INCLUDE_PATTERNS_SINGLETON_H
 
 namespace cpputil {
 
@@ -28,14 +28,11 @@ class Singleton {
 		Singleton(const Singleton& s) = delete;
 		Singleton& operator=(Singleton s) = delete;
 
-		static reference get();
+		static reference get() {
+      static T instance;
+      return instance;
+    }
 };
-
-template <typename T>
-inline typename Singleton<T>::reference Singleton<T>::get() {
-  static T instance;
-  return instance;
-}
 
 } // namespace cpputil
 
