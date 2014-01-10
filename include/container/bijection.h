@@ -139,9 +139,9 @@ class Bijection {
       r2d_.swap(rhs.r2d_);
     }
 
-	private:
-		DMap d2r_;
-		RMap r2d_;
+  private:
+    DMap d2r_;
+    RMap r2d_;
 };  
 
 } // namespace cpputil
