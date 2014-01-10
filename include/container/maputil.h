@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef MAP_UTIL_H
-#define MAP_UTIL_H
+#ifndef CPPUTIL_INCLUDE_CONTAINER_MAP_UTIL_H
+#define CPPUTIL_INCLUDE_CONTAINER_MAP_UTIL_H
 
 #include <cassert>
 
@@ -23,245 +23,145 @@ namespace cpputil {
 
 template <typename Map>
 class CppUtilMap : public Map {
-	public:
-		typedef Map map_type;
+  public:
+    typedef Map map_type;
 
-		class const_key_iterator {
-			public:
-				const_key_iterator() = delete;
-				const_key_iterator(const typename map_type::const_iterator& itr);
+    class const_key_iterator {
+      public:
+        const_key_iterator() = delete;
+        const_key_iterator(const typename map_type::const_iterator& itr) 
+          : itr_{itr} { }
 
-				const_key_iterator& operator++();
-				const typename map_type::key_type& operator*() const;
+        const_key_iterator& operator++() {
+          itr_++;
+          return *this;
+        }
 
-				bool operator==(const const_key_iterator& rhs) const;
-				bool operator!=(const const_key_iterator& rhs) const;
+        const typename map_type::key_type& operator*() const {
+          return itr_->first;
+        }
 
-			private:
-				typename map_type::const_iterator itr_; 
-		};
+        bool operator==(const const_key_iterator& rhs) const {
+          return itr_ == rhs.itr_;
+        }
 
-		class value_iterator {
-			public:
-				value_iterator() = delete;
-				value_iterator(const typename map_type::iterator& itr);
+        bool operator!=(const const_key_iterator& rhs) const {
+          return itr_ != rhs.itr_;
+        }
 
-				value_iterator& operator++();
-				typename map_type::mapped_type& operator*() const; 
+      private:
+        typename map_type::const_iterator itr_; 
+    };
 
-				bool operator==(const value_iterator& rhs) const; 
-				bool operator!=(const value_iterator& rhs) const; 
+    class value_iterator {
+      public:
+        value_iterator() = delete;
+        value_iterator(const typename map_type::iterator& itr)
+          : itr_{itr} { }
 
-			private:
-				typename map_type::iterator itr_; 
-		};
+        value_iterator& operator++() {
+          itr_++;
+          return *this;
+        }
 
-		class const_value_iterator {
-			public:
-				const_value_iterator() = delete;
-				const_value_iterator(const typename map_type::const_iterator& itr);
+        typename map_type::mapped_type& operator*() const {
+          return itr_->second;
+        }
 
-				const_value_iterator& operator++();
-				const typename map_type::mapped_type& operator*() const;
+        bool operator==(const value_iterator& rhs) const {
+          return itr_ == rhs.itr_;
+        }
 
-				bool operator==(const const_value_iterator& rhs) const;
-				bool operator!=(const const_value_iterator& rhs) const;
+        bool operator!=(const value_iterator& rhs) const {
+          return itr_ != rhs.itr_;
+        }
 
-			private:
-				typename map_type::const_iterator itr_; 
-		};
+      private:
+        typename map_type::iterator itr_; 
+    };
 
-		const_key_iterator key_begin() const;
-		const_key_iterator key_cbegin() const;
+    class const_value_iterator {
+      public:
+        const_value_iterator() = delete;
+        const_value_iterator(const typename map_type::const_iterator& itr)
+          : itr_{itr} { }
 
-		const_key_iterator key_end() const;
-		const_key_iterator key_cend() const;
+        const_value_iterator& operator++() {
+          itr_++;
+          return *this;
+        }
 
-		value_iterator value_begin();
-		const_value_iterator value_begin() const;
-		const_value_iterator value_cbegin() const;
+        const typename map_type::mapped_type& operator*() const {
+          return itr_->second;
+        }
 
-		value_iterator value_end();
-		const_value_iterator value_end() const;
-		const_value_iterator value_cend() const;
+        bool operator==(const const_value_iterator& rhs) const {
+          return itr_ == rhs.itr_;
+        }
 
-    typename map_type::mapped_type& assert_at(const typename map_type::key_type& k);
-		const typename map_type::mapped_type& assert_at(const typename map_type::key_type& k) const;		
-		
-		typename map_type::size_type assert_erase(const typename map_type::key_type& k);
+        bool operator!=(const const_value_iterator& rhs) const {
+          return itr_ != rhs.itr_;
+        }
+
+      private:
+        typename map_type::const_iterator itr_; 
+    };
+
+    const_key_iterator key_begin() const {
+      return const_key_iterator(Map::begin());
+    }
+
+    const_key_iterator key_cbegin() const {
+      return const_key_iterator(Map::cbegin());
+    }
+
+    const_key_iterator key_end() const {
+      return const_key_iterator(Map::end());
+    }
+
+    const_key_iterator key_cend() const {
+      return const_key_iterator(Map::cend());
+    }
+
+    value_iterator value_begin() {
+      return value_iterator(Map::begin());
+    }
+
+    const_value_iterator value_begin() const {
+      return const_value_iterator(Map::begin());
+    }
+
+    const_value_iterator value_cbegin() const {
+      return const_value_iterator(Map::cbegin());
+    }
+
+    value_iterator value_end() {
+      return value_iterator(Map::end());
+    }
+
+    const_value_iterator value_end() const {
+      return const_value_iterator(Map::end());
+    }
+
+    const_value_iterator value_cend() const {
+      return const_value_iterator(Map::cend());
+    }
+
+    typename map_type::mapped_type& assert_at(const typename map_type::key_type& k) {
+      assert(Map::find(k) != Map::end() && "Unrecognized key!");
+      return Map::at(k);
+    }
+
+    const typename map_type::mapped_type& assert_at(const typename map_type::key_type& k) const {
+      assert(Map::find(k) != Map::end() && "Unrecognized key!");
+      return Map::at(k);
+    }
+
+    typename map_type::size_type assert_erase(const typename map_type::key_type& k) {
+      assert(Map::find(k) != Map::end() && "Unrecognized key!");
+      return Map::erase(k);
+    }
 };
-
-template <typename Map>
-inline CppUtilMap<Map>::value_iterator::value_iterator(
-		const typename map_type::iterator& itr) 
-		: itr_{itr} { 
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::value_iterator& 
-CppUtilMap<Map>::value_iterator::operator++() {
-	itr_++;
-	return *this;
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::map_type::mapped_type& 
-CppUtilMap<Map>::value_iterator::operator*() const {
-	return itr_->second;
-}
-
-template <typename Map>
-inline bool CppUtilMap<Map>::value_iterator::operator==(
-		const value_iterator& rhs) const {
-	return itr_ == rhs.itr_;
-}
-
-template <typename Map>
-inline bool CppUtilMap<Map>::value_iterator::operator!=(
-		const value_iterator& rhs) const {
-	return itr_ != rhs.itr_;
-}
-
-template <typename Map>
-inline CppUtilMap<Map>::const_key_iterator::const_key_iterator(
-		const typename map_type::const_iterator& itr) 
-		: itr_{itr} { 
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_key_iterator& 
-CppUtilMap<Map>::const_key_iterator::operator++() {
-	itr_++;
-	return *this;
-}
-
-template <typename Map>
-inline const typename CppUtilMap<Map>::map_type::key_type& 
-CppUtilMap<Map>::const_key_iterator::operator*() const {
-	return itr_->first;
-}
-
-template <typename Map>
-inline bool CppUtilMap<Map>::const_key_iterator::operator==(
-		const const_key_iterator& rhs) const {
-	return itr_ == rhs.itr_;
-}
-
-template <typename Map>
-inline bool CppUtilMap<Map>::const_key_iterator::operator!=(
-		const const_key_iterator& rhs) const {
-	return itr_ != rhs.itr_;
-}
-
-template <typename Map>
-inline CppUtilMap<Map>::const_value_iterator::const_value_iterator(
-		const typename map_type::const_iterator& itr) 
-		: itr_{itr} { 
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_value_iterator& 
-CppUtilMap<Map>::const_value_iterator::operator++() {
-	itr_++;
-	return *this;
-}
-
-template <typename Map>
-inline const typename CppUtilMap<Map>::map_type::mapped_type& 
-CppUtilMap<Map>::const_value_iterator::operator*() const {
-	return itr_->second;
-}
-
-template <typename Map>
-inline bool CppUtilMap<Map>::const_value_iterator::operator==(
-		const const_value_iterator& rhs) const {
-	return itr_ == rhs.itr_;
-}
-
-template <typename Map>
-inline bool CppUtilMap<Map>::const_value_iterator::operator!=(
-		const const_value_iterator& rhs) const {
-	return itr_ != rhs.itr_;
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_key_iterator 
-CppUtilMap<Map>::key_begin() const {
-	return const_key_iterator(Map::begin());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_key_iterator 
-CppUtilMap<Map>::key_cbegin() const {
-	return const_key_iterator(Map::cbegin());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_key_iterator 
-CppUtilMap<Map>::key_end() const {
-	return const_key_iterator(Map::end());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_key_iterator 
-CppUtilMap<Map>::key_cend() const {
-	return const_key_iterator(Map::cend());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::value_iterator CppUtilMap<Map>::value_begin() {
-	return value_iterator(Map::begin());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_value_iterator 
-CppUtilMap<Map>::value_begin() const {
-	return const_value_iterator(Map::begin());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_value_iterator 
-CppUtilMap<Map>::value_cbegin() const {
-	return const_value_iterator(Map::cbegin());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::value_iterator CppUtilMap<Map>::value_end() {
-	return value_iterator(Map::end());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_value_iterator 
-CppUtilMap<Map>::value_end() const {
-	return const_value_iterator(Map::end());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::const_value_iterator 
-CppUtilMap<Map>::value_cend() const {
-	return const_value_iterator(Map::cend());
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::map_type::mapped_type& 
-CppUtilMap<Map>::assert_at(const typename map_type::key_type& k) {
-	assert(Map::find(k) != Map::end() && "Unrecognized key!");
-	return Map::at(k);
-}
-
-template <typename Map>
-inline const typename CppUtilMap<Map>::map_type::mapped_type& 
-CppUtilMap<Map>::assert_at(const typename map_type::key_type& k) const {
-	assert(Map::find(k) != Map::end() && "Unrecognized key!");
-	return Map::at(k);
-}
-
-template <typename Map>
-inline typename CppUtilMap<Map>::map_type::size_type
-CppUtilMap<Map>::assert_erase(const typename map_type::key_type& k) {
-	assert(Map::find(k) != Map::end() && "Unrecognized key!");
-	return Map::erase(k);
-}
 
 } // namespace cpputil
 
