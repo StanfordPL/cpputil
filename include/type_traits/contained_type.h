@@ -1,7 +1,9 @@
+#ifndef CPPUTIL_INCLUDE_TYPE_TRAITS_CONTAINED_TYPE_H
+#define CPPUTIL_INCLUDE_TYPE_TRAITS_CONTAINED_TYPE_H
+
 #include <type_traits>
 
 #include "include/type_traits/is_stl_sequence.h"
-
 
 namespace cpputil {
 
@@ -16,3 +18,5 @@ struct contained_type<T, typename std::enable_if<is_stl_sequence<T>::value>::typ
 };
 
 } // namespace cpputil
+
+#endif
