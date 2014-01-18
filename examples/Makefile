@@ -21,6 +21,7 @@ LIB =
 EX  = container/bijection \
 			container/maputil \
 			container/tokenizer \
+			io/nopstream \
 			memory/interner \
 			patterns/singleton \
 			signal/debug_handler
