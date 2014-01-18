@@ -1,12 +1,14 @@
 #include <iostream>
 
-#include "include/sig_handler.h"
+#include "include/signal/debug_handler.h"
 
 using namespace cpputil;
 using namespace std;
 
 int main() {
-	VerboseSegvHandler::install();
+	DebugHandler dh;
+	dh.install_sigsegv();
+
 	int* v = 0;
 	*v = 0;
 

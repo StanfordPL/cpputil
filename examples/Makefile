@@ -22,7 +22,8 @@ EX  = container/bijection \
 			container/maputil \
 			container/tokenizer \
 			memory/interner \
-			patterns/singleton 
+			patterns/singleton \
+			signal/debug_handler
 
 ##### TOP LEVEL TARGETS
 
