@@ -15,21 +15,61 @@
 #ifndef CPPUTIL_INCLUDE_IO_FILTER_STREAM_H
 #define CPPUTIL_INCLUDE_IO_FILTER_STREAM_H
 
-#include <array>
 #include <iostream>
 #include <streambuf>
-#include <string>
 #include <vector>
 
 namespace cpputil {
 
-template <typename F>
-class ofilterstreambuf : public std::streambuf {
+template <typename F, typename Ch, typename Tr>
+class basic_ifilterstreambuf : public std::basic_streambuf<Ch,Tr> {
   public:
-    ofilterstreambuf(std::streambuf* buf) 
+		typedef typename std::basic_streambuf<Ch, Tr>::char_type char_type;
+    typedef typename std::basic_streambuf<Ch, Tr>::int_type int_type;   
+		typedef typename std::basic_streambuf<Ch, Tr>::off_type off_type;
+		typedef typename std::basic_streambuf<Ch, Tr>::pos_type pos_type;
+    typedef typename std::basic_streambuf<Ch, Tr>::traits_type traits_type; 
+
+    basic_ifilterstreambuf(std::basic_streambuf<Ch,Tr>* buf) 
+      : buf_(buf), next_(16) { }
+
+    virtual ~basic_ifilterstreambuf() { }
+
+    F& filter() {
+      return filter_;
+    }
+
+    void reserve(size_t bytes) {
+      next_.reserve(bytes);
+    }
+
+  protected:
+    virtual int_type underflow() { 
+      if ( std::basic_streambuf<Ch,Tr>::gptr() == std::basic_streambuf<Ch,Tr>::egptr() ) {
+        const auto c = buf_->sbumpc();
+        const auto count = filter_(c, next_.data());
+        setg(next_.data(), next_.data(), next_.data()+count);
+      }
+      return *std::basic_streambuf<Ch,Tr>::gptr();
+    }
+
+    virtual int_type sync() { 
+      return buf_->pubsync();
+    }
+
+  private:
+    std::basic_streambuf<Ch,Tr>* buf_;
+    std::vector<Ch> next_;
+    F filter_;
+};
+
+template <typename F, typename Ch, typename Tr>
+class basic_ofilterstreambuf : public std::basic_streambuf<Ch,Tr> {
+  public:
+    basic_ofilterstreambuf(std::basic_streambuf<Ch,Tr>* buf) 
       : buf_(buf) { }
 
-    virtual ~ofilterstreambuf() { }
+    virtual ~basic_ofilterstreambuf() { }
 
     F& filter() {
       return filter_;
@@ -37,7 +77,7 @@ class ofilterstreambuf : public std::streambuf {
 
   protected:
     virtual int sync() {
-      return buf_->pubsync() == 0 ? 0 : -1;
+      return buf_->pubsync();
     }
 
     virtual int overflow(int c = EOF) {
@@ -49,126 +89,61 @@ class ofilterstreambuf : public std::streambuf {
     }
 
   private:
-    std::streambuf* buf_;
+    std::basic_streambuf<Ch,Tr>* buf_;
     F filter_;
 };
 
-template <typename F>
-class ofilterstream : public std::ostream {
+template <typename F, typename Ch, typename Tr>
+class basic_ifilterstream : public std::basic_istream<Ch,Tr> {
   public:
-    explicit ofilterstream(std::ostream& os) 
-      : std::ostream(&buf_), buf_(os.rdbuf()) { }
+    explicit basic_ifilterstream(std::basic_istream<Ch,Tr>& is) 
+      : std::basic_istream<Ch,Tr>(&buf_), buf_(is.rdbuf()) { }
 
-    explicit ofilterstream(std::streambuf& sb) 
-      : std::ostream(&buf_), buf_(sb) { }
+    explicit basic_ifilterstream(std::basic_streambuf<Ch,Tr>& sb) 
+      : std::basic_istream<Ch,Tr>(&buf_), buf_(sb) { }
 
-    virtual ~ofilterstream() { }
+    virtual ~basic_ifilterstream() { }
+
+    F& filter() {
+      return buf_.filter();
+    }
+
+    void reserve(size_t bytes) {
+      buf_.reserve(bytes);
+    }
+
+  private:
+    basic_ifilterstreambuf<F,Ch,Tr> buf_;
+};
+
+template <typename F>
+using ifilterstream = public basic_ifilterstream<F,char,std::char_traits<char>>;
+template <typename F>
+using wifilterstream = public basic_ifilterstream<F,wchar_t,std::char_traits<wchar_t>>;
+
+template <typename F, typename Ch, typename Tr>
+class basic_ofilterstream : public std::basic_ostream<Ch,Tr> {
+  public:
+    explicit basic_ofilterstream(std::basic_ostream<Ch,Tr>& os) 
+      : std::basic_ostream<Ch,Tr>(&buf_), buf_(os.rdbuf()) { }
+
+    explicit basic_ofilterstream(std::basic_streambuf<Ch,Tr>& sb) 
+      : std::basic_ostream<Ch,Tr>(&buf_), buf_(sb) { }
+
+    virtual ~basic_ofilterstream() { }
 
     F& filter() {
       return buf_.filter();
     }
 
   private:
-    ofilterstreambuf<F> buf_;
+    basic_ofilterstreambuf<F,Ch,Tr> buf_;
 };
 
-
-
-
-
-
-template <typename InF, typename OutF, size_t Size>
-class filterstreambuf;
-
-template <typename InF, typename OutF>
-class filterstreambuf<InF, OutF, 0> : public std::streambuf {
-  public:
-    filterstreambuf(std::streambuf* buf) : buf_(buf) { }
-
-    virtual ~filterstreambuf() { }
-
-    virtual int underflow() { 
-      if ( gptr() == egptr() ) {
-        next_ = buf_->sbumpc();
-        setg(&next_, &next_, &next_+1);
-      }
-      return *gptr();
-    }
-
-    virtual int overflow(int c = EOF) { 
-      return buf_->sputc(c);
-    }
-
-    virtual int sync() { 
-      if ( gptr() != egptr() ) {
-        buf_->sputbackc(next_);
-        setg(0,0,0);
-      }
-      return buf_->pubsync();
-    }
-
-  private:
-    std::streambuf* buf_;
-    char next_;
-};
-
-template <typename InF, typename OutF>
-class filterstreambuf<InF, OutF, 1> : public std::streambuf {
-  public:
-    filterstreambuf(std::streambuf* buf) : buf_(buf) { }
-
-    virtual ~filterstreambuf() { }
-
-    virtual int underflow() { 
-      if ( gptr() == egptr() ) {
-        in_buf_.resize(1);
-        if ( (in_buf_.front() = buf_->sbumpc()) == EOF ) {
-          return EOF;
-        }
-        in_(in_buf_);
-        setg(in_buf_.data(), in_buf_.data(), in_buf_.data()+in_buf_.size());
-      }
-
-      return *gptr();
-    }
-
-    virtual int overflow(int c = EOF) { 
-      if ( c == EOF ) {
-        return EOF;
-      } 
-
-      out_buf_.resize(1);
-      out_buf_.front() = c;
-      out_(out_buf_);
-      for ( const auto val : out_buf_ ) {
-        buf_->sputc(val);
-      }
-
-      return out_buf_.empty() ? EOF : out_buf_.back();
-    }
-
-    virtual int sync() { 
-      return buf_->pubsync();
-    }
-
-  private:
-    std::streambuf* buf_;
-
-    InF in_;
-    std::vector<char> in_buf_;
-    OutF out_;
-    std::vector<char> out_buf_;
-};
-
-template <typename InF, size_t Size>
-class ifilterstream : public std::istream {
-  public:
-    ifilterstream(std::istream& is) : std::istream(&buf_), buf_(is.rdbuf()) { }
-    virtual ~ifilterstream() { }
-
-  private:
-    filterstreambuf<InF, void*, Size> buf_;
-};
+template <typename F>
+using ofilterstream = public basic_ofilterstream<F,char,std::char_traits<char>>;
+template <typename F>
+using wofilterstream = public basic_ofilterstream<F,wchar_t,std::char_traits<wchar_t>>;
 
 } // namespace cpputil
 
