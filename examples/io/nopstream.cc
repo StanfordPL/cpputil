@@ -19,6 +19,12 @@
 using namespace cpputil;
 using namespace std;
 
+int foo() {
+  int x = 0;
+  for ( ; x < 1e9; ++x );
+  return x;
+}
+
 struct C {
 	int x_; 
   int y_;
@@ -98,6 +104,8 @@ int main() {
   ons << scp;
   ons << ucp;
   ons << udt;
+
+  ons << foo();
 
   cout << "If you didn't type anything or see anything, this works!" << endl;
 
