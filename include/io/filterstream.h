@@ -48,7 +48,7 @@ class basic_ifilterstreambuf : public std::basic_streambuf<Ch,Tr> {
       if ( std::basic_streambuf<Ch,Tr>::gptr() == std::basic_streambuf<Ch,Tr>::egptr() ) {
         const auto c = buf_->sbumpc();
         const auto count = filter_(c, next_.data());
-        setg(next_.data(), next_.data(), next_.data()+count);
+				std::basic_streambuf<Ch,Tr>::setg(next_.data(), next_.data(), next_.data()+count);
       }
       return *std::basic_streambuf<Ch,Tr>::gptr();
     }
@@ -117,9 +117,9 @@ class basic_ifilterstream : public std::basic_istream<Ch,Tr> {
 };
 
 template <typename F>
-using ifilterstream = public basic_ifilterstream<F,char,std::char_traits<char>>;
+using ifilterstream = basic_ifilterstream<F,char,std::char_traits<char>>;
 template <typename F>
-using wifilterstream = public basic_ifilterstream<F,wchar_t,std::char_traits<wchar_t>>;
+using wifilterstream = basic_ifilterstream<F,wchar_t,std::char_traits<wchar_t>>;
 
 template <typename F, typename Ch, typename Tr>
 class basic_ofilterstream : public std::basic_ostream<Ch,Tr> {
@@ -141,9 +141,9 @@ class basic_ofilterstream : public std::basic_ostream<Ch,Tr> {
 };
 
 template <typename F>
-using ofilterstream = public basic_ofilterstream<F,char,std::char_traits<char>>;
+using ofilterstream = basic_ofilterstream<F,char,std::char_traits<char>>;
 template <typename F>
-using wofilterstream = public basic_ofilterstream<F,wchar_t,std::char_traits<wchar_t>>;
+using wofilterstream = basic_ofilterstream<F,wchar_t,std::char_traits<wchar_t>>;
 
 } // namespace cpputil
 
