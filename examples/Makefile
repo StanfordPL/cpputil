@@ -21,8 +21,12 @@ LIB =
 EX  = container/bijection \
 			container/maputil \
 			container/tokenizer \
+			io/filterstream \
+			io/indent \
 			io/multistream \
+			io/redact \
 			io/redirectstream \
+			io/shunt \
 			io/nopstream \
 			memory/interner \
 			patterns/singleton \
