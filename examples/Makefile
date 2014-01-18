@@ -18,9 +18,11 @@ GCC = ccache g++ -std=c++0x
 OPT = -Werror -O3
 INC = -I../
 LIB = 
-EX  = memory/interner \
+EX  = container/bijection \
+			container/maputil \
+			container/tokenizer \
+			memory/interner \
 			patterns/singleton 
-		 
 
 ##### TOP LEVEL TARGETS
 
