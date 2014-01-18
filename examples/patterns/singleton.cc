@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_TYPE_TRAITS_CONTAINED_TYPE_H
-#define CPPUTIL_INCLUDE_TYPE_TRAITS_CONTAINED_TYPE_H
+#include <iostream>
 
-#include <type_traits>
+#include "include/patterns/singleton.h"
 
-#include "include/type_traits/is_stl_sequence.h"
+using namespace cpputil;
+using namespace std;
 
-namespace cpputil {
+int main() {
+  auto& x = Singleton<int>::get();
+  x = 10;
+  const auto& y = Singleton<int>::get();
+  auto& z = Singleton<double>::get();
+  z = 20;
 
-template <typename T, typename Ignore = void>
-struct contained_type {
-	typedef T type;
-};
+  if ( y == 10 )
+    cout << "It works!" << endl;
+  else
+    cout << "It's broken!" << endl; 
 
-template <typename T>
-struct contained_type<T, typename std::enable_if<is_stl_sequence<T>::value>::type> {
-	typedef typename contained_type<typename T::value_type>::type type;
-};
+  return 0;
+}
 
-} // namespace cpputil
-
-#endif
