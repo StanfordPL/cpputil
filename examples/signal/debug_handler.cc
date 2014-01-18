@@ -6,8 +6,7 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-	DebugHandler dh;
-	dh.install_sigsegv();
+  DebugHandler::install_sigsegv();
 
 	int* v = 0;
 	*v = 0;

@@ -15,77 +15,42 @@
 #ifndef CPPUTIL_INCLUDE_SIGNAL_DEBUG_HANDLER_H
 #define CPPUTIL_INCLUDE_SIGNAL_DEBUG_HANDLER_H
 
+#include <cassert>
+#include <csignal>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <stdint.h>
 #include <string>
+#include <sys/ucontext.h>
 #include <unistd.h>
-
-#include "include/signal/handler.h"
 
 namespace cpputil {
 
-class DebugHandler : public SigHandler {
+class DebugHandler {
 	public:
-		virtual ~DebugHandler() { }
-
-	protected:
-		virtual int handle_sigsegv(int sig, siginfo_t* siginfo) {
-			std::cout << "SIGNAL: SIGSEGV" << std::endl;
-			std::cout << std::endl;
-
-			std::cout << "Address: ";
-			std::cout << std::hex << std::showbase;
-			std::cout	<< (uint64_t) siginfo->si_addr << std::endl;
-			std::cout << "Cause: ";
-			if (siginfo->si_code == SEGV_MAPERR)
-				std::cout << "Address not mapped" << std::endl;
-			else
-				std::cout << "Bad permissions" << std::endl;
-			std::cout << std::endl;
-
-			print_cpu(context);
-			exit(1);
+		static void install_sigsegv() {
+			install(SIGSEGV, sigsegv);
 		}
 
-		virtual int handle_sigill(int sig, siginfo_t* siginfo) {
-			std::cout << "SIGNAL: SIGILL" << std::endl;
-			std::cout << std::endl;
-
-			std::cout << "Caused by: ";
-			switch (siginfo->si_code) {
-				case ILL_ILLOPC:
-					std::cout << "Illegal opcode" << std::endl;
-					break;
-				case ILL_ILLOPN:
-					std::cout << "Illegal operand" << std::endl;
-					break;
-				case ILL_ILLADR:
-					std::cout << "Illegal addressing mode" << std::endl;
-					break;
-				case ILL_PRVOPC:
-					std::cout << "Privileged opcode" << std::endl;
-					break;
-				case ILL_PRVREG:
-					std::cout << "Privileged register" << std::endl;
-					break;
-				case ILL_COPROC:
-					std::cout << "Coprocessor error" << std::endl;
-					break;
-				case ILL_BADSTK:
-					std::cout << "Bad stack" << std::endl;
-					break;
-				default:
-					std::cout << "<UNKNOWN>" << std::endl;
-			}
-			std::cout << std::endl;
-
-			print_cpu(context);
-			exit(1);
+		static void install_sigill() {
+			install(SIGILL, sigill);
 		}
 
 	private:
-		void print_quad(uint64_t val) {
+		typedef void (*handler_t)(int, siginfo_t*, void*);
+
+		static void install(int signum, handler_t h) {
+			struct sigaction sa;
+			memset (&sa, '\0', sizeof(sa));
+			sigfillset(&sa.sa_mask);
+			sa.sa_sigaction = h;
+			sa.sa_flags = SA_ONSTACK;
+
+			assert(sigaction(signum, &sa, 0) >= 0);
+		}
+
+		static void print_quad(uint64_t val) {
 			for ( int i = 7; i >=0; --i ) {
 				std::cout << std::hex << std::noshowbase;
 				std::cout	<< std::setfill('0') << std::setw(2);
@@ -93,20 +58,20 @@ class DebugHandler : public SigHandler {
 			}
 		}
 
-		void print_reg(const std::string& reg, uint64_t val) {
+		static void print_reg(const std::string& reg, uint64_t val) {
 			std::cout << reg << " = ";
 			print_quad(val);
 			std::cout << std::endl;
 		}
 
-		void print_mem(unsigned char* addr) {
+		static void print_mem(unsigned char* addr) {
 			auto p = (uint64_t*)addr;
 			std::cout << std::hex << std::showbase << std::setfill('0') << p << ": ";
 			print_quad(*p);
 			std::cout << std::endl;
 		}
 
-		void print_cpu(void* context) {
+		static void print_cpu(void* context) {
 			const auto regs = ((ucontext_t*)context)->uc_mcontext.gregs;
 
 			std::cout << "Register Contents:" << std::endl;
@@ -153,6 +118,60 @@ class DebugHandler : public SigHandler {
 			for( unsigned char* i = ip; i < ip + 128; i += 8 )
 				print_mem(i);
 			std::cout << std::endl;
+		}
+
+		static void sigsegv(int sig, siginfo_t* siginfo, void* context) {
+			std::cout << "SIGNAL: SIGSEGV" << std::endl;
+			std::cout << std::endl;
+
+			std::cout << "Address: ";
+			std::cout << std::hex << std::showbase;
+			std::cout	<< (uint64_t) siginfo->si_addr << std::endl;
+			std::cout << "Cause: ";
+			if (siginfo->si_code == SEGV_MAPERR)
+				std::cout << "Address not mapped" << std::endl;
+			else
+				std::cout << "Bad permissions" << std::endl;
+			std::cout << std::endl;
+
+			print_cpu(context);
+			exit(1);
+		}
+
+		static void sigill(int sig, siginfo_t* siginfo, void* context) {
+			std::cout << "SIGNAL: SIGILL" << std::endl;
+			std::cout << std::endl;
+
+			std::cout << "Caused by: ";
+			switch (siginfo->si_code) {
+				case ILL_ILLOPC:
+					std::cout << "Illegal opcode" << std::endl;
+					break;
+				case ILL_ILLOPN:
+					std::cout << "Illegal operand" << std::endl;
+					break;
+				case ILL_ILLADR:
+					std::cout << "Illegal addressing mode" << std::endl;
+					break;
+				case ILL_PRVOPC:
+					std::cout << "Privileged opcode" << std::endl;
+					break;
+				case ILL_PRVREG:
+					std::cout << "Privileged register" << std::endl;
+					break;
+				case ILL_COPROC:
+					std::cout << "Coprocessor error" << std::endl;
+					break;
+				case ILL_BADSTK:
+					std::cout << "Bad stack" << std::endl;
+					break;
+				default:
+					std::cout << "<UNKNOWN>" << std::endl;
+			}
+			std::cout << std::endl;
+
+			print_cpu(context);
+			exit(1);
 		}
 };
 
