@@ -20,12 +20,14 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+
 namespace cpputil {
 
 class Column {
 	public:
 		Column() :
-			padding_(1), text_(1), sb_(0) { }
+			padding_(1), sb_(0) { }
 
 		Column& padding(size_t p) {
 			padding_ = p;
@@ -35,13 +37,16 @@ class Column {
 		void operator()(std::streambuf* sb, char c) {
 			sb_ = sb;
 
+			if ( text_.empty() )
+				text_.resize(1);
 			auto& col = text_.back();
+			if ( col.empty() )
+				col.resize(1);
+
 			if ( c == '\n' )
 				col.resize(col.size()+1);
-			else {
-				auto& line = col.back();
-				line.push_back(c);
-			}
+			else 
+				col.back().push_back(c);
 		}
 
 		Column& next() {
@@ -69,7 +74,7 @@ class Column {
 			for ( size_t i = 0; i < height; ++i ) {
 				for ( size_t c = 0, ce = text_.size(); c < ce; ++c ) {
 					const auto& col = text_[c];
-					if ( col.size() < i ) {
+					if ( col.size() <= i ) {
 						for ( size_t j = 0; j < width[c]; ++j )
 							sb_->sputc(' ');
 					} else {
@@ -86,10 +91,9 @@ class Column {
 
 				sb_->sputc('\n');
 			}
-			sb_->pubsync();
 
-			text_.resize(1);
-			text_[0].clear();
+			sb_->pubsync();
+			text_.clear();
 
 			return *this;
 		}

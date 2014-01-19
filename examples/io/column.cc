@@ -64,11 +64,11 @@ int main() {
 	Triple t{1,2,3};
 	Sext s{{1,2,3},{4,5,6}};
 
-	os << "Col 1" << d;
+	os << "Col 1" << endl << d;
  	os.filter().next();
-	os << "Col 2" << t;
+	os << "Col 2" << endl << t;
  	os.filter().next();
-	os << "Col 3" << s;
+	os << "Col 3" << endl << s;
  	os.filter().done();
 
 	return 0;
