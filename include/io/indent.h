@@ -20,42 +20,45 @@
 namespace cpputil {
 
 class Indent {
-  public:
-    Indent() : 
-      indent_(0), width_(2), pending_(true) { }
+ public:
+  Indent() :
+    indent_(0), width_(2), pending_(true) { }
 
-    Indent& indent() { 
-      indent_++;
-      return *this;
+  Indent& indent() {
+    indent_++;
+    return *this;
+  }
+
+  Indent& unindent() {
+    if (indent_ > 0) {
+      indent_--;
     }
+    return *this;
+  }
 
-    Indent& unindent() {
-      if ( indent_ > 0 )
-        indent_--;
-      return *this;
-    }
+  Indent& width(size_t width) {
+    width_ = width;
+    return *this;
+  }
 
-    Indent& width(size_t width) {
-      width_ = width;
-      return *this;
-    }
-
-    void operator()(std::streambuf* sb, char c) {
-      if ( pending_ ) {
-        for ( size_t i = 0, ie = indent_*width_; i < ie; ++i )
-          sb->sputc(' ');
-        pending_ = false;
+  void operator()(std::streambuf* sb, char c) {
+    if (pending_) {
+      for (size_t i = 0, ie = indent_ * width_; i < ie; ++i) {
+        sb->sputc(' ');
       }
-
-      sb->sputc(c);
-      if ( c == '\n' )
-        pending_ = true;
+      pending_ = false;
     }
 
-  private:
-    size_t indent_;
-    size_t width_;
-    bool pending_;
+    sb->sputc(c);
+    if (c == '\n') {
+      pending_ = true;
+    }
+  }
+
+ private:
+  size_t indent_;
+  size_t width_;
+  bool pending_;
 };
 
 } // namespace cpputil

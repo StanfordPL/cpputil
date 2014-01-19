@@ -20,27 +20,28 @@
 namespace cpputil {
 
 class Shunt {
-  public:
-    Shunt() : 
-      open_(true) { }
+ public:
+  Shunt() :
+    open_(true) { }
 
-    Shunt& open() { 
-      open_ = true;
-      return *this;
+  Shunt& open() {
+    open_ = true;
+    return *this;
+  }
+
+  Shunt& close() {
+    open_ = false;
+    return *this;
+  }
+
+  void operator()(std::streambuf* sb, char c) {
+    if (open_) {
+      sb->sputc(c);
     }
+  }
 
-    Shunt& close() {
-      open_ = false;
-      return *this;
-    }
-
-    void operator()(std::streambuf* sb, char c) {
-      if ( open_ )
-        sb->sputc(c);
-    }
-
-  private:
-    bool open_;
+ private:
+  bool open_;
 };
 
 } // namespace cpputil

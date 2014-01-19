@@ -21,26 +21,26 @@
 namespace cpputil {
 
 class Redact {
-  public:
-    Redact() : 
-      on_(false) { }
+ public:
+  Redact() :
+    on_(false) { }
 
-    Redact& on() { 
-      on_ = true;
-      return *this;
-    }
+  Redact& on() {
+    on_ = true;
+    return *this;
+  }
 
-    Redact& off() {
-      on_ = false;
-      return *this;
-    }
+  Redact& off() {
+    on_ = false;
+    return *this;
+  }
 
-    void operator()(std::streambuf* sb, char c) {
-      sb->sputc(on_ && !isspace(c) ? 'x' : c);
-    }
+  void operator()(std::streambuf* sb, char c) {
+    sb->sputc(on_ && !isspace(c) ? 'x' : c);
+  }
 
-  private:
-    bool on_;
+ private:
+  bool on_;
 };
 
 } // namespace cpputil

@@ -26,10 +26,11 @@ int main() {
   auto& z = Singleton<double>::get();
   z = 20;
 
-  if ( y == 10 )
+  if (y == 10) {
     cout << "It works!" << endl;
-  else
-    cout << "It's broken!" << endl; 
+  } else {
+    cout << "It's broken!" << endl;
+  }
 
   return 0;
 }

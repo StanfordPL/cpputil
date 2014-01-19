@@ -22,55 +22,55 @@ namespace cpputil {
 
 template <typename T, typename Set = std::unordered_set<T>>
 class Interner {
-  public:
-    typedef T value_type;
-    typedef const T& const_reference; 
-    typedef typename Set::size_type size_type;
-    typedef typename Set::const_iterator const_iterator;
+ public:
+  typedef T value_type;
+  typedef const T& const_reference;
+  typedef typename Set::size_type size_type;
+  typedef typename Set::const_iterator const_iterator;
 
-    const_reference intern(const_reference t) {
-      const auto res = vals_.insert(t);
-      return *(res.first);
-    }
+  const_reference intern(const_reference t) {
+    const auto res = vals_.insert(t);
+    return *(res.first);
+  }
 
-    const_iterator begin() const {
-      return vals_.begin();
-    }
+  const_iterator begin() const {
+    return vals_.begin();
+  }
 
-    const_iterator cbegin() const {
-      return begin();
-    }
+  const_iterator cbegin() const {
+    return begin();
+  }
 
-    const_iterator end() const {
-      return vals_.end();
-    }
+  const_iterator end() const {
+    return vals_.end();
+  }
 
-    const_iterator cend() const {
-      return end();
-    }
+  const_iterator cend() const {
+    return end();
+  }
 
-    bool empty() const {
-      return vals_.empty();
-    }
+  bool empty() const {
+    return vals_.empty();
+  }
 
-    size_type size() const {
-      return vals_.size();
-    }
+  size_type size() const {
+    return vals_.size();
+  }
 
-    void clear() {
-      vals_.clear();
-    }
+  void clear() {
+    vals_.clear();
+  }
 
-    void swap(Interner& rhs) {
-      vals_.swap(rhs.vals_); 
-    }
+  void swap(Interner& rhs) {
+    vals_.swap(rhs.vals_);
+  }
 
-  private:
-    Set vals_;
+ private:
+  Set vals_;
 };
 
 template <typename T, typename Set>
-void swap(Interner<T,Set>& i1, Interner<T,Set>& i2) {
+void swap(Interner<T, Set>& i1, Interner<T, Set>& i2) {
   i1.swap(i2);
 }
 

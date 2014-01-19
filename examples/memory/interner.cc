@@ -27,26 +27,27 @@ int main() {
   string s2 = "Hello";
   string s3 = "world";
 
-  if ( &i.intern(s1) == &i.intern(s2) ) {
+  if (&i.intern(s1) == &i.intern(s2)) {
     cout << "These are the same string!" << endl;
-	} else {
+  } else {
     cout << "Something is broken!" << endl;
-	}
+  }
 
-  if ( &i.intern(s1) == &i.intern(s3) ) {
+  if (&i.intern(s1) == &i.intern(s3)) {
     cout << "Something is broken!" << endl;
-	} else {
+  } else {
     cout << "These are the same string!" << endl;
-	}
+  }
 
-	for ( int n = 0; n < 2; ++n ) {
-		cout << "Interned strings: (" << i.size() << ") [ ";
-		for ( const auto& itr : i )
-			cout << itr << " ";
-		cout << "]" << endl;
+  for (int n = 0; n < 2; ++n) {
+    cout << "Interned strings: (" << i.size() << ") [ ";
+    for (const auto& itr : i) {
+      cout << itr << " ";
+    }
+    cout << "]" << endl;
 
-		i.clear();
-	}
+    i.clear();
+  }
 
   return 0;
 }

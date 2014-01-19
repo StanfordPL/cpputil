@@ -22,54 +22,54 @@ using namespace cpputil;
 using namespace std;
 
 struct Double {
-	string x;
-	string y;
+  string x;
+  string y;
 };
 
 struct Triple {
-	int x;
-	int y;
-	int z;
+  int x;
+  int y;
+  int z;
 };
 
 struct Sext {
-	Triple t1;
-	Triple t2;
+  Triple t1;
+  Triple t2;
 };
 
 ostream& operator<<(ostream& os, const Double& d) {
-	os << d.x << endl;
-	os << d.y;
-	return os;
+  os << d.x << endl;
+  os << d.y;
+  return os;
 }
 
 ostream& operator<<(ostream& os, const Triple& t) {
-	os << t.x << endl;
-	os << t.y << endl;
-	os << t.z;
-	return os;
+  os << t.x << endl;
+  os << t.y << endl;
+  os << t.z;
+  return os;
 }
 
 ostream& operator<<(ostream& os, const Sext& s) {
-	os << s.t1 << endl;
-	os << s.t2;
-	return os;
+  os << s.t1 << endl;
+  os << s.t2;
+  return os;
 }
 
 int main() {
-	ofilterstream<Column> os(cout);
-	os.filter().padding(3);
-	
-	Double d{"Hello", "World!!!"};
-	Triple t{1,2,3};
-	Sext s{{1,2,3},{4,5,6}};
+  ofilterstream<Column> os(cout);
+  os.filter().padding(3);
 
-	os << "Col 1" << endl << d;
- 	os.filter().next();
-	os << "Col 2" << endl << t;
- 	os.filter().next();
-	os << "Col 3" << endl << s;
- 	os.filter().done();
+  Double d {"Hello", "World!!!"};
+  Triple t {1, 2, 3};
+  Sext s {{1, 2, 3}, {4, 5, 6}};
 
-	return 0;
+  os << "Col 1" << endl << d;
+  os.filter().next();
+  os << "Col 2" << endl << t;
+  os.filter().next();
+  os << "Col 3" << endl << s;
+  os.filter().done();
+
+  return 0;
 }

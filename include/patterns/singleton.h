@@ -19,17 +19,17 @@ namespace cpputil {
 
 template <typename T>
 class Singleton {
-  public:
-    typedef T& reference;
+ public:
+  typedef T& reference;
 
-    Singleton() = delete;
-    Singleton(const Singleton& s) = delete;
-    Singleton& operator=(Singleton s) = delete;
+  Singleton() = delete;
+  Singleton(const Singleton& s) = delete;
+  Singleton& operator=(Singleton s) = delete;
 
-    static reference get() {
-      static T instance;
-      return instance;
-    }
+  static reference get() {
+    static T instance;
+    return instance;
+  }
 };
 
 } // namespace cpputil

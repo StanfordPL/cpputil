@@ -21,8 +21,7 @@
 using namespace cpputil;
 using namespace std;
 
-int main()
-{
+int main() {
   oredirectstream ors(cout);
   ors << "Hello world!" << endl;
 

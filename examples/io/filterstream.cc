@@ -29,8 +29,9 @@ struct Nop {
 template <char C>
 struct Skip {
   void operator()(streambuf* sb, char c) {
-    if ( c != C ) 
+    if (c != C) {
       sb->sputc(c);
+    }
   }
 };
 
@@ -38,8 +39,9 @@ template <char C>
 struct Double {
   size_t operator()(char c, char* buffer) {
     auto count = c != C ? 1 : 2;
-    for ( size_t i = 0; i < count; ++i )
+    for (size_t i = 0; i < count; ++i) {
       buffer[i] = c;
+    }
     return count;
   }
 };

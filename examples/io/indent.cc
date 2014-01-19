@@ -28,8 +28,9 @@ int main() {
   os.filter().indent();
   os << "Hello, world!" << endl;
 
-  for ( size_t i = 0; i < 100; ++i )
+  for (size_t i = 0; i < 100; ++i) {
     os.filter().unindent();
+  }
 
   os << "Hello, world!" << endl;
 

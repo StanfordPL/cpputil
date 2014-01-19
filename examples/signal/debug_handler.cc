@@ -8,8 +8,8 @@ using namespace std;
 int main() {
   DebugHandler::install_sigsegv();
 
-	int* v = 0;
-	*v = 0;
+  int* v = 0;
+  *v = 0;
 
-	return 0;
+  return 0;
 }

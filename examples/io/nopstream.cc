@@ -21,24 +21,24 @@ using namespace std;
 
 int foo() {
   int x = 0;
-  for ( ; x < 1e9; ++x );
+  for (; x < 1e9; ++x);
   return x;
 }
 
 struct C {
-	int x_; 
+  int x_;
   int y_;
   int z_;
 };
 
-istream& operator>>(istream& is, C& c) { 
-  is >> c.x_ >> c.y_ >> c.z_; 
-  return is; 
+istream& operator>>(istream& is, C& c) {
+  is >> c.x_ >> c.y_ >> c.z_;
+  return is;
 }
 
-ostream& operator<<(ostream& os, const C& c) { 
-  os << c.x_ << c.y_ << c.z_ << endl; 
-  return os; 
+ostream& operator<<(ostream& os, const C& c) {
+  os << c.x_ << c.y_ << c.z_ << endl;
+  return os;
 }
 
 int main() {
@@ -59,9 +59,9 @@ int main() {
   char* ch;
   signed char* scp;
   unsigned char* ucp;
-	C udt;
+  C udt;
 
-	inopstream ins(cin);
+  inopstream ins(cin);
   ins >> b;
   ins >> s;
   ins >> us;
@@ -81,9 +81,9 @@ int main() {
   ins >> ch;
   ins >> scp;
   ins >> ucp;
-	ins >> udt;
+  ins >> udt;
 
-	onopstream ons(cout);
+  onopstream ons(cout);
   ons << b;
   ons << s;
   ons << us;
@@ -109,6 +109,6 @@ int main() {
 
   cout << "If you didn't type anything or see anything, this works!" << endl;
 
-	return 0;
+  return 0;
 }
 
