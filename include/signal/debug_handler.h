@@ -72,10 +72,10 @@ class DebugHandler {
 		}
 
 		static void print_cpu(void* context) {
-			const auto regs = ((ucontext_t*)context)->uc_mcontext.gregs;
-
 			std::cout << "Register Contents:" << std::endl;
 			std::cout << std::endl;
+
+			const auto regs = ((ucontext_t*)context)->uc_mcontext.gregs;
 
 			print_reg("%rip", regs[REG_RIP]); 
 			print_reg("%rfl", regs[REG_EFL]);

@@ -21,6 +21,7 @@ LIB =
 EX  = container/bijection \
 			container/maputil \
 			container/tokenizer \
+			io/column \
 			io/filterstream \
 			io/indent \
 			io/multistream \
