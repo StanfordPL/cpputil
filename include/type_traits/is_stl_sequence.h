@@ -27,31 +27,36 @@ namespace cpputil {
 template <typename T>
 struct is_stl_sequence : public std::false_type {};
 
-template <typename T, size_t N> 
+template <typename T, size_t N>
 struct is_stl_sequence<std::array<T, N>> : public std::true_type {};
-template <typename T, size_t N> 
+
+template <typename T, size_t N>
 struct is_stl_sequence<const std::array<T, N>> : public std::true_type {};
 
-template <typename T, typename Alloc> 
+template <typename T, typename Alloc>
 struct is_stl_sequence<std::deque<T, Alloc>> : public std::true_type {};
-template <typename T, typename Alloc> 
+
+template <typename T, typename Alloc>
 struct is_stl_sequence<const std::deque<T, Alloc>> : public std::true_type {};
 
-template <typename T, typename Alloc> 
+template <typename T, typename Alloc>
 struct is_stl_sequence<std::list<T, Alloc>> : public std::true_type {};
-template <typename T, typename Alloc> 
+
+template <typename T, typename Alloc>
 struct is_stl_sequence<const std::list<T, Alloc>> : public std::true_type {};
 
-template <typename T, typename Alloc> 
+template <typename T, typename Alloc>
 struct is_stl_sequence<std::forward_list<T, Alloc>> : public std::true_type {};
-template <typename T, typename Alloc> 
+
+template <typename T, typename Alloc>
 struct is_stl_sequence<const std::forward_list<T, Alloc>> : public std::true_type {};
 
-template <typename T, typename Alloc> 
+template <typename T, typename Alloc>
 struct is_stl_sequence<std::vector<T, Alloc>> : public std::true_type {};
-template <typename T, typename Alloc> 
+
+template <typename T, typename Alloc>
 struct is_stl_sequence<const std::vector<T, Alloc>> : public std::true_type {};
 
-} // namespace cpputil 
+} // namespace cpputil
 
 #endif
