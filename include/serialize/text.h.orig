@@ -1,0 +1,220 @@
+// Copyright 2014 eric schkufza
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef CPPUTIL_INCLUDE_SERIALIZE_TEXT_H
+#define CPPUTIL_INCLUDE_SERIALIZE_TEXT_H
+
+#include <iostream>
+#include <type_traits>
+
+#include "include/type_traits/is_stl_associative.h"
+#include "include/type_traits/is_stl_sequence.h"
+
+namespace cpputil {
+
+template <typename T, char Open = '{', char Close = '}', char Quote ='"', char Sep = ',',
+				     typename Enable = void>
+							 struct TextReader;
+
+template <typename T, char Open, char Close, char Quote, char Sep>
+	struct TextReader<T, Open, Close, Quote, Sep,
+	    typename std::enable_if<std::is_scalar<T>::value && !std::is_enum<T>::value>::type> {
+				  void operator()(std::istream& is, T& t) const {
+						    is >> t; 
+								  }
+			};
+
+template <char Open, char Close, char Quote, char Sep>
+	struct TextReader<std::string, Open, Close, Quote, Sep, void> {
+		  void operator()(std::istream& is, std::string& s) const {
+				    auto c = ' ';
+						    
+						    GET_THIS(c, Quote);
+								    getline(is, s, Quote);
+										    DIE_IF(is.eof());
+												  }
+	};
+
+template <typename T1, typename T2, char Open, char Close, char Quote, char Sep>
+	struct TextReader<std::pair<T1, T2>, Open, Close, Quote, Sep, void> {
+		  void operator()(std::istream& is, std::pair<T1, T2>& p) const {
+				    auto c = ' ';
+
+						    GET_THIS(c, Open);
+								    PEEK_NEITHER(c, Sep, Close);
+
+										    TextReader<T1, Open, Close, Quote, Sep> r1;
+												    r1(is, p.first);
+
+														    GET_THIS(c, Sep);
+
+																    TextReader<T2, Open, Close, Quote, Sep> r2;
+																		    r2(is, p.second);
+
+																				    GET_THIS(c, Close);
+																						  }
+	};
+
+template <typename T, char Open, char Close, char Quote, char Sep>
+	struct TextReader<T, Open, Close, Quote, Sep,
+	    typename std::enable_if<is_stl_sequence<T>::value>::type> {
+				  void operator()(std::istream& is, T& t) const {
+						    auto c = ' ';
+
+								    GET_THIS(c, Open);
+										    GET_NEXT(c);
+												    
+												    t.clear();
+														    while ( c != Close ) {
+																	      DIE_IF((t.empty() && c == Sep) || (!t.empty() && c != Sep));
+																				      if ( t.empty() ) {
+																								        is.putback(c);
+																												      }
+
+																							      typename T::value_type v;
+																										      TextReader<decltype(v), Open, Close, Quote, Sep> r;
+																													      r(is, v);
+																																      t.push_back(v);
+
+																																			      GET_NEXT(c);
+																																						    }
+																  }
+			};
+
+template <typename T, char Open, char Close, char Quote, char Sep>
+	struct TextReader<T, Open, Close, Quote, Sep,
+	    typename std::enable_if<is_stl_set<T>::value>::type> {
+				  void operator()(std::istream& is, T& t) const {
+						    auto c = ' ';
+
+								    GET_THIS(c, Open);
+										    GET_NEXT(c);
+												    
+												    t.clear();
+														    while ( c != Close ) {
+																	      DIE_IF((t.empty() && c == Sep) || (!t.empty() && c != Sep));
+																				      if ( t.empty() ) {
+																								        is.putback(c);
+																												      }
+
+																							      typename T::value_type v;
+																										      TextReader<decltype(v), Open, Close, Quote, Sep> r;
+																													      r(is, v);
+																																      DIE_IF(!t.insert(v).second);
+
+																																			      GET_NEXT(c);
+																																						    }
+																  }
+			};
+
+template <typename T, char Open, char Close, char Quote, char Sep>
+	struct TextReader<T, Open, Close, Quote, Sep,
+	    typename std::enable_if<is_stl_map<T>::value>::type> {
+				  void operator()(std::istream& is, T& t) const {
+						    auto c = ' ';
+
+								    GET_THIS(c, Open);
+										    GET_NEXT(c);
+												    
+												    t.clear();
+														    while ( c != Close ) {
+																	      DIE_IF((t.empty() && c == Sep) || (!t.empty() && c != Sep));
+																				      if ( t.empty() ) {
+																								        is.putback(c);
+																												      }
+
+																							      std::pair<typename std::remove_const<typename T::key_type>::type, typename T::mapped_type> v;
+																										      TextReader<decltype(v), Open, Close, Quote, Sep> r;
+																													      r(is, v);
+																																      DIE_IF(!t.insert(v).second);
+
+																																			      GET_NEXT(c);
+																																						    }
+																  }
+			};
+
+
+
+
+
+
+
+
+
+
+
+
+
+template <typename T, char Open = '{', char Close = '}', char Quote = '"', typename Enable = void>
+struct TextWriter;
+
+template <typename T, char Open, char Close, char Quote>
+struct TextWriter < T, Open, Close, Quote,
+    typename std::enable_if < std::is_scalar<T>::value && !std::is_enum<T>::value >::type > {
+  void operator()(std::ostream& os, const T& t) const {
+    os << t;
+  }
+};
+
+template <typename T, char Open, char Close, char Quote>
+struct TextWriter < T, Open, Close, Quote,
+    typename std::enable_if < std::is_scalar<T>::value && std::is_enum<T>::value >::type > {
+  void operator()(std::ostream& os, const T& t) const {
+    os << (typename std::underlying_type<T>::type) t;
+  }
+};
+
+template <char Open, char Close, char Quote>
+struct TextWriter<std::string, Open, Close, Quote, void> {
+  void operator()(std::ostream& os, const std::string& s) const {
+    os << Quote << s << Quote;
+  }
+};
+
+template <typename T1, typename T2, char Open, char Close, char Quote>
+struct TextWriter<std::pair<T1, T2>, Open, Close, Quote, void> {
+  void operator()(std::ostream& os, const std::pair<T1, T2>& p) const {
+    os << Open << " ";
+
+    TextWriter<T1, Open, Close, Quote> w1;
+    w1(os, p.first);
+
+    os << " ";
+
+    TextWriter<T2, Open, Close, Quote> w2;
+    w2(os, p.second);
+
+    os << " " << Close;
+  }
+};
+
+template <typename T, char Open, char Close, char Quote>
+struct TextWriter < T, Open, Close, Quote,
+    typename std::enable_if < is_stl_sequence<T>::value || is_stl_associative<T>::value >::type > {
+  void operator()(std::ostream& os, const T& t) const {
+    TextWriter<typename T::value_type, Open, Close, Quote> w;
+
+    os << Open;
+    for (auto i = t.begin(), ie = t.end(); i != ie; ++i) {
+      os << " ";
+      w(os, *i);
+    }
+    os << " " << Close;
+  }
+};
+
+} // namespace cpputil
+
+#endif
+

@@ -31,6 +31,7 @@ EX  = container/bijection \
 			io/nopstream \
 			memory/interner \
 			patterns/singleton \
+			serialize/text \
 			signal/debug_handler
 
 ##### TOP LEVEL TARGETS
