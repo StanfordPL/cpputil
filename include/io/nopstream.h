@@ -21,9 +21,11 @@ namespace cpputil {
 
 template <typename Ch, typename Tr>
 struct basic_inopstream : std::basic_istream<Ch, Tr> {
-	explicit basic_inopstream(std::basic_istream<Ch, Tr>& is) { }
+	explicit basic_inopstream(std::basic_istream<Ch, Tr>& is) 
+		: std::basic_istream<Ch,Tr>(is.rdbuf()) { }
 
-	explicit basic_inopstream(std::basic_streambuf<Ch, Tr>* sb) { }
+	explicit basic_inopstream(std::basic_streambuf<Ch, Tr>* sb) 
+		: std::basic_istream<Ch,Tr>(sb) { }
 
 	virtual ~basic_inopstream() { }
 
@@ -128,9 +130,11 @@ typedef basic_inopstream<wchar_t, std::char_traits<wchar_t>> winopstream;
 
 template <typename Ch, typename Tr>
 struct basic_onopstream : std::basic_ostream<Ch, Tr> {
-	explicit basic_onopstream(std::basic_ostream<Ch, Tr>& os) { }
+	explicit basic_onopstream(std::basic_ostream<Ch, Tr>& os) 
+		: std::basic_ostream<Ch,Tr>(os.rdbuf()) { }
 
-	explicit basic_onopstream(std::basic_streambuf<Ch, Tr>* sb) { }
+	explicit basic_onopstream(std::basic_streambuf<Ch, Tr>* sb) 
+		: std::basic_ostream<Ch,Tr>(sb) { }
 
 	virtual ~basic_onopstream() { }
 
@@ -235,9 +239,11 @@ typedef basic_onopstream<wchar_t, std::char_traits<wchar_t>> wonopstream;
 
 template <typename Ch, typename Tr>
 struct basic_nopstream : public basic_inopstream<Ch, Tr>, public basic_onopstream<Ch, Tr> {
-	explicit basic_nopstream(std::basic_iostream<Ch, Tr>& ios) { }
+	explicit basic_nopstream(std::basic_iostream<Ch, Tr>& ios)
+		: basic_inopstream<Ch,Tr>(ios), basic_onopstream<Ch,Tr>(ios) { }
 
-	explicit basic_nopstream(std::basic_streambuf<Ch, Tr>* sb) { }
+	explicit basic_nopstream(std::basic_streambuf<Ch, Tr>* sb) 
+		: basic_inopstream<Ch,Tr>(sb), basic_onopstream<Ch,Tr>(sb) { }
 
 	virtual ~basic_nopstream() { }
 };
