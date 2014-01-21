@@ -18,7 +18,7 @@ GCC = ccache g++ -std=c++0x
 OPT = -Werror -O3
 INC = -I../
 LIB = 
-EX  = \
+EX  = command_line/command_line \
 			container/bijection \
 			container/maputil \
 			container/tokenizer \
