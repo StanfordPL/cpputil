@@ -19,7 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "include/serialize/text.h"
+#include "include/serialize/text_reader.h"
+#include "include/serialize/text_writer.h"
 
 using namespace cpputil;
 using namespace std;
