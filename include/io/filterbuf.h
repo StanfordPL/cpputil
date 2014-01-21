@@ -63,6 +63,38 @@ class basic_ifilterbuf : public std::basic_streambuf<Ch, Tr> {
   F filter_;
 };
 
+template <typename F, typename Ch, typename Tr>
+class basic_ofilterbuf : public std::basic_streambuf<Ch, Tr> {
+ public:
+  basic_ofilterbuf(std::basic_streambuf<Ch, Tr>* buf)
+    : buf_(buf) { }
+
+  virtual ~basic_ofilterbuf() { }
+
+  F& filter() {
+    return filter_;
+  }
+
+ protected:
+  virtual int sync() {
+    return buf_->pubsync();
+  }
+
+  virtual int overflow(int c = EOF) {
+    if (c == EOF) {
+      return EOF;
+    }
+
+    filter_(buf_, c);
+    return 1;
+  }
+
+ private:
+  std::basic_streambuf<Ch, Tr>* buf_;
+  F filter_;
+};
+
+
 } // namespace cpputil
 
 #endif
