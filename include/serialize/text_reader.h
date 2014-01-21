@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_SERIALIZE_TEXT_H
-#define CPPUTIL_INCLUDE_SERIALIZE_TEXT_H
+#ifndef CPPUTIL_INCLUDE_SERIALIZE_TEXT_READER_H
+#define CPPUTIL_INCLUDE_SERIALIZE_TEXT_READER_H
 
 #include <iostream>
 #include <type_traits>
@@ -159,65 +159,8 @@ struct TextReader<T, Open, Close, Quote,
   }
 };
 
-template <typename T, char Open = '{', char Close = '}', char Quote = '"', typename Enable = void>
-struct TextWriter;
-
-template <typename T, char Open, char Close, char Quote>
-struct TextWriter < T, Open, Close, Quote,
-    typename std::enable_if < std::is_scalar<T>::value&&  !std::is_enum<T>::value >::type > {
-  void operator()(std::ostream& os, const T& t) const {
-    os << t;
-  }
-};
-
-template <typename T, char Open, char Close, char Quote>
-struct TextWriter < T, Open, Close, Quote,
-    typename std::enable_if < std::is_scalar<T>::value&&  std::is_enum<T>::value >::type > {
-  void operator()(std::ostream& os, const T& t) const {
-    os << (typename std::underlying_type<T>::type) t;
-  }
-};
-
-template <char Open, char Close, char Quote>
-struct TextWriter<std::string, Open, Close, Quote, void> {
-  void operator()(std::ostream& os, const std::string& s) const {
-    os << Quote << s << Quote;
-  }
-};
-
-template <typename T1, typename T2, char Open, char Close, char Quote>
-struct TextWriter<std::pair<T1, T2>, Open, Close, Quote, void> {
-  void operator()(std::ostream& os, const std::pair<T1, T2>& p) const {
-    os << Open << " ";
-
-    TextWriter<T1, Open, Close, Quote> w1;
-    w1(os, p.first);
-
-    os << " ";
-
-    TextWriter<T2, Open, Close, Quote> w2;
-    w2(os, p.second);
-
-    os << " " << Close;
-  }
-};
-
-template <typename T, char Open, char Close, char Quote>
-struct TextWriter < T, Open, Close, Quote,
-    typename std::enable_if < is_stl_sequence<T>::value || is_stl_associative<T>::value >::type > {
-  void operator()(std::ostream& os, const T& t) const {
-    TextWriter<typename T::value_type, Open, Close, Quote> w;
-
-    os << Open;
-    for (auto i = t.begin(), ie = t.end(); i != ie; ++i) {
-      os << " ";
-      w(os, *i);
-    }
-    os << " " << Close;
-  }
-};
-
 } // namespace cpputil
 
 #endif
+
 
