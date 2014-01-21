@@ -18,7 +18,6 @@
 #include <iostream>
 #include <type_traits>
 
-#include "include/type_traits/is_stl_associative.h"
 #include "include/type_traits/is_stl_map.h"
 #include "include/type_traits/is_stl_sequence.h"
 #include "include/type_traits/is_stl_set.h"
