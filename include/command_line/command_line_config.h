@@ -23,6 +23,8 @@
 #include "include/command_line/args.h"
 #include "include/command_line/flag_arg.h"
 #include "include/command_line/value_arg.h"
+#include "include/io/filterstream.h"
+#include "include/io/indent.h"
 
 namespace cpputil {
 
@@ -31,21 +33,21 @@ class CommandLineConfig {
   /** Strict parse with help, config, and debug support */
   static void strict_with_convenience(int argc, char** argv) {
     auto& help = FlagArg::create("h")
-      .alternate("help")
-      .description("Print this message and quit");
+                 .alternate("help")
+                 .description("Print this message and quit");
 
     auto& debug = FlagArg::create("debug_args")
-      .description("Print program arguments and quit");
+                  .description("Print program arguments and quit");
 
     auto& read_config = ValueArg<std::string>::create("read_config")
-      .usage("<path/to/file.dat>")
-      .default_val("")
-      .description("Read program args from a configuration file");
+                        .usage("<path/to/file.dat>")
+                        .default_val("")
+                        .description("Read program args from a configuration file");
 
     auto& example_config = ValueArg<std::string>::create("example_config")
-      .usage("<path/to/file.dat>")
-      .default_val("")
-      .description("Print an example configuration file");
+                           .usage("<path/to/file.dat>")
+                           .default_val("")
+                           .description("Print an example configuration file");
 
     Args::read(argc, argv);
 
@@ -141,30 +143,48 @@ class CommandLineConfig {
 
   /** Prints arg aliases, usages, and descriptions */
   static void write_help(std::ostream& os, const char* argv0) {
-    os << "Usage: " << argv0 << " [options]" << std::endl;
-    os << "Options:" << std::endl;
+    ofilterstream<Indent> ofs(os);
 
+    ofs << "Usage: " << argv0 << " [options]" << std::endl;
+    ofs << "Options:" << std::endl;
+    ofs << std::endl;
+
+    ofs.filter().indent();
     for (auto a = Args::arg_begin(); a != Args::arg_end(); ++a) {
       for (auto i = (*a)->alias_begin(); i != (*a)->alias_end(); ++i) {
-        os << *i << " ";
+        ofs << *i << " ";
       }
-      (*a)->usage(os);
-      os << std::endl;
-      (*a)->description(os);
-      os << std::endl;
+      (*a)->usage(ofs);
+      ofs << std::endl;
+
+      ofs.filter().indent(2);
+      (*a)->description(ofs);
+      ofs << std::endl;
+      ofs.filter().unindent(2);
     }
+    ofs.filter().unindent();
   }
 
   /** Prints args and their corresponding values */
   static void write_arg_vals(std::ostream& os) {
+    ofilterstream<Indent> ofs(os);
+
+    ofs.filter().indent();
     for (auto i = Args::arg_begin(); i != Args::arg_end(); ++i) {
       for (auto j = (*i)->alias_begin(); j != (*i)->alias_end(); ++j) {
-        os << *j << " ";
+        ofs << *j << " ";
       }
-      os << std::endl;
-      (*i)->debug(os);
-      os << std::endl;
+      (*i)->usage(ofs);
+      ofs << std::endl;
+
+      ofs.filter().indent(2);
+      (*i)->description(ofs);
+      ofs << std::endl;
+      (*i)->debug(ofs);
+      ofs << std::endl;
+      ofs.filter().unindent(2);
     }
+    ofs.filter().unindent();
   }
 
   /** Prints a config file with descriptions, aliases, and usages */

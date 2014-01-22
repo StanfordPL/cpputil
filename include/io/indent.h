@@ -24,14 +24,16 @@ class Indent {
   Indent() :
     indent_(0), width_(2), pending_(true) { }
 
-  Indent& indent() {
-    indent_++;
+  Indent& indent(size_t count = 1) {
+    indent_ += count;
     return *this;
   }
 
-  Indent& unindent() {
-    if (indent_ > 0) {
-      indent_--;
+  Indent& unindent(size_t count = 1) {
+    if (count > indent_) {
+      indent_ = 0;
+    } else {
+      indent_ -= count;
     }
     return *this;
   }
@@ -50,7 +52,7 @@ class Indent {
     }
 
     sb->sputc(c);
-    if (c == '\n') {
+    if (c == '\n' || c == '\r') {
       pending_ = true;
     }
   }

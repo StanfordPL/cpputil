@@ -24,8 +24,9 @@ int main() {
   ofilterstream<Indent> os(cout);
   os << "Hello, world!" << endl;
   os.filter().indent();
-  os << "Hello, world!" << endl;
+  os << "Hello, world!";
   os.filter().indent();
+  os << endl;
   os << "Hello, world!" << endl;
 
   for (size_t i = 0; i < 100; ++i) {
