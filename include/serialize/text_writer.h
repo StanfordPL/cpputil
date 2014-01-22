@@ -34,14 +34,6 @@ struct TextWriter < T, Open, Close, Quote,
   }
 };
 
-template <typename T, char Open, char Close, char Quote>
-struct TextWriter < T, Open, Close, Quote,
-    typename std::enable_if < std::is_scalar<T>::value&&  std::is_enum<T>::value >::type > {
-  void operator()(std::ostream& os, const T& t) const {
-    os << (typename std::underlying_type<T>::type) t;
-  }
-};
-
 template <char Open, char Close, char Quote>
 struct TextWriter<std::string, Open, Close, Quote, void> {
   void operator()(std::ostream& os, const std::string& s) const {

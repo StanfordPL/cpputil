@@ -35,16 +35,6 @@ struct TextReader < T, Open, Close, Quote,
   }
 };
 
-template <typename T, char Open, char Close, char Quote>
-struct TextReader < T, Open, Close, Quote,
-    typename std::enable_if < std::is_scalar<T>::value&&  std::is_enum<T>::value >::type > {
-  void operator()(std::istream& is, T& t) const {
-    typename std::underlying_type<T>::type v;
-    is >> v;
-    t = (T)v;;
-  }
-};
-
 template <char Open, char Close, char Quote>
 struct TextReader<std::string, Open, Close, Quote, void> {
   void operator()(std::istream& is, std::string& s) const {

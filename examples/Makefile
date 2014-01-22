@@ -25,6 +25,7 @@ EX  = command_line/command_line \
 			io/column \
 			io/filterstream \
 			io/indent \
+			io/line_comment \
 			io/multistream \
 			io/redact \
 			io/redirectstream \
