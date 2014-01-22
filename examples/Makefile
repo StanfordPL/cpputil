@@ -49,3 +49,10 @@ all: $(EX)
 
 clean:
 	rm -f $(EX)
+	rm -rf command_line/*.dSYM
+	rm -rf container/*.dSYM
+	rm -rf io/*.dSYM
+	rm -rf memory/*.dSYM
+	rm -rf patterns/*.dSYM
+	rm -rf serialize/*.dSYM
+	rm -rf signal/*.dSYM

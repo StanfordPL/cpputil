@@ -33,8 +33,16 @@ src/mainpage.dox: README.txt
 	echo \\endverbatim >> src/mainpage.dox &&\
 	echo "*/" >> src/mainpage.dox
 
+##### ASTYLE TARGETS
+
+astyle: 
+	astyle -r include/*.h
+	astyle -r examples/*.cc
+
 ##### CLEAN TARGETS
 
 clean:
 	rm -rf $(DOC) src/mainpage.dox
+	rm -f `ls -R examples/*/*.orig`
+	rm -f `ls -R include/*/*.orig`
 	make -C examples clean

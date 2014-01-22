@@ -22,23 +22,23 @@ using namespace cpputil;
 using namespace std;
 
 auto& i = ValueArg<int>::create("i")
-  .alternate("int")
-  .usage("<int>")
-  .default_val(10);
+          .alternate("int")
+          .usage("<int>")
+          .default_val(10);
 
 auto& s = ValueArg<string>::create("s")
-  .alternate("str")
-  .usage("\"...\"")
-  .default_val("Hello, world");
+          .alternate("str")
+          .usage("\"...\"")
+          .default_val("Hello, world");
 
-auto& v = ValueArg<vector<int>, RangeReader<vector<int>,1,10>>::create("v")
-	.alternate("vector")
-	.usage("{ 1 2 3 }")
-	.default_val({1,2});
+auto& v = ValueArg<vector<int>, RangeReader<vector<int>, 1, 10>>::create("v")
+          .alternate("vector")
+          .usage("{ 1 2 3 }")
+          .default_val({1, 2});
 
-auto& set = ValueArg<set<char>, RangeReader<set<char>,'a','z'>>::create("set")
-	.usage("{ a b c }")
-	.default_val({'a','b'});
+auto& set = ValueArg<set<char>, RangeReader<set<char>, 'a', 'z'>>::create("set")
+            .usage("{ a b c }")
+            .default_val({'a', 'b'});
 
 int main(int argc, char** argv) {
   CommandLineConfig::strict_with_convenience(argc, argv);

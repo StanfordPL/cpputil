@@ -83,7 +83,8 @@ template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<std::unordered_map<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<const std::unordered_map<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::unordered_map<Key, T, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type {};
@@ -92,16 +93,19 @@ template <typename Key, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<const std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type {};
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<const std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<std::unordered_multiset<Key, Hash, Eq, Alloc>> : public std::true_type {};
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<const std::unordered_multiset<Key, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::unordered_multiset<Key, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename T, typename Alloc>
 struct is_stl_container<std::vector<T, Alloc>> : public std::true_type {};

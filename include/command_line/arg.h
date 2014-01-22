@@ -129,7 +129,7 @@ class Arg {
 
     opts_.insert(alt);
 
-		return *this;
+    return *this;
   }
 
   /** Reset arg usage */

@@ -42,12 +42,14 @@ template <typename Key, typename Hash, typename Eq, typename Alloc>
 struct is_stl_associative<std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type {};
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
-struct is_stl_associative<const std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_associative<const std::unordered_set<Key, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
 struct is_stl_associative<std::unordered_multiset<Key, Hash, Eq, Alloc>> : public std::true_type {};
 template <typename Key, typename Hash, typename Eq, typename Alloc>
-struct is_stl_associative<const std::unordered_multiset<Key, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_associative<const std::unordered_multiset<Key, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename Key, typename T, typename Comp, typename Alloc>
 struct is_stl_associative<std::map<Key, T, Comp, Alloc>> : public std::true_type {};
@@ -65,13 +67,16 @@ template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
 struct is_stl_associative<std::unordered_map<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
-struct is_stl_associative<const std::unordered_map<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_associative<const std::unordered_map<Key, T, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
-struct is_stl_associative<std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_associative<std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
-struct is_stl_associative<const std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_associative<const std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public
+        std::true_type {};
 
 } // namespace cpputil
 
