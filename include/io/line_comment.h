@@ -19,33 +19,33 @@ namespace cpputil {
 
 template <char C>
 class LineComment {
-	public:
-		LineComment() :
-			ignoring_(false) { }
+ public:
+  LineComment() :
+    ignoring_(false) { }
 
-		size_t operator()(char c, char* buffer) {
-			switch (c) {
-				case C: 
-					ignoring_ = true;
-					return 0;
+  size_t operator()(char c, char* buffer) {
+    switch (c) {
+      case C:
+        ignoring_ = true;
+        return 0;
 
-				case '\n':
-					ignoring_ = false;
-					buffer[0] = c;
-					return 1;
+      case '\n':
+        ignoring_ = false;
+        buffer[0] = c;
+        return 1;
 
-				default:
-					if ( !ignoring_ ) {
-						buffer[0] = c;
-						return 1;
-					} else {
-						return 0;
-					}
-			}
-		}
+      default:
+        if (!ignoring_) {
+          buffer[0] = c;
+          return 1;
+        } else {
+          return 0;
+        }
+    }
+  }
 
-	private:
-		bool ignoring_;
+ private:
+  bool ignoring_;
 };
 
 } // namespace cpputil

@@ -22,15 +22,15 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-	stringstream ss;
-	ss << "#\n10 #20\n30";
+  stringstream ss;
+  ss << "#\n10 #20\n30";
 
-	int x = 7;
-	int y = 7;
-	ifilterstream<LineComment<'#'>> is(ss);
-	is >> x >> y;
+  int x = 7;
+  int y = 7;
+  ifilterstream<LineComment<'#'>> is(ss);
+  is >> x >> y;
 
-	cout << x << " " << y << endl;
+  cout << x << " " << y << endl;
 
   return 0;
 }
