@@ -18,13 +18,12 @@
 #include <string>
 
 #include "include/command_line/arg.h"
-#include "include/command_line/default_reader.h"
-#include "include/command_line/default_writer.h"
+#include "include/serialize/text_reader.h"
+#include "include/serialize/text_writer.h"
 
 namespace cpputil {
 
-template <typename T, typename R = DefaultReader<T>,
-          typename W = DefaultWriter<T>>
+template <typename T, typename R = TextReader<T>, typename W = TextWriter<T>>
 class ValueArg : public Arg {
  public:
   virtual ~ValueArg() = default;

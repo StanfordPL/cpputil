@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <vector>
+
 #include "include/command_line/command_line.h"
 
 using namespace cpputil;
@@ -26,6 +28,11 @@ auto& s = ValueArg<string>::create("s")
   .alternate("str")
   .usage("\"...\"")
   .default_val("Hello, world");
+
+auto& v = ValueArg<vector<int>>::create("v")
+	.alternate("vector")
+	.usage("{ 1 2 3 }")
+	.default_val({1,2});
 
 int main(int argc, char** argv) {
   CommandLineConfig::strict_with_convenience(argc, argv);
