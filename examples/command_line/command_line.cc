@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <set>
 #include <vector>
 
 #include "include/command_line/command_line.h"
+#include "include/serialize/range_reader.h"
 
 using namespace cpputil;
 using namespace std;
@@ -29,10 +31,14 @@ auto& s = ValueArg<string>::create("s")
   .usage("\"...\"")
   .default_val("Hello, world");
 
-auto& v = ValueArg<vector<int>>::create("v")
+auto& v = ValueArg<vector<int>, RangeReader<vector<int>,1,10>>::create("v")
 	.alternate("vector")
 	.usage("{ 1 2 3 }")
 	.default_val({1,2});
+
+auto& set = ValueArg<set<char>, RangeReader<set<char>,'a','z'>>::create("set")
+	.usage("{ a b c }")
+	.default_val({'a','b'});
 
 int main(int argc, char** argv) {
   CommandLineConfig::strict_with_convenience(argc, argv);
