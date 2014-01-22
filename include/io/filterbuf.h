@@ -46,12 +46,12 @@ class basic_ifilterbuf : public std::basic_streambuf<Ch, Tr> {
  protected:
   virtual int_type underflow() {
     if (std::basic_streambuf<Ch, Tr>::gptr() == std::basic_streambuf<Ch, Tr>::egptr()) {
-			size_t count = 0;
-			do {
-      	const auto c = buf_->sbumpc();
-				count = filter_(c, next_.data());
-			} while (count == 0);
-	    std::basic_streambuf<Ch, Tr>::setg(next_.data(), next_.data(), next_.data() + count);
+      size_t count = 0;
+      do {
+        const auto c = buf_->sbumpc();
+        count = filter_(c, next_.data());
+      } while (count == 0);
+      std::basic_streambuf<Ch, Tr>::setg(next_.data(), next_.data(), next_.data() + count);
     }
     return *std::basic_streambuf<Ch, Tr>::gptr();
   }
