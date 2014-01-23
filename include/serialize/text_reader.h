@@ -38,10 +38,12 @@ struct TextReader < T, Open, Close, Quote,
 template <char Open, char Close, char Quote>
 struct TextReader<std::string, Open, Close, Quote, void> {
   void operator()(std::istream& is, std::string& s) const {
-    if (is.get() != Quote) {
-      is.setstate(std::ios::failbit);
+    if (is.peek() == Quote) {
+      is.get();
+      std::getline(is, s, Quote);
+    } else {
+      is >> s;
     }
-    std::getline(is, s, Quote);
   }
 };
 
