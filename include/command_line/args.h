@@ -55,18 +55,18 @@ class Args {
     return Singleton<ArgRegistry>::get().arg_end();
   }
 
-	/** Iterator over registered arg groups */
-	typedef ArgRegistry::group_iterator group_iterator;
+  /** Iterator over registered arg groups */
+  typedef ArgRegistry::group_iterator group_iterator;
 
-	/** First registered group */
-	static group_iterator group_begin() {
-		return Singleton<ArgRegistry>::get().group_begin();
-	}
+  /** First registered group */
+  static group_iterator group_begin() {
+    return Singleton<ArgRegistry>::get().group_begin();
+  }
 
-	/** Last registered group */
-	static group_iterator group_end() {
-		return Singleton<ArgRegistry>::get().group_end();
-	}
+  /** Last registered group */
+  static group_iterator group_end() {
+    return Singleton<ArgRegistry>::get().group_end();
+  }
 
   /** Did any args signal errors? */
   static bool error() {
@@ -140,19 +140,19 @@ class Args {
     return Singleton<Parse>::get().anonymous.end();
   }
 
-	/** Sort arg groups */
-	template <typename Comp>
-	static void sort_groups(Comp c) {
-		std::sort(group_begin(), group_end(), c);
-	}
+  /** Sort arg groups */
+  template <typename Comp>
+  static void sort_groups(Comp c) {
+    std::sort(group_begin(), group_end(), c);
+  }
 
-	/** Sort args within groups */ 
-	template <typename Comp>
-	static void sort_args(Comp c) {
-		for ( auto g = group_begin(); g != group_end(); ++g) {
-			std::sort(g->arg_begin(), g->arg_end(), c);
-		}
-	}
+  /** Sort args within groups */
+  template <typename Comp>
+  static void sort_args(Comp c) {
+    for (auto g = group_begin(); g != group_end(); ++g) {
+      std::sort(g->arg_begin(), g->arg_end(), c);
+    }
+  }
 
   /** Read arguments in standard argc/argv format */
   static void read(int argc, char** argv) {
@@ -164,7 +164,7 @@ class Args {
 
     auto& arg_reg = Singleton<ArgRegistry>::get();
     std::vector<bool> used(argc);
-		for (auto a = arg_reg.arg_begin(), ae = arg_reg.arg_end(); a != ae; ++a ) {
+    for (auto a = arg_reg.arg_begin(), ae = arg_reg.arg_end(); a != ae; ++a) {
       const auto res = (*a)->read(argc, argv);
       for (auto i = res.first; i <= res.second; ++i) {
         used[i] = true;

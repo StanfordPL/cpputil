@@ -119,7 +119,7 @@ class Arg {
     }
 
     auto& arg_reg = Singleton<ArgRegistry>::get();
-		for (auto i = arg_reg.arg_begin(), ie = arg_reg.arg_end(); i != ie; ++i ) {
+    for (auto i = arg_reg.arg_begin(), ie = arg_reg.arg_end(); i != ie; ++i) {
       if ((*i)->opts_.find(alt) != (*i)->opts_.end()) {
         std::ostringstream oss;
         oss << "Unable to register duplicate arg name \"" << alt << "\"!";

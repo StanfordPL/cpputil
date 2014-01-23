@@ -23,16 +23,16 @@
 namespace cpputil {
 
 class Heading {
-	public:
-		static Heading& create(const std::string& text) {
-			return *(new Heading(text));
-		}
+ public:
+  static Heading& create(const std::string& text) {
+    return *(new Heading(text));
+  }
 
-	private:
-		Heading(const std::string& text) {
-			auto& arg_reg = Singleton<ArgRegistry>::get();
-			arg_reg.insert_group(text);
-		}
+ private:
+  Heading(const std::string& text) {
+    auto& arg_reg = Singleton<ArgRegistry>::get();
+    arg_reg.insert_group(text);
+  }
 };
 
 } // namespace cpputil

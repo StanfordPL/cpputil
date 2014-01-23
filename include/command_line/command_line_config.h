@@ -32,30 +32,32 @@ class CommandLineConfig {
  public:
   /** Strict parse with help, config, and debug support */
   static void strict_with_convenience(int argc, char** argv) {
-		auto& heading = Heading::create("Help and argument utilities:");
+    auto& heading = Heading::create("Help and argument utilities:");
     auto& help = FlagArg::create("h")
-      .alternate("help")
-      .description("Print this message and quit");
+                 .alternate("help")
+                 .description("Print this message and quit");
     auto& debug = FlagArg::create("write_args")
-      .description("Print program arguments and quit");
+                  .description("Print program arguments and quit");
     auto& read_config = ValueArg<std::string>::create("read_config")
-      .usage("<path/to/file.dat>")
-      .default_val("")
-      .description("Read program args from a configuration file");
+                        .usage("<path/to/file.dat>")
+                        .default_val("")
+                        .description("Read program args from a configuration file");
     auto& write_config = ValueArg<std::string>::create("write_config")
-      .usage("<path/to/file.dat>")
-      .default_val("")
-      .description("Print an example configuration file");
+                         .usage("<path/to/file.dat>")
+                         .default_val("")
+                         .description("Print an example configuration file");
 
-		auto alpha = [](Arg* a1, Arg* a2) { return *(a1->alias_begin()) < *(a2->alias_begin()); };
-		Args::sort_args(alpha);
+    auto alpha = [](Arg * a1, Arg * a2) {
+      return *(a1->alias_begin()) < *(a2->alias_begin());
+    };
+    Args::sort_args(alpha);
 
     Args::read(argc, argv);
 
     if (help) {
-			std::cout << std::endl;
-			std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
-			std::cout << std::endl;
+      std::cout << std::endl;
+      std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
+      std::cout << std::endl;
 
       write_help(std::cout);
 
@@ -72,22 +74,22 @@ class CommandLineConfig {
     }
 
     if (Args::error() || Args::duplicate() || Args::unrecognized() || Args::anonymous()) {
-			std::cerr << std::endl;
-			std::cerr << "Errors:" << std::endl;
-			std::cerr << std::endl;
+      std::cerr << std::endl;
+      std::cerr << "Errors:" << std::endl;
+      std::cerr << std::endl;
 
-			write_errors(std::cerr);
-			write_duplicates(std::cerr);
-			write_unrecognized(std::cerr);
-			write_anonymous(std::cerr);
+      write_errors(std::cerr);
+      write_duplicates(std::cerr);
+      write_unrecognized(std::cerr);
+      write_anonymous(std::cerr);
 
       exit(1);
     }
 
     if (debug) {
-			std::clog << std::endl;
-			std::clog << "Arg Values:" << std::endl;
-			std::clog << std::endl;
+      std::clog << std::endl;
+      std::clog << "Arg Values:" << std::endl;
+      std::clog << std::endl;
 
       write_arg_vals(std::clog);
 
@@ -105,78 +107,78 @@ class CommandLineConfig {
   }
 
  private:
-	/** Prints arg aliases and usage */
-	static void write_arg(std::ostream& os, Arg* a) {
-		for (auto i = a->alias_begin(); i != a->alias_end(); ++i) {
-			os << *i << " ";
-		}
-		a->usage(os);
-	}
+  /** Prints arg aliases and usage */
+  static void write_arg(std::ostream& os, Arg* a) {
+    for (auto i = a->alias_begin(); i != a->alias_end(); ++i) {
+      os << *i << " ";
+    }
+    a->usage(os);
+  }
 
-	/** Prints error args */
-	static void write_errors(std::ostream& os) {
-		ofilterstream<Indent> ofs(os);
-		ofs.filter().indent();
+  /** Prints error args */
+  static void write_errors(std::ostream& os) {
+    ofilterstream<Indent> ofs(os);
+    ofs.filter().indent();
 
-		for (auto a = Args::error_begin(); a != Args::error_end(); ++a) {
-			write_arg(ofs, *a);
-     	ofs << std::endl;
+    for (auto a = Args::error_begin(); a != Args::error_end(); ++a) {
+      write_arg(ofs, *a);
+      ofs << std::endl;
 
-			ofs.filter().indent(2);
+      ofs.filter().indent(2);
       ofs << "Error reading value: ";
       (*a)->error(ofs);
       ofs << std::endl;
-			ofs.filter().unindent(2);
-		}
-			
-		ofs.filter().unindent();
-	}
+      ofs.filter().unindent(2);
+    }
 
-	/** Prints duplicate args */
-	static void write_duplicates(std::ostream& os) {
-		ofilterstream<Indent> ofs(os);
-		ofs.filter().indent();
+    ofs.filter().unindent();
+  }
 
-		for (auto a = Args::duplicate_begin(); a != Args::duplicate_end(); ++a) {
-			write_arg(ofs, *a);
-     	ofs << std::endl;
+  /** Prints duplicate args */
+  static void write_duplicates(std::ostream& os) {
+    ofilterstream<Indent> ofs(os);
+    ofs.filter().indent();
 
-			ofs.filter().indent(2);
-			ofs << "Ignoring duplicate occurences!" << std::endl;
-			ofs.filter().unindent(2);
-		}
-			
-		ofs.filter().unindent();
-	}
+    for (auto a = Args::duplicate_begin(); a != Args::duplicate_end(); ++a) {
+      write_arg(ofs, *a);
+      ofs << std::endl;
+
+      ofs.filter().indent(2);
+      ofs << "Ignoring duplicate occurences!" << std::endl;
+      ofs.filter().unindent(2);
+    }
+
+    ofs.filter().unindent();
+  }
 
   /** Prints unrecognized args */
   static void write_unrecognized(std::ostream& os) {
-		ofilterstream<Indent> ofs(os);
-		ofs.filter().indent();
+    ofilterstream<Indent> ofs(os);
+    ofs.filter().indent();
 
     for (auto i = Args::unrecognized_begin(); i != Args::unrecognized_end(); ++i) {
       ofs << *i << " " << std::endl;
-			ofs.filter().indent(2);
-    	ofs << "Ignoring unrecognized argument!" << std::endl;
-			ofs.filter().unindent(2);
+      ofs.filter().indent(2);
+      ofs << "Ignoring unrecognized argument!" << std::endl;
+      ofs.filter().unindent(2);
     }
 
-		ofs.filter().unindent();
+    ofs.filter().unindent();
   }
 
-	/** Prints anonymous args */
+  /** Prints anonymous args */
   static void write_anonymous(std::ostream& os) {
-		ofilterstream<Indent> ofs(os);
-		ofs.filter().indent();
+    ofilterstream<Indent> ofs(os);
+    ofs.filter().indent();
 
     for (auto i = Args::anonymous_begin(); i != Args::anonymous_end(); ++i) {
-			ofs << *i << " " << std::endl;
-			ofs.filter().indent(2);
+      ofs << *i << " " << std::endl;
+      ofs.filter().indent(2);
       ofs << "Ignoring dangling value!" << std::endl;
-			ofs.filter().unindent(2);
+      ofs.filter().unindent(2);
     }
 
-		ofs.filter().unindent();
+    ofs.filter().unindent();
   }
 
   /** Prints arg aliases, usages, and descriptions */
@@ -184,44 +186,44 @@ class CommandLineConfig {
     ofilterstream<Indent> ofs(os);
     ofs.filter().indent();
 
-		for (auto g = Args::group_begin(); g != Args::group_end(); ++g ) {
-			ofs << g->heading << std::endl;
-			ofs << std::endl;
-			for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
-				write_arg(ofs, *a);
-				ofs << std::endl;
+    for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
+      ofs << g->heading << std::endl;
+      ofs << std::endl;
+      for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
+        write_arg(ofs, *a);
+        ofs << std::endl;
 
-				ofs.filter().indent(2);
-				(*a)->description(ofs);
-				ofs << std::endl;
-				ofs.filter().unindent(2);
-			}
-			ofs << std::endl;
-		}
+        ofs.filter().indent(2);
+        (*a)->description(ofs);
+        ofs << std::endl;
+        ofs.filter().unindent(2);
+      }
+      ofs << std::endl;
+    }
 
-		ofs.filter().unindent();
-	}
+    ofs.filter().unindent();
+  }
 
   /** Prints args and their corresponding values */
   static void write_arg_vals(std::ostream& os) {
     ofilterstream<Indent> ofs(os);
     ofs.filter().indent();
 
-		for (auto g = Args::group_begin(); g != Args::group_end(); ++g ) {
-			ofs << g->heading << std::endl;
-			ofs << std::endl;
-			for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
-				write_arg(ofs, *a);
-				ofs << std::endl;
+    for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
+      ofs << g->heading << std::endl;
+      ofs << std::endl;
+      for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
+        write_arg(ofs, *a);
+        ofs << std::endl;
 
-				ofs.filter().indent(2);
-				(*a)->description(ofs);
-				ofs << std::endl;
-				(*a)->debug(ofs);
-				ofs << std::endl;
-				ofs.filter().unindent(2);
-			}
-		}
+        ofs.filter().indent(2);
+        (*a)->description(ofs);
+        ofs << std::endl;
+        (*a)->debug(ofs);
+        ofs << std::endl;
+        ofs.filter().unindent(2);
+      }
+    }
 
     ofs.filter().unindent();
   }
@@ -229,21 +231,21 @@ class CommandLineConfig {
   /** Prints a config file with descriptions, aliases, and usages */
   static void write_config_file(std::ostream& os, const char* argv0) {
     os << "##### " << argv0 << std::endl;
-		os << std::endl;
+    os << std::endl;
 
-		for (auto g = Args::group_begin(); g != Args::group_end(); ++g ) {
-			os << "##### " << g->heading << std::endl;
-			os << std::endl;
-			for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
-				os << "# ";
-				(*a)->description(os);
-				os << std::endl;
-				os << "# " << *((*a)->alias_begin()) << " ";
-				(*a)->usage(os);
-				os << std::endl;
-				os << std::endl;
-			}
-		}
+    for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
+      os << "##### " << g->heading << std::endl;
+      os << std::endl;
+      for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
+        os << "# ";
+        (*a)->description(os);
+        os << std::endl;
+        os << "# " << *((*a)->alias_begin()) << " ";
+        (*a)->usage(os);
+        os << std::endl;
+        os << std::endl;
+      }
+    }
   }
 };
 

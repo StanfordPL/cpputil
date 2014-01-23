@@ -23,60 +23,60 @@ namespace cpputil {
 class Arg;
 
 class ArgRegistry {
-	public:
-		struct ArgGroup {
-			std::string heading;
-			std::vector<Arg*> args;
+ public:
+  struct ArgGroup {
+    std::string heading;
+    std::vector<Arg*> args;
 
-			typedef std::vector<Arg*>::iterator arg_iterator;
+    typedef std::vector<Arg*>::iterator arg_iterator;
 
-			arg_iterator arg_begin() {
-				return args.begin();
-			}
+    arg_iterator arg_begin() {
+      return args.begin();
+    }
 
-			arg_iterator arg_end() {
-				return args.end();
-			}
-		};
+    arg_iterator arg_end() {
+      return args.end();
+    }
+  };
 
-		ArgRegistry() :
-			groups_{{"",std::vector<Arg*>()}} { }
-			
-		void insert_arg(Arg* arg) {
-			groups_.back().args.push_back(arg);
-			args_.push_back(arg);
-		}
+  ArgRegistry() :
+    groups_ {{"", std::vector<Arg*>()}} { }
 
-		void insert_group(const std::string& heading) {
-			if (groups_.size() > 1 || groups_.back().heading != "") {
-				groups_.resize(groups_.size()+1);
-			}
-			groups_.back().heading = heading;
-		}
+  void insert_arg(Arg* arg) {
+    groups_.back().args.push_back(arg);
+    args_.push_back(arg);
+  }
 
-		typedef std::vector<ArgGroup>::iterator group_iterator;
-		
-		group_iterator group_begin() {
-			return groups_.begin();
-		}
-	
-		group_iterator group_end() {
-			return groups_.end();
-		}
+  void insert_group(const std::string& heading) {
+    if (groups_.size() > 1 || groups_.back().heading != "") {
+      groups_.resize(groups_.size() + 1);
+    }
+    groups_.back().heading = heading;
+  }
 
-		typedef std::vector<Arg*>::iterator arg_iterator;
+  typedef std::vector<ArgGroup>::iterator group_iterator;
 
-		arg_iterator arg_begin() {
-			return args_.begin();
-		}
+  group_iterator group_begin() {
+    return groups_.begin();
+  }
 
-		arg_iterator arg_end() {
-			return args_.end();
-		}
+  group_iterator group_end() {
+    return groups_.end();
+  }
 
-	private:
-		std::vector<ArgGroup> groups_;
-		std::vector<Arg*> args_;
+  typedef std::vector<Arg*>::iterator arg_iterator;
+
+  arg_iterator arg_begin() {
+    return args_.begin();
+  }
+
+  arg_iterator arg_end() {
+    return args_.end();
+  }
+
+ private:
+  std::vector<ArgGroup> groups_;
+  std::vector<Arg*> args_;
 };
 
 } // namespace cpputil
