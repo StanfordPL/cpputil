@@ -223,6 +223,7 @@ class CommandLineConfig {
         ofs << std::endl;
         ofs.filter().unindent(2);
       }
+      ofs << std::endl;
     }
 
     ofs.filter().unindent();
