@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "include/command_line/arg.h"
-#include "include/command_line/arg_list.h"
+#include "include/command_line/arg_registry.h"
 #include "include/patterns/singleton.h"
 
 namespace cpputil {
@@ -43,17 +43,30 @@ class Args {
 
  public:
   /** Iterator over registered args */
-  typedef std::vector<Arg*>::iterator arg_iterator;
+  typedef ArgRegistry::arg_iterator arg_iterator;
 
   /** First registered arg */
   static arg_iterator arg_begin() {
-    return Singleton<ArgList>::get().args_.begin();
+    return Singleton<ArgRegistry>::get().arg_begin();
   }
 
   /** Last registered arg */
   static arg_iterator arg_end() {
-    return Singleton<ArgList>::get().args_.end();
+    return Singleton<ArgRegistry>::get().arg_end();
   }
+
+	/** Iterator over registered arg groups */
+	typedef ArgRegistry::group_iterator group_iterator;
+
+	/** First registered group */
+	static group_iterator group_begin() {
+		return Singleton<ArgRegistry>::get().group_begin();
+	}
+
+	/** Last registered group */
+	static group_iterator group_end() {
+		return Singleton<ArgRegistry>::get().group_end();
+	}
 
   /** Did any args signal errors? */
   static bool error() {
@@ -127,6 +140,20 @@ class Args {
     return Singleton<Parse>::get().anonymous.end();
   }
 
+	/** Sort arg groups */
+	template <typename Comp>
+	static void sort_groups(Comp c) {
+		std::sort(group_begin(), group_end(), c);
+	}
+
+	/** Sort args within groups */ 
+	template <typename Comp>
+	static void sort_args(Comp c) {
+		for ( auto g = group_begin(); g != group_end(); ++g) {
+			std::sort(g->arg_begin(), g->arg_end(), c);
+		}
+	}
+
   /** Read arguments in standard argc/argv format */
   static void read(int argc, char** argv) {
     auto& parse = Singleton<Parse>::get();
@@ -135,23 +162,23 @@ class Args {
     parse.unrecognized.clear();
     parse.anonymous.clear();
 
-    auto& arg_list = Singleton<ArgList>::get().args_;
+    auto& arg_reg = Singleton<ArgRegistry>::get();
     std::vector<bool> used(argc);
-    for (auto a : arg_list) {
-      const auto res = a->read(argc, argv);
+		for (auto a = arg_reg.arg_begin(), ae = arg_reg.arg_end(); a != ae; ++a ) {
+      const auto res = (*a)->read(argc, argv);
       for (auto i = res.first; i <= res.second; ++i) {
         used[i] = true;
       }
 
-      for (auto i = a->appearance_begin(); i != a->appearance_end(); ++i) {
+      for (auto i = (*a)->appearance_begin(); i != (*a)->appearance_end(); ++i) {
         used[*i] = true;
       }
-      if (a->duplicated()) {
-        parse.duplicates.push_back(a);
+      if ((*a)->duplicated()) {
+        parse.duplicates.push_back(*a);
       }
 
-      if (!a->good()) {
-        parse.errors.push_back(a);
+      if (!(*a)->good()) {
+        parse.errors.push_back(*a);
       }
     }
 

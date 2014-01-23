@@ -21,6 +21,8 @@
 using namespace cpputil;
 using namespace std;
 
+auto& heading = Heading::create("Program-specific arguments");
+
 auto& i = ValueArg<int>::create("i")
           .alternate("int")
           .usage("<int>")

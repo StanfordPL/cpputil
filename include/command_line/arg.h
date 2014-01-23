@@ -1,13 +1,3 @@
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_ARG_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_ARG_H
-
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <set>
-#include <sstream>
-#include <vector>
-
 // Copyright 2014 eric schkufza
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "include/command_line/arg_list.h"
+#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_ARG_H
+#define CPPUTIL_INCLUDE_COMMAND_LINE_ARG_H
+
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <set>
+#include <sstream>
+#include <vector>
+
+#include "include/command_line/arg_registry.h"
 #include "include/patterns/singleton.h"
 
 namespace cpputil {
@@ -96,8 +96,8 @@ class Arg {
     description("(no description provided)");
     survivable_error("");
 
-    auto& arg_list = Singleton<ArgList>::get().args_;
-    arg_list.push_back(this);
+    auto& arg_reg = Singleton<ArgRegistry>::get();
+    arg_reg.insert_arg(this);
   }
 
   /** Create a new arg alias (dashes implicit; chars get 1, strings 2) */
@@ -118,9 +118,9 @@ class Arg {
       alt = std::string("--") + a;
     }
 
-    const auto& arg_list = Singleton<ArgList>::get().args_;
-    for (const auto arg : arg_list) {
-      if (opts_.find(alt) != opts_.end()) {
+    auto& arg_reg = Singleton<ArgRegistry>::get();
+		for (auto i = arg_reg.arg_begin(), ie = arg_reg.arg_end(); i != ie; ++i ) {
+      if ((*i)->opts_.find(alt) != (*i)->opts_.end()) {
         std::ostringstream oss;
         oss << "Unable to register duplicate arg name \"" << alt << "\"!";
         fatal_error(oss.str());

@@ -16,10 +16,10 @@
 #define CPPUTIL_INCLUDE_COMMAND_LINE_COMMAND_LINE_H
 
 #include "include/command_line/arg.h"
-#include "include/command_line/arg_list.h"
 #include "include/command_line/args.h"
 #include "include/command_line/command_line_config.h"
 #include "include/command_line/flag_arg.h"
+#include "include/command_line/heading.h"
 #include "include/command_line/value_arg.h"
 
 #endif

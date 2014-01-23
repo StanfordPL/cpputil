@@ -12,24 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_ARG_LIST_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_ARG_LIST_H
+#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_HEADING_H
+#define CPPUTIL_INCLUDE_COMMAND_LINE_HEADING_H
 
-#include <vector>
+#include <string>
+
+#include "include/command_line/arg_registry.h"
+#include "include/patterns/singleton.h"
 
 namespace cpputil {
 
-class Arg;
-class Args;
+class Heading {
+	public:
+		static Heading& create(const std::string& text) {
+			return *(new Heading(text));
+		}
 
-class ArgList {
-  friend class Arg;
-  friend class Args;
-
-  std::vector<Arg*> args_;
+	private:
+		Heading(const std::string& text) {
+			auto& arg_reg = Singleton<ArgRegistry>::get();
+			arg_reg.insert_group(text);
+		}
 };
 
 } // namespace cpputil
 
 #endif
-
