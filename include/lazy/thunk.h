@@ -29,7 +29,7 @@ class Thunk {
 };
 
 template <typename Fxn, typename... Args>
-auto make_thunk(Fxn&& fxn, Args&& ... args) -> Thunk<Fxn, Args...> {
+Thunk<Fxn, Args...> make_thunk(Fxn&& fxn, Args&& ... args) {
   return {fxn, std::forward<Args>(args)...};
 }
 
