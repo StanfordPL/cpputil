@@ -31,10 +31,12 @@ EX  = command_line/command_line \
 			io/redirectstream \
 			io/shunt \
 			io/nopstream \
+			lazy/thunk \
 			memory/interner \
 			patterns/singleton \
 			serialize/text \
-			signal/debug_handler
+			signal/debug_handler \
+			type_traits/indices
 
 ##### TOP LEVEL TARGETS
 
