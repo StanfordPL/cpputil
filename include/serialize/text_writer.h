@@ -18,8 +18,8 @@
 #include <iostream>
 #include <type_traits>
 
-#include "include/type_traits/is_stl_associative.h"
-#include "include/type_traits/is_stl_sequence.h"
+#include "include/meta/is_stl_associative.h"
+#include "include/meta/is_stl_sequence.h"
 
 namespace cpputil {
 

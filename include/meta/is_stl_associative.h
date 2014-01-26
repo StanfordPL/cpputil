@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_TYPE_TRAITS_IS_STL_ASSOCIATIVE_H
-#define CPPUTIL_TYPE_TRAITS_IS_STL_ASSOCIATIVE_H
+#ifndef CPPUTIL_META_IS_STL_ASSOCIATIVE_H
+#define CPPUTIL_META_IS_STL_ASSOCIATIVE_H
 
 #include <map>
 #include <set>

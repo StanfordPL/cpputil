@@ -19,8 +19,8 @@
 #include <type_traits>
 
 #include "include/serialize/text_reader.h"
-#include "include/type_traits/is_stl_sequence.h"
-#include "include/type_traits/is_stl_set.h"
+#include "include/meta/is_stl_sequence.h"
+#include "include/meta/is_stl_set.h"
 
 namespace cpputil {
 

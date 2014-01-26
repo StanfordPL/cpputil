@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_TYPE_TRAITS_CONTAINED_TYPE_H
-#define CPPUTIL_INCLUDE_TYPE_TRAITS_CONTAINED_TYPE_H
+#ifndef CPPUTIL_INCLUDE_META_CONTAINED_TYPE_H
+#define CPPUTIL_INCLUDE_META_CONTAINED_TYPE_H
 
 #include <type_traits>
 
-#include "include/type_traits/is_stl_sequence.h"
+#include "include/meta/is_stl_sequence.h"
 
 namespace cpputil {
 

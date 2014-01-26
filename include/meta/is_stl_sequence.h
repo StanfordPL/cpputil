@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_TYPE_TRAITS_IS_STL_SEQUENCE_H
-#define CPPUTIL_INCLUDE_TYPE_TRAITS_IS_STL_SEQUENCE_H
+#ifndef CPPUTIL_INCLUDE_META_IS_STL_SEQUENCE_H
+#define CPPUTIL_INCLUDE_META_IS_STL_SEQUENCE_H
 
 #include <array>
 #include <deque>

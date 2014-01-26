@@ -33,10 +33,10 @@ EX  = command_line/command_line \
 			io/nopstream \
 			lazy/thunk \
 			memory/interner \
+			meta/indices \
 			patterns/singleton \
 			serialize/text \
-			signal/debug_handler \
-			type_traits/indices
+			signal/debug_handler
 
 ##### TOP LEVEL TARGETS
 

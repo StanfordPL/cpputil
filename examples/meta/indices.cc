@@ -12,24 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_TYPE_TRAITS_INDICES_H
-#define CPPUTIL_INCLUDE_TYPE_TRAITS_INDICES_H
+#include <array>
+#include <iostream>
 
-namespace cpputil {
+#include "include/meta/indices.h"
 
-// This is a simple implementation of the 'indices trick'. Credit goes
-// to http://loungecpp.wikidot.com/tips-and-tricks%3aindices.
+using namespace cpputil;
+using namespace std;
 
-template<size_t... Is> struct Indices {
-  enum { size = sizeof...(Is) };
-};
+template <size_t... Is>
+std::array<int, sizeof...(Is)> make_array_helper(Indices<Is...>) {
+  return {Is...};
+}
 
-template<size_t N, size_t... Is>
-struct MakeIndices : MakeIndices < N - 1, N - 1, Is... > { };
+template <size_t N>
+std::array<int, N> make_array() {
+  return make_array_helper(MakeIndices<N>());
+}
 
-template<size_t... Is>
-struct MakeIndices<0, Is...> : Indices<Is...> { };
+int main() {
+  for (auto i : make_array<10>()) {
+    cout << i << " ";
+  }
+  cout << endl;
 
-} // namespace cpputil
-
-#endif
+  return 0;
+}
