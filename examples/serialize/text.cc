@@ -17,8 +17,10 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
+#include "include/meta/is_stl_container.h"
 #include "include/serialize/text_reader.h"
 #include "include/serialize/text_writer.h"
 
@@ -66,27 +68,46 @@ struct TextReader<C, Open, Close, Quote> {
 
 } // namespace cpputil
 
+template <typename T>
+typename enable_if<is_stl_container<T>::value, ostream&>::type operator<<(ostream& os, const T& t) {
+	TextWriter<T> tw;
+	tw(os, t);
+	return os;
+}
+
+template <typename T>
+typename enable_if<is_stl_container<T>::value, istream&>::type operator>>(istream& is, T& t) {
+	TextReader<T> tr;
+	tr(is, t);
+	return is;
+}
+
 int main() {
   C c {1, 'c', 2.0, "Hello"};
-  vector<int> v {1, 2};
-  list<decltype(v)> l {v, v};
-  map<decltype(l), vector<C>> m {{l, {c}}};
-  pair<decltype(m), short> p {m, 3};
 
-	TextWriter<decltype(p)> tw;
-	TextReader<decltype(p)> tr;
+	typedef vector<int> VI;
+  VI vi {1, 2};
+
+	typedef vector<C> VC;
+	VC vc {c};
+
+	typedef list<VI> L;
+  L l {vi, vi};
+
+	typedef map<L, VC> M;
+  M m {{l, vc}};
+
+	typedef pair<M, short> P;
+  P p1 {m, 3};
 
   stringstream ss;
-	tw(ss, p);
+	ss << p1;
 
-  decltype(p) p2;
-	tr(ss, p2);
+  P p2;
+	ss >> p2;
 
-	tw(cout, p);
-	cout << endl;
-
-	tw(cout, p2);
-	cout << endl;
+	cout << p1 << endl;
+	cout << p2 << endl;
 
   return 0;
 };

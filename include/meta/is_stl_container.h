@@ -73,6 +73,12 @@ struct is_stl_container<std::multiset<Key, Comp, Alloc>> : public std::true_type
 template <typename Key, typename Comp, typename Alloc>
 struct is_stl_container<const std::multiset<Key, Comp, Alloc>> : public std::true_type {};
 
+template <typename T1, typename T2>
+struct is_stl_container<std::pair<T1, T2>> : public std::true_type {};
+
+template <typename T1, typename T2>
+struct is_stl_container<const std::pair<T1, T2>> : public std::true_type {};
+
 template <typename Key, typename Comp, typename Alloc>
 struct is_stl_container<std::set<Key, Comp, Alloc>> : public std::true_type {};
 
