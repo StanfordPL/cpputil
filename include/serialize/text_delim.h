@@ -17,7 +17,7 @@
 
 namespace cpputil {
 
-template <char Open = '{', char Close = '}', char Quote = '"'>
+template <char Open = '{', char Close = '}', char Quote = '"', char Etc = '.'>
 struct TextDelim {
 	static constexpr char open() {
 		return Open;
@@ -29,6 +29,10 @@ struct TextDelim {
 
 	static constexpr char quote() {
 		return Quote;
+	}
+
+	static constexpr char etc() {
+		return Etc;
 	}
 };
 

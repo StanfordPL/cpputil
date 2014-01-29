@@ -28,7 +28,7 @@
 
 namespace cpputil {
 
-template <typename T, typename Delim = TextDelim<>, typename Ignore = void>
+template <typename T, typename Delim = TextDelim<>, typename Enable = void>
 struct TextWriter;
 
 template <typename T, typename Delim>
@@ -73,7 +73,6 @@ struct TextWriter < T, Delim,
     os << " " << Delim::close();
   }
 };
-
 
 template <typename T, typename Delim>
 class TextWriter <T, Delim, typename std::enable_if < is_stl_tuple<T>::value>::type > {

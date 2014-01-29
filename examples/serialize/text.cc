@@ -18,10 +18,8 @@
 #include <sstream>
 #include <string>
 #include <tuple>
-#include <type_traits>
 #include <vector>
 
-#include "include/meta/is_stl_container.h"
 #include "include/serialize/stl_debug.h"
 #include "include/serialize/text_reader.h"
 #include "include/serialize/text_writer.h"
@@ -40,7 +38,7 @@ namespace cpputil {
 
 template <typename Delim>
 struct TextWriter<C, Delim> {
-  void operator()(ostream& os, const C& c) {
+  void operator()(ostream& os, const C& c) const {
     os << Delim::open();
     TextWriter<int, Delim>()(os, c.x);
     os << " ";
@@ -55,7 +53,7 @@ struct TextWriter<C, Delim> {
 
 template <typename Delim>
 struct TextReader<C, Delim> {
-  void operator()(istream& is, C& c) {
+  void operator()(istream& is, C& c) const {
     is.get();
     TextReader<int, Delim>()(is, c.x);
     is.get();
