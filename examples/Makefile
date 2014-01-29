@@ -36,6 +36,7 @@ EX  = command_line/command_line \
 			meta/indices \
 			patterns/singleton \
 			serialize/text \
+			serialize/stl_debug \
 			signal/debug_handler
 
 ##### TOP LEVEL TARGETS

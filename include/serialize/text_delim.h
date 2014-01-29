@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_META_INDICES_H
-#define CPPUTIL_INCLUDE_META_INDICES_H
+#ifndef CPPUTIL_INCLUDE_SERIALIZE_TEXT_DELIM_H
+#define CPPUTIL_INCLUDE_SERIALIZE_TEXT_DELIM_H
 
 namespace cpputil {
 
-template<size_t... Is> 
-struct Indices {
-	static constexpr size_t size() {
-		return sizeof...(Is);
+template <char Open = '{', char Close = '}', char Quote = '"'>
+struct TextDelim {
+	static constexpr char open() {
+		return Open;
+	}
+
+	static constexpr char close() {
+		return Close;
+	}
+
+	static constexpr char quote() {
+		return Quote;
 	}
 };
-
-template<size_t N, size_t... Is>
-struct MakeIndices : MakeIndices < N - 1, N - 1, Is... > { };
-
-template<size_t... Is>
-struct MakeIndices<0, Is...> : Indices<Is...> { };
 
 } // namespace cpputil
 

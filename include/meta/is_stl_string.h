@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_META_INDICES_H
-#define CPPUTIL_INCLUDE_META_INDICES_H
+#ifndef CPPUTIL_INCLUDE_META_IS_STL_STRING_H
+#define CPPUTIL_INCLUDE_META_IS_STL_STRING_H
+
+#include <string>
 
 namespace cpputil {
 
-template<size_t... Is> 
-struct Indices {
-	static constexpr size_t size() {
-		return sizeof...(Is);
-	}
-};
+template <typename T>
+struct is_stl_string : public std::false_type { };
 
-template<size_t N, size_t... Is>
-struct MakeIndices : MakeIndices < N - 1, N - 1, Is... > { };
+template <>
+struct is_stl_string<std::string> : public std::true_type { };
 
-template<size_t... Is>
-struct MakeIndices<0, Is...> : Indices<Is...> { };
+template <>
+struct is_stl_string<const std::string> : public std::true_type { };
 
 } // namespace cpputil
 
 #endif
+
+
+

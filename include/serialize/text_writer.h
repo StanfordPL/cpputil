@@ -18,59 +18,86 @@
 #include <iostream>
 #include <type_traits>
 
+#include "include/meta/is_char_pointer.h"
 #include "include/meta/is_stl_associative.h"
 #include "include/meta/is_stl_sequence.h"
+#include "include/meta/is_stl_pair.h"
+#include "include/meta/is_stl_string.h"
+#include "include/meta/is_stl_tuple.h"
+#include "include/serialize/text_delim.h"
 
 namespace cpputil {
 
-template <typename T, char Open = '{', char Close = '}', char Quote = '"', typename Enable = void>
+template <typename T, typename Delim = TextDelim<>, typename Ignore = void>
 struct TextWriter;
 
-template <typename T, char Open, char Close, char Quote>
-struct TextWriter < T, Open, Close, Quote,
-    typename std::enable_if < std::is_scalar<T>::value&&  !std::is_enum<T>::value >::type > {
+template <typename T, typename Delim>
+struct TextWriter < T, Delim, typename std::enable_if < std::is_fundamental<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
     os << t;
   }
 };
 
-template <char Open, char Close, char Quote>
-struct TextWriter<std::string, Open, Close, Quote, void> {
-  void operator()(std::ostream& os, const std::string& s) const {
-    os << Quote << s << Quote;
+template <typename T, typename Delim>
+struct TextWriter<T, Delim, 
+		typename std::enable_if<is_char_pointer<T>::value || is_stl_string<T>::value>::type> {
+  void operator()(std::ostream& os, const T& t) const {
+    os << Delim::quote() << t << Delim::quote();
   }
 };
 
-template <typename T1, typename T2, char Open, char Close, char Quote>
-struct TextWriter<std::pair<T1, T2>, Open, Close, Quote, void> {
-  void operator()(std::ostream& os, const std::pair<T1, T2>& p) const {
-    os << Open << " ";
+template <typename T, typename Delim>
+struct TextWriter<T, Delim, typename std::enable_if < is_stl_pair<T>::value>::type> {
+  void operator()(std::ostream& os, const T& t) const {
+    os << Delim::open() << " ";
 
-    TextWriter<T1, Open, Close, Quote> w1;
-    w1(os, p.first);
-
+    TextWriter<typename T::first_type, Delim>()(os, t.first);
     os << " ";
+    TextWriter<typename T::second_type, Delim>()(os, t.second);
 
-    TextWriter<T2, Open, Close, Quote> w2;
-    w2(os, p.second);
-
-    os << " " << Close;
+    os << " " << Delim::close();
   }
 };
 
-template <typename T, char Open, char Close, char Quote>
-struct TextWriter < T, Open, Close, Quote,
+template <typename T, typename Delim>
+struct TextWriter < T, Delim,
     typename std::enable_if < is_stl_sequence<T>::value || is_stl_associative<T>::value >::type > {
   void operator()(std::ostream& os, const T& t) const {
-    TextWriter<typename T::value_type, Open, Close, Quote> w;
+    os << Delim::open();
 
-    os << Open;
-    for (auto i = t.begin(), ie = t.end(); i != ie; ++i) {
+		for (auto& elem : t ) {
       os << " ";
-      w(os, *i);
+    	TextWriter<typename T::value_type, Delim>()(os, elem);
     }
-    os << " " << Close;
+
+    os << " " << Delim::close();
   }
+};
+
+
+template <typename T, typename Delim>
+class TextWriter <T, Delim, typename std::enable_if < is_stl_tuple<T>::value>::type > {
+	public:
+		void operator()(std::ostream& os, const T& t) const {
+			os << Delim::open();
+			Helper<T, 0, std::tuple_size<T>::value>()(os, t);
+			os << " " << Delim::close();
+		}
+
+	private:
+	template <typename Tuple, size_t Begin, size_t End>
+		struct Helper {
+			void operator()(std::ostream& os, const Tuple& t) {
+				os << " ";
+				TextWriter<typename std::tuple_element<Begin, Tuple>::type, Delim>()(os, std::get<Begin>(t));
+				Helper<Tuple, Begin+1, End>()(os, t);
+			}	
+		};
+
+	template <typename Tuple, size_t End>
+		struct Helper<Tuple, End, End> {
+			void operator()(std::ostream& os, const Tuple& t) { }
+		};
 };
 
 } // namespace cpputil

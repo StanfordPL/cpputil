@@ -17,7 +17,7 @@
 
 namespace cpputil {
 
-template <typename... Ts>
+template <typename T>
 struct is_stl_tuple : public std::false_type { };
 
 template <typename... Ts>

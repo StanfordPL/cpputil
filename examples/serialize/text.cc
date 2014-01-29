@@ -38,32 +38,32 @@ struct C {
 
 namespace cpputil {
 
-template <char Open, char Close, char Quote>
-struct TextWriter<C, Open, Close, Quote> {
+template <typename Delim>
+struct TextWriter<C, Delim> {
   void operator()(ostream& os, const C& c) {
-    os << Open;
-    TextWriter<int, Open, Close, Quote>()(os, c.x);
+    os << Delim::open();
+    TextWriter<int, Delim>()(os, c.x);
     os << " ";
-    TextWriter<char, Open, Close, Quote>()(os, c.c);
+    TextWriter<char, Delim>()(os, c.c);
     os << " ";
-    TextWriter<double, Open, Close, Quote>()(os, c.d);
+    TextWriter<double, Delim>()(os, c.d);
     os << " ";
-    TextWriter<string, Open, Close, Quote>()(os, c.s);
-    os << Close;
+    TextWriter<string, Delim>()(os, c.s);
+    os << Delim::close();
   }
 };
 
-template <char Open, char Close, char Quote>
-struct TextReader<C, Open, Close, Quote> {
+template <typename Delim>
+struct TextReader<C, Delim> {
   void operator()(istream& is, C& c) {
     is.get();
-    TextReader<int, Open, Close, Quote>()(is, c.x);
+    TextReader<int, Delim>()(is, c.x);
     is.get();
-    TextReader<char, Open, Close, Quote>()(is, c.c);
+    TextReader<char, Delim>()(is, c.c);
     is.get();
-    TextReader<double, Open, Close, Quote>()(is, c.d);
+    TextReader<double, Delim>()(is, c.d);
     is.get();
-    TextReader<string, Open, Close, Quote>()(is, c.s);
+    TextReader<string, Delim>()(is, c.s);
     is.get();
   }
 };

@@ -12,24 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_META_INDICES_H
-#define CPPUTIL_INCLUDE_META_INDICES_H
+#include <iostream>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <map>
 
-namespace cpputil {
+#include "include/serialize/stl_debug.h"
 
-template<size_t... Is> 
-struct Indices {
-	static constexpr size_t size() {
-		return sizeof...(Is);
-	}
-};
+using namespace cpputil;
+using namespace std;
 
-template<size_t N, size_t... Is>
-struct MakeIndices : MakeIndices < N - 1, N - 1, Is... > { };
+int main() {
+	auto p = make_pair(1, 2.0);
+	cout << p << endl;
 
-template<size_t... Is>
-struct MakeIndices<0, Is...> : Indices<Is...> { };
+	vector<int> v { 1, 2, 3, 4, 5};
+	cout << v << endl;
 
-} // namespace cpputil
+	map<int, char> m { {1,'a'}, {2,'b'} };
+	cout << m << endl;	
 
-#endif
+	auto t = make_tuple(1, 2.0, "three", p, v, m);
+	cout << t << endl;
+
+	return 0;
+}

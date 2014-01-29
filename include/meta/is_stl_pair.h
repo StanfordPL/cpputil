@@ -17,7 +17,7 @@
 
 namespace cpputil {
 
-template <typename T1, typename T2>
+template <typename T>
 struct is_stl_pair : public std::false_type { };
 
 template <typename T1, typename T2>
