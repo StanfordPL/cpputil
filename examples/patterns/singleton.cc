@@ -21,8 +21,9 @@ using namespace std;
 
 int main() {
   auto& x = Singleton<int>::get();
-  x = 10;
   const auto& y = Singleton<int>::get();
+  x = 10;
+
   auto& z = Singleton<double>::get();
   z = 20;
 

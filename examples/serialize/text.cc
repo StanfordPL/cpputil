@@ -32,6 +32,8 @@ struct C {
   string s;
 };
 
+namespace cpputil {
+
 template <char Open, char Close, char Quote>
 struct TextWriter<C, Open, Close, Quote> {
   void operator()(ostream& os, const C& c) {
@@ -62,19 +64,7 @@ struct TextReader<C, Open, Close, Quote> {
   }
 };
 
-template <typename T>
-ostream& operator<<(ostream& os, const T& t) {
-  TextWriter<T> tw;
-  tw(os, t);
-  return os;
-}
-
-template <typename T>
-istream& operator>>(istream& is, T& t) {
-  TextReader<T> tr;
-  tr(is, t);
-  return is;
-}
+} // namespace cpputil
 
 int main() {
   C c {1, 'c', 2.0, "Hello"};
@@ -83,14 +73,20 @@ int main() {
   map<decltype(l), vector<C>> m {{l, {c}}};
   pair<decltype(m), short> p {m, 3};
 
+	TextWriter<decltype(p)> tw;
+	TextReader<decltype(p)> tr;
+
   stringstream ss;
-  ss << p << endl;
+	tw(ss, p);
 
   decltype(p) p2;
-  ss >> p2;
+	tr(ss, p2);
 
-  cout << p << endl;
-  cout << p2 << endl;
+	tw(cout, p);
+	cout << endl;
+
+	tw(cout, p2);
+	cout << endl;
 
   return 0;
 };
