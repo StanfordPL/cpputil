@@ -17,10 +17,12 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
 #include "include/meta/is_stl_container.h"
+#include "include/serialize/stl_debug.h"
 #include "include/serialize/text_reader.h"
 #include "include/serialize/text_writer.h"
 
@@ -67,20 +69,6 @@ struct TextReader<C, Open, Close, Quote> {
 };
 
 } // namespace cpputil
-
-template <typename T>
-typename enable_if<is_stl_container<T>::value, ostream&>::type operator<<(ostream& os, const T& t) {
-	TextWriter<T> tw;
-	tw(os, t);
-	return os;
-}
-
-template <typename T>
-typename enable_if<is_stl_container<T>::value, istream&>::type operator>>(istream& is, T& t) {
-	TextReader<T> tr;
-	tr(is, t);
-	return is;
-}
 
 int main() {
   C c {1, 'c', 2.0, "Hello"};
