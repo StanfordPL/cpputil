@@ -15,6 +15,7 @@
 #ifndef CPPUTIL_INCLUDE_COMMAND_LINE_ARGS_H
 #define CPPUTIL_INCLUDE_COMMAND_LINE_ARGS_H
 
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <sstream>
