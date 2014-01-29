@@ -17,10 +17,8 @@
 
 namespace cpputil {
 
-// This is a simple implementation of the 'indices trick'. Credit goes
-// to http://loungecpp.wikidot.com/tips-and-tricks%3aindices.
-
-template<size_t... Is> struct Indices {
+template<size_t... Is> 
+struct Indices {
   enum { size = sizeof...(Is) };
 };
 

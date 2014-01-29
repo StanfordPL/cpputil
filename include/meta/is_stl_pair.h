@@ -12,28 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_META_CONTAINED_TYPE_H
-#define CPPUTIL_INCLUDE_META_CONTAINED_TYPE_H
-
-#include <type_traits>
-
-#include "include/meta/is_stl_sequence.h"
+#ifndef CPPUTIL_INCLUDE_META_IS_STL_PAIR_H
+#define CPPUTIL_INCLUDE_META_IS_STL_PAIR_H
 
 namespace cpputil {
 
-template <typename T, typename Ignore = void>
-struct contained_type { };
+template <typename T1, typename T2>
+struct is_stl_pair : public std::false_type { };
 
-template <typename T>
-struct contained_type<T, typename std::enable_if<!is_stl_sequence<T>::value>::type {
-  typedef T type;
-};
+template <typename T1, typename T2>
+struct is_stl_pair<std::pair<T1, T2>> : public std::true_type { };
 
-template <typename T>
-struct contained_type<T, typename std::enable_if<is_stl_sequence<T>::value>::type> {
-  typedef typename contained_type<typename T::value_type>::type type;
-};
+template <typename T1, typename T2>
+struct is_stl_pair<const std::pair<T1, T2>> : public std::true_type { };
 
 } // namespace cpputil
 
 #endif
+

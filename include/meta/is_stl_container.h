@@ -21,6 +21,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
@@ -29,95 +30,101 @@
 namespace cpputil {
 
 template <typename T>
-struct is_stl_container : public std::false_type {};
+struct is_stl_container : public std::false_type { };
 
 template <typename T, size_t N>
-struct is_stl_container<std::array<T, N>> : public std::true_type {};
+struct is_stl_container<std::array<T, N>> : public std::true_type { };
 
 template <typename T, size_t N>
-struct is_stl_container<const std::array<T, N>> : public std::true_type {};
+struct is_stl_container<const std::array<T, N>> : public std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<std::deque<T, Alloc>> : public std::true_type {};
+struct is_stl_container<std::deque<T, Alloc>> : public std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<const std::deque<T, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::deque<T, Alloc>> : public std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<std::list<T, Alloc>> : public std::true_type {};
+struct is_stl_container<std::list<T, Alloc>> : public std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<const std::list<T, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::list<T, Alloc>> : public std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<std::forward_list<T, Alloc>> : public std::true_type {};
+struct is_stl_container<std::forward_list<T, Alloc>> : public std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<const std::forward_list<T, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::forward_list<T, Alloc>> : public std::true_type { };
 
 template <typename Key, typename T, typename Comp, typename Alloc>
-struct is_stl_container<std::map<Key, T, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<std::map<Key, T, Comp, Alloc>> : public std::true_type { };
 
 template <typename Key, typename T, typename Comp, typename Alloc>
-struct is_stl_container<const std::map<Key, T, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::map<Key, T, Comp, Alloc>> : public std::true_type { };
 
 template <typename Key, typename T, typename Comp, typename Alloc>
-struct is_stl_container<std::multimap<Key, T, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<std::multimap<Key, T, Comp, Alloc>> : public std::true_type { };
 
 template <typename Key, typename T, typename Comp, typename Alloc>
-struct is_stl_container<const std::multimap<Key, T, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::multimap<Key, T, Comp, Alloc>> : public std::true_type { };
 
 template <typename Key, typename Comp, typename Alloc>
-struct is_stl_container<std::multiset<Key, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<std::multiset<Key, Comp, Alloc>> : public std::true_type { };
 
 template <typename Key, typename Comp, typename Alloc>
-struct is_stl_container<const std::multiset<Key, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::multiset<Key, Comp, Alloc>> : public std::true_type { };
 
 template <typename T1, typename T2>
-struct is_stl_container<std::pair<T1, T2>> : public std::true_type {};
+struct is_stl_container<std::pair<T1, T2>> : public std::true_type { };
 
 template <typename T1, typename T2>
-struct is_stl_container<const std::pair<T1, T2>> : public std::true_type {};
+struct is_stl_container<const std::pair<T1, T2>> : public std::true_type { };
 
 template <typename Key, typename Comp, typename Alloc>
-struct is_stl_container<std::set<Key, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<std::set<Key, Comp, Alloc>> : public std::true_type { };
 
 template <typename Key, typename Comp, typename Alloc>
-struct is_stl_container<const std::set<Key, Comp, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::set<Key, Comp, Alloc>> : public std::true_type { };
+
+template <typename... Ts>
+struct is_stl_container<std::tuple<Ts...>> : public std::true_type { };
+
+template <typename... Ts>
+struct is_stl_container<const std::tuple<Ts...>> : public std::true_type { };
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<std::unordered_map<Key, T, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<std::unordered_map<Key, T, Hash, Eq, Alloc>> : public std::true_type { };
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<const std::unordered_map<Key, T, Hash, Eq, Alloc>> : public
-        std::true_type {};
+        std::true_type { };
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type { };
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<const std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::unordered_set<Key, Hash, Eq, Alloc>> : public std::true_type { };
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public
-        std::true_type {};
+        std::true_type { };
 
 template <typename Key, typename T, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<const std::unordered_multimap<Key, T, Hash, Eq, Alloc>> : public
-        std::true_type {};
+        std::true_type { };
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
-struct is_stl_container<std::unordered_multiset<Key, Hash, Eq, Alloc>> : public std::true_type {};
+struct is_stl_container<std::unordered_multiset<Key, Hash, Eq, Alloc>> : public std::true_type { };
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
 struct is_stl_container<const std::unordered_multiset<Key, Hash, Eq, Alloc>> : public
-        std::true_type {};
+        std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<std::vector<T, Alloc>> : public std::true_type {};
+struct is_stl_container<std::vector<T, Alloc>> : public std::true_type { };
 
 template <typename T, typename Alloc>
-struct is_stl_container<const std::vector<T, Alloc>> : public std::true_type {};
+struct is_stl_container<const std::vector<T, Alloc>> : public std::true_type { };
 
 } // namespace cpputil
 
