@@ -18,132 +18,129 @@
 #include <iostream>
 #include <type_traits>
 
-#include "include/serialize/text_reader.h"
 #include "include/meta/is_stl_sequence.h"
 #include "include/meta/is_stl_set.h"
+#include "include/serialize/range.h"
+#include "include/serialize/text_reader.h"
 
 namespace cpputil {
 
-template <typename T, typename T::value_type Min, typename T::value_type Max,
-          typename R = TextReader<typename T::value_type>, char Open = '{', char Close = '}',
-          char Etc = '.', typename Enable = void>
+#define die_unless(c) \
+	if (is.get() != c) { \
+		is.setstate(std::ios::failbit); \
+		return; \
+	}
+
+#define die_outside(l,u) \
+	if (v < l || v > u) { \
+		is.setstate(std::ios::failbit); \
+		return; \
+	}
+
+template <typename T, typename Range, typename Delim = TextDelim<>, typename Enable = void>
 struct RangeReader;
 
-template <typename T, typename T::value_type Min, typename T::value_type Max, typename R, char Open,
-          char Close, char Etc>
-struct RangeReader<T, Min, Max, R, Open, Close, Etc,
-    typename std::enable_if<is_stl_sequence<T>::value>::type> {
-  void operator()(std::istream& is, T& t) const {
-    auto die_unless = [](std::istream & is, char c) {
-      if (is.get() != c) {
-        is.setstate(std::ios::failbit);
-      }
-    };
+template <typename T, typename Range, typename Delim>
+class RangeReader<T, Range, Delim, typename std::enable_if<is_stl_sequence<T>::value>::type> {
+	public:
+		void operator()(std::istream& is, T& t) const {
+			die_unless(Delim::open());
+			die_unless(' ');
 
-    die_unless(is, Open);
-    die_unless(is, ' ');
+			t.clear();
+			auto range = false;
 
-    t.clear();
-    auto range = false;
+			while (is.peek() != Delim::close()) {
+				if (is.peek() == Delim::etc()) {
+					range = true;
+					while (is.peek() == Delim::etc()) {
+						is.get();
+					}
+				} else {
+					typename T::value_type v;
+					TextReader<typename T::value_type, Delim>()(is, v);
+					die_outside(Range::lower(), Range::upper());
 
-    while (is.peek() != Close) {
-      if (is.peek() == Etc) {
-        range = true;
-        while (is.peek() == Etc) {
-          is.get();
-        }
-      } else {
-        typename T::value_type v;
-        R r;
-        r(is, v);
+					if (range) {
+						range = false;
+						fill_until(t, v);
+					}
+					t.emplace_back(v);
+				}
 
-        if (range) {
-          range = false;
-          if (t.empty()) {
-            t.push_back(Min);
-          }
-          auto vv = t.back();
-          for (++vv; vv < v; ++vv) {
-            t.push_back(vv);
-          }
-        }
-        t.push_back(v);
-      }
+				die_unless(' ');
+			}
+			die_unless(Delim::close());
 
-      die_unless(is, ' ');
-    }
-    die_unless(is, Close);
+			if (range) {
+				fill_until(t, Range::upper());
+			}
+		}
 
-    if (range) {
-      if (t.empty()) {
-        t.push_back(Min);
-      }
-      auto v = t.back();
-      for (++v; v < Max; ++v) {
-        t.push_back(v);
-      }
-    }
-  }
+	private:
+		void fill_until(T& t, const typename T::value_type& v) const {
+			if (t.empty()) {
+				t.emplace_back(Range::lower());
+			}
+			auto last = t.back();
+			for (++last; last <= v; ++last) {
+				t.emplace_back(last);
+			}	
+		}
 };
 
-template <typename T, typename T::value_type Min, typename T::value_type Max, typename R, char Open,
-          char Close, char Etc>
-struct RangeReader<T, Min, Max, R, Open, Close, Etc,
-    typename std::enable_if<is_stl_set<T>::value>::type> {
-  void operator()(std::istream& is, T& t) const {
-    auto die_unless = [](std::istream & is, char c) {
-      if (is.get() != c) {
-        is.setstate(std::ios::failbit);
-      }
-    };
+template <typename T, typename Range, typename Delim>
+struct RangeReader<T, Range, Delim, typename std::enable_if<is_stl_set<T>::value>::type> {
+	public:
+		void operator()(std::istream& is, T& t) const {
+			die_unless(Delim::open());
+			die_unless(' ');
 
-    die_unless(is, Open);
-    die_unless(is, ' ');
+			t.clear();
+			auto range = false;
+			auto last = Range::lower();
 
-    t.clear();
-    auto range = false;
-    auto last_insert = Min;
+			while (is.peek() != Delim::close()) {
+				if (is.peek() == Delim::etc()) {
+					range = true;
+					while (is.peek() == Delim::etc()) {
+						is.get();
+					}
+				} else {
+					typename T::value_type v;
+					TextReader<typename T::value_type, Delim>()(is, v);
+					die_outside(Range::lower(), Range::upper());
 
-    while (is.peek() != Close) {
-      if (is.peek() == Etc) {
-        range = true;
-        while (is.peek() == Etc) {
-          is.get();
-        }
-      } else {
-        typename T::value_type v;
-        R r;
-        r(is, v);
+					if (range) {
+						range = false;
+						fill_until(t, last, v);
+					}
+					t.emplace(v);
+					last = v;
+				}
 
-        if (range) {
-          range = false;
-          if (t.empty()) {
-            t.insert(Min);
-          }
-          auto vv = last_insert;
-          for (++vv; vv < v; ++vv) {
-            t.insert(vv);
-          }
-        }
-        t.insert(v);
-        last_insert = v;
-      }
+				die_unless(' ');
+			}
+			die_unless(Delim::close());
 
-      die_unless(is, ' ');
-    }
-    die_unless(is, Close);
+			if (range) {
+				fill_until(t, last, Range::upper());
+			}
+		}
 
-    if (range) {
-      if (t.empty()) {
-        t.insert(Min);
-      }
-      auto v = last_insert;
-      for (++v; v < Max; ++v) {
-        t.insert(v);
-      }
-    }
-  }
+	private:
+		void fill_until(T& t, typename T::value_type last, const typename T::value_type& v) const {
+			if (t.empty()) {
+				t.emplace(Range::lower());
+			}
+			for (++last; last <= v; ++last) {
+				t.emplace(last);
+			}	
+		}
 };
+
+#undef die_unless
+#undef die_outside
 
 } // namespace cpputil
 
