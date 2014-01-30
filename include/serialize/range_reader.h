@@ -31,7 +31,7 @@ namespace cpputil {
 		return; \
 	}
 
-#define die_outside(l,u) \
+#define die_outside(v, l,u) \
 	if (v < l || v > u) { \
 		is.setstate(std::ios::failbit); \
 		return; \
@@ -39,6 +39,14 @@ namespace cpputil {
 
 template <typename T, typename Range, typename Delim = TextDelim<>, typename Enable = void>
 struct RangeReader;
+
+template <typename T, typename Range, typename Delim>
+struct RangeReader<T, Range, Delim, typename std::enable_if<std::is_integral<T>::value>::type> {
+	void operator()(std::istream& is, T& t) const {
+		is >> t;
+		die_outside(t, Range::lower(), Range::upper());		
+	}
+};
 
 template <typename T, typename Range, typename Delim>
 class RangeReader<T, Range, Delim, typename std::enable_if<is_stl_sequence<T>::value>::type> {
@@ -59,7 +67,7 @@ class RangeReader<T, Range, Delim, typename std::enable_if<is_stl_sequence<T>::v
       } else {
         typename T::value_type v;
         TextReader<typename T::value_type, Delim>()(is, v);
-        die_outside(Range::lower(), Range::upper());
+        die_outside(v, Range::lower(), Range::upper());
 
         if (range) {
           range = false;
@@ -109,7 +117,7 @@ struct RangeReader<T, Range, Delim, typename std::enable_if<is_stl_set<T>::value
       } else {
         typename T::value_type v;
         TextReader<typename T::value_type, Delim>()(is, v);
-        die_outside(Range::lower(), Range::upper());
+        die_outside(v, Range::lower(), Range::upper());
 
         if (range) {
           range = false;

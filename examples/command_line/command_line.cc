@@ -23,10 +23,10 @@ using namespace std;
 
 auto& heading = Heading::create("Program-specific arguments");
 
-auto& i = ValueArg<int>::create("i")
+auto& i = ValueArg<int, RangeReader<int, Range<int, 1, 10>>>::create("i")
           .alternate("int")
-          .usage("<int>")
-          .default_val(10);
+          .usage("| 0 <= i <= 10")
+          .default_val(5);
 
 auto& s = ValueArg<string>::create("s")
           .alternate("str")
