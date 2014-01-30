@@ -16,6 +16,8 @@
 #include <vector>
 
 #include "include/command_line/command_line.h"
+#include "include/serialize/hex_reader.h"
+#include "include/serialize/hex_writer.h"
 #include "include/serialize/range_reader.h"
 
 using namespace cpputil;
@@ -27,6 +29,11 @@ auto& i = ValueArg<int, RangeReader<int, Range<int, 1, 10>>>::create("i")
           .alternate("int")
           .usage("| 0 <= i <= 10")
           .default_val(5);
+
+auto& h = ValueArg<uint64_t, HexReader<uint64_t, 4>, HexWriter<uint64_t, 4>>::create("j")
+					.alternate("hex")
+					.usage("0123 4567 89ab cdef")
+					.default_val(0);
 
 auto& s = ValueArg<string>::create("s")
           .alternate("str")
