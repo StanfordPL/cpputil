@@ -119,58 +119,58 @@ class DebugHandler {
   }
 
   static void sigsegv(int sig, siginfo_t* siginfo, void* context) {
-    std::cout << "SIGNAL: SIGSEGV" << std::endl;
-    std::cout << std::endl;
+    std::cerr << "SIGNAL: SIGSEGV" << std::endl;
+    std::cerr << std::endl;
 
-    std::cout << "Address: ";
-    HexWriter<uint64_t, 8>()(std::cout, (uint64_t) siginfo->si_addr);
-    std::cout << std::endl;
+    std::cerr << "Address: ";
+    HexWriter<uint64_t, 8>()(std::cerr, (uint64_t) siginfo->si_addr);
+    std::cerr << std::endl;
 
-    std::cout << "Cause: ";
+    std::cerr << "Cause: ";
     if (siginfo->si_code == SEGV_MAPERR) {
-      std::cout << "Address not mapped" << std::endl;
+      std::cerr << "Address not mapped" << std::endl;
     } else {
-      std::cout << "Bad permissions" << std::endl;
+      std::cerr << "Bad permissions" << std::endl;
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
-    write_cpu(std::cout, context);
+    write_cpu(std::cerr, context);
     exit(1);
   }
 
   static void sigill(int sig, siginfo_t* siginfo, void* context) {
-    std::cout << "SIGNAL: SIGILL" << std::endl;
-    std::cout << std::endl;
+    std::cerr << "SIGNAL: SIGILL" << std::endl;
+    std::cerr << std::endl;
 
-    std::cout << "Caused by: ";
+    std::cerr << "Caused by: ";
     switch (siginfo->si_code) {
       case ILL_ILLOPC:
-        std::cout << "Illegal opcode" << std::endl;
+        std::cerr << "Illegal opcode" << std::endl;
         break;
       case ILL_ILLOPN:
-        std::cout << "Illegal operand" << std::endl;
+        std::cerr << "Illegal operand" << std::endl;
         break;
       case ILL_ILLADR:
-        std::cout << "Illegal addressing mode" << std::endl;
+        std::cerr << "Illegal addressing mode" << std::endl;
         break;
       case ILL_PRVOPC:
-        std::cout << "Privileged opcode" << std::endl;
+        std::cerr << "Privileged opcode" << std::endl;
         break;
       case ILL_PRVREG:
-        std::cout << "Privileged register" << std::endl;
+        std::cerr << "Privileged register" << std::endl;
         break;
       case ILL_COPROC:
-        std::cout << "Coprocessor error" << std::endl;
+        std::cerr << "Coprocessor error" << std::endl;
         break;
       case ILL_BADSTK:
-        std::cout << "Bad stack" << std::endl;
+        std::cerr << "Bad stack" << std::endl;
         break;
       default:
-        std::cout << "<UNKNOWN>" << std::endl;
+        std::cerr << "<UNKNOWN>" << std::endl;
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
-    write_cpu(std::cout, context);
+    write_cpu(std::cerr, context);
     exit(1);
   }
 };
