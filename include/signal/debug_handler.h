@@ -18,12 +18,13 @@
 #include <cassert>
 #include <csignal>
 #include <cstring>
-#include <iomanip>
 #include <iostream>
 #include <stdint.h>
 #include <string>
 #include <sys/ucontext.h>
 #include <unistd.h>
+
+#include "include/serialize/hex_writer.h"
 
 namespace cpputil {
 
@@ -50,76 +51,71 @@ class DebugHandler {
     assert(sigaction(signum, &sa, 0) >= 0);
   }
 
-  static void print_quad(uint64_t val) {
-    for (int i = 7; i >= 0; --i) {
-      std::cout << std::hex << std::noshowbase;
-      std::cout	<< std::setfill('0') << std::setw(2);
-      std::cout << (((uint64_t)val >> (i * 8)) & 0x0ff) << " ";
-    }
+  static void write_reg(std::ostream& os, const std::string& reg, uint64_t val) {
+    os << reg << " = ";
+    HexWriter<uint64_t>()(os, val);
+    os << std::endl;
   }
 
-  static void print_reg(const std::string& reg, uint64_t val) {
-    std::cout << reg << " = ";
-    print_quad(val);
-    std::cout << std::endl;
-  }
-
-  static void print_mem(unsigned char* addr) {
+  static void write_mem(std::ostream& os, unsigned char* addr) {
     auto p = (uint64_t*)addr;
-    std::cout << std::hex << std::showbase << std::setfill('0') << p << ": ";
-    print_quad(*p);
-    std::cout << std::endl;
+
+		HexWriter<uint64_t,8>()(os, (uint64_t)p);
+		os << ": ";
+
+    HexWriter<uint64_t>()(os, *p);
+    os << std::endl;
   }
 
-  static void print_cpu(void* context) {
-    std::cout << "Register Contents:" << std::endl;
-    std::cout << std::endl;
+  static void write_cpu(std::ostream& os, void* context) {
+    os << "Register Contents:" << std::endl;
+    os << std::endl;
 
     const auto regs = ((ucontext_t*)context)->uc_mcontext.gregs;
 
-    print_reg("%rip", regs[REG_RIP]);
-    print_reg("%rfl", regs[REG_EFL]);
-    std::cout << std::endl;
+    write_reg(os, "%rip", regs[REG_RIP]);
+    write_reg(os, "%rfl", regs[REG_EFL]);
+    os << std::endl;
 
-    print_reg("%rax", regs[REG_RAX]);
-    print_reg("%rdx", regs[REG_RDX]);
-    print_reg("%rcx", regs[REG_RCX]);
-    print_reg("%rbx", regs[REG_RBX]);
-    print_reg("%rdi", regs[REG_RDI]);
-    print_reg("%rsi", regs[REG_RSI]);
-    print_reg("%rbp", regs[REG_RBP]);
-    print_reg("%rsp", regs[REG_RSP]);
-    print_reg("%r8 ", regs[REG_R8]);
-    print_reg("%r9 ", regs[REG_R9]);
-    print_reg("%r10", regs[REG_R10]);
-    print_reg("%r11", regs[REG_R11]);
-    print_reg("%r12", regs[REG_R12]);
-    print_reg("%r13", regs[REG_R13]);
-    print_reg("%r14", regs[REG_R14]);
-    print_reg("%r15", regs[REG_R15]);
-    std::cout << std::endl;
+    write_reg(os, "%rax", regs[REG_RAX]);
+    write_reg(os, "%rdx", regs[REG_RDX]);
+    write_reg(os, "%rcx", regs[REG_RCX]);
+    write_reg(os, "%rbx", regs[REG_RBX]);
+    write_reg(os, "%rdi", regs[REG_RDI]);
+    write_reg(os, "%rsi", regs[REG_RSI]);
+    write_reg(os, "%rbp", regs[REG_RBP]);
+    write_reg(os, "%rsp", regs[REG_RSP]);
+    write_reg(os, "%r8 ", regs[REG_R8]);
+    write_reg(os, "%r9 ", regs[REG_R9]);
+    write_reg(os, "%r10", regs[REG_R10]);
+    write_reg(os, "%r11", regs[REG_R11]);
+    write_reg(os, "%r12", regs[REG_R12]);
+    write_reg(os, "%r13", regs[REG_R13]);
+    write_reg(os, "%r14", regs[REG_R14]);
+    write_reg(os, "%r15", regs[REG_R15]);
+    os << std::endl;
 
     const auto ip = (unsigned char*)regs[REG_RIP];
     if (ip == 0) {
-      std::cout << "Unable to print memory in vicinity of %rip" << std::endl;
+      os << "Unable to print memory in vicinity of %rip" << std::endl;
       exit(1);
     }
 
-    std::cout << "Preceeding 64 bytes of %rip" << std::endl;
-    std::cout << std::endl;
+    os << "Preceeding 64 bytes of %rip" << std::endl;
+    os << std::endl;
 
     for (unsigned char* i = ip - 64; i < ip; i += 8) {
-      print_mem(i);
+      write_mem(os, i);
     }
-    std::cout << std::endl;
+    os << std::endl;
 
-    std::cout << "Next 128 bytes of %rip" << std::endl;
-    std::cout << std::endl;
+    os << "Next 128 bytes of %rip" << std::endl;
+    os << std::endl;
 
     for (unsigned char* i = ip; i < ip + 128; i += 8) {
-      print_mem(i);
+      write_mem(os, i);
     }
-    std::cout << std::endl;
+    os << std::endl;
   }
 
   static void sigsegv(int sig, siginfo_t* siginfo, void* context) {
@@ -127,8 +123,9 @@ class DebugHandler {
     std::cout << std::endl;
 
     std::cout << "Address: ";
-    std::cout << std::hex << std::showbase;
-    std::cout	<< (uint64_t) siginfo->si_addr << std::endl;
+		HexWriter<uint64_t, 8>()(std::cout, (uint64_t) siginfo->si_addr);
+		std::cout << std::endl;
+
     std::cout << "Cause: ";
     if (siginfo->si_code == SEGV_MAPERR) {
       std::cout << "Address not mapped" << std::endl;
@@ -137,7 +134,7 @@ class DebugHandler {
     }
     std::cout << std::endl;
 
-    print_cpu(context);
+    write_cpu(std::cout, context);
     exit(1);
   }
 
@@ -173,7 +170,7 @@ class DebugHandler {
     }
     std::cout << std::endl;
 
-    print_cpu(context);
+    write_cpu(std::cout, context);
     exit(1);
   }
 };
