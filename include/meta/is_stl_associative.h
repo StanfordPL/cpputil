@@ -46,7 +46,8 @@ struct is_stl_associative<const std::unordered_set<Key, Hash, Eq, Alloc>> : publ
         std::true_type { };
 
 template <typename Key, typename Hash, typename Eq, typename Alloc>
-struct is_stl_associative<std::unordered_multiset<Key, Hash, Eq, Alloc>> : public std::true_type { };
+struct is_stl_associative<std::unordered_multiset<Key, Hash, Eq, Alloc>> : public
+        std::true_type { };
 template <typename Key, typename Hash, typename Eq, typename Alloc>
 struct is_stl_associative<const std::unordered_multiset<Key, Hash, Eq, Alloc>> : public
         std::true_type { };

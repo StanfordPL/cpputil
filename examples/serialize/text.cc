@@ -71,29 +71,29 @@ struct TextReader<C, Delim> {
 int main() {
   C c {1, 'c', 2.0, "Hello"};
 
-	typedef vector<int> VI;
+  typedef vector<int> VI;
   VI vi {1, 2};
 
-	typedef vector<C> VC;
-	VC vc {c};
+  typedef vector<C> VC;
+  VC vc {c};
 
-	typedef list<VI> L;
+  typedef list<VI> L;
   L l {vi, vi};
 
-	typedef map<L, VC> M;
+  typedef map<L, VC> M;
   M m {{l, vc}};
 
-	typedef pair<M, short> P;
+  typedef pair<M, short> P;
   P p1 {m, 3};
 
   stringstream ss;
-	ss << p1;
+  ss << p1;
 
   P p2;
-	ss >> p2;
+  ss >> p2;
 
-	cout << p1 << endl;
-	cout << p2 << endl;
+  cout << p1 << endl;
+  cout << p2 << endl;
 
   return 0;
 };

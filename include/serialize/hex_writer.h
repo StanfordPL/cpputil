@@ -26,19 +26,19 @@ template <typename T, size_t Group = 2, typename Enable = void>
 struct HexWriter;
 
 template <typename T, size_t Group>
-struct HexWriter <T, Group, typename std::enable_if < std::is_integral<T>::value>::type> {
+struct HexWriter <T, Group, typename std::enable_if <std::is_integral<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
-		const auto f = os.flags(std::ios::hex);
-		os.unsetf(std::ios::showbase);
+    const auto f = os.flags(std::ios::hex);
+    os.unsetf(std::ios::showbase);
 
-		for (size_t i = bit_width<T>::value/4; i > 0; --i) {
-			if (i < bit_width<T>::value/4 && i % Group == 0) {
-				os << " ";
-			}
-			os << ((t >> (4*i-4)) & 0x0f);
-		}
+    for (size_t i = bit_width<T>::value / 4; i > 0; --i) {
+      if (i < bit_width<T>::value / 4 && i % Group == 0) {
+        os << " ";
+      }
+      os << ((t >> (4 * i - 4)) & 0x0f);
+    }
 
-		os.setf(f);
+    os.setf(f);
   }
 };
 

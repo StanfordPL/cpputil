@@ -25,7 +25,7 @@ template <typename T, typename Ignore = void>
 struct contained_type { };
 
 template <typename T>
-struct contained_type<T, typename std::enable_if<!is_stl_sequence<T>::value>::type {
+struct contained_type < T, typename std::enable_if < !is_stl_sequence<T>::value >::type {
   typedef T type;
 };
 

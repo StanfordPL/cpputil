@@ -38,7 +38,7 @@ template <typename T, typename Delim = TextDelim<>, typename Enable = void>
 struct TextReader;
 
 template <typename T, typename Delim>
-struct TextReader < T, Delim, typename std::enable_if < std::is_fundamental<T>::value>::type> {
+struct TextReader <T, Delim, typename std::enable_if <std::is_fundamental<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
     is >> t;
   }
@@ -57,7 +57,7 @@ struct TextReader<T, Delim, typename std::enable_if<is_stl_string<T>::value>::ty
 };
 
 template <typename T, typename Delim>
-struct TextReader<T, Delim, typename std::enable_if < is_stl_pair<T>::value>::type> {
+struct TextReader<T, Delim, typename std::enable_if <is_stl_pair<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
     die_unless(Delim::open());
     die_unless(' ');
@@ -91,7 +91,7 @@ struct TextReader<T, Delim, typename std::enable_if<is_stl_sequence<T>::value>::
 
 template <typename T, typename Delim>
 struct TextReader<T, Delim, typename std::enable_if<is_stl_set<T>::value>::type> {
-	void operator()(std::istream& is, T& t) const {
+  void operator()(std::istream& is, T& t) const {
     die_unless(Delim::open());
     die_unless(' ');
 
@@ -109,7 +109,7 @@ struct TextReader<T, Delim, typename std::enable_if<is_stl_set<T>::value>::type>
 
 template <typename T, typename Delim>
 struct TextReader<T, Delim, typename std::enable_if<is_stl_map<T>::value>::type> {
-	void operator()(std::istream& is, T& t) const {
+  void operator()(std::istream& is, T& t) const {
     die_unless(Delim::open());
     die_unless(' ');
 
@@ -126,29 +126,29 @@ struct TextReader<T, Delim, typename std::enable_if<is_stl_map<T>::value>::type>
 };
 
 template <typename T, typename Delim>
-class TextReader <T, Delim, typename std::enable_if < is_stl_tuple<T>::value>::type > {
-	public:
-		void operator()(std::istream& is, const T& t) const {
-			die_unless(Delim::open());
-			Helper<T, 0, std::tuple_size<T>::value>()(is, t);
-			die_unless(' ');
-			die_unless(Delim::close());
-		}
+class TextReader <T, Delim, typename std::enable_if <is_stl_tuple<T>::value>::type> {
+ public:
+  void operator()(std::istream& is, const T& t) const {
+    die_unless(Delim::open());
+    Helper<T, 0, std::tuple_size<T>::value>()(is, t);
+    die_unless(' ');
+    die_unless(Delim::close());
+  }
 
-	private:
-	template <typename Tuple, size_t Begin, size_t End>
-		struct Helper {
-			void operator()(std::istream& is, const Tuple& t) {
-				die_unless(' ');
-				TextReader<typename std::tuple_element<Begin, Tuple>::type, Delim>()(is, std::get<Begin>(t));
-				Helper<Tuple, Begin+1, End>()(is, t);
-			}	
-		};
+ private:
+  template <typename Tuple, size_t Begin, size_t End>
+  struct Helper {
+    void operator()(std::istream& is, const Tuple& t) {
+      die_unless(' ');
+      TextReader<typename std::tuple_element<Begin, Tuple>::type, Delim>()(is, std::get<Begin>(t));
+      Helper < Tuple, Begin + 1, End > ()(is, t);
+    }
+  };
 
-	template <typename Tuple, size_t End>
-		struct Helper<Tuple, End, End> {
-			void operator()(std::istream& is, const Tuple& t) { }
-		};
+  template <typename Tuple, size_t End>
+  struct Helper<Tuple, End, End> {
+    void operator()(std::istream& is, const Tuple& t) { }
+  };
 };
 
 #undef die_unless

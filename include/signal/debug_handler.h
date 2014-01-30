@@ -60,8 +60,8 @@ class DebugHandler {
   static void write_mem(std::ostream& os, unsigned char* addr) {
     auto p = (uint64_t*)addr;
 
-		HexWriter<uint64_t,8>()(os, (uint64_t)p);
-		os << ": ";
+    HexWriter<uint64_t, 8>()(os, (uint64_t)p);
+    os << ": ";
 
     HexWriter<uint64_t>()(os, *p);
     os << std::endl;
@@ -123,8 +123,8 @@ class DebugHandler {
     std::cout << std::endl;
 
     std::cout << "Address: ";
-		HexWriter<uint64_t, 8>()(std::cout, (uint64_t) siginfo->si_addr);
-		std::cout << std::endl;
+    HexWriter<uint64_t, 8>()(std::cout, (uint64_t) siginfo->si_addr);
+    std::cout << std::endl;
 
     std::cout << "Cause: ";
     if (siginfo->si_code == SEGV_MAPERR) {

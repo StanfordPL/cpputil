@@ -21,7 +21,7 @@
 namespace cpputil {
 
 template <typename T>
-struct bit_width : public std::integral_constant<int, -1> { };
+struct bit_width : public std::integral_constant < int, -1 > { };
 
 template <>
 struct bit_width<char> : public std::integral_constant<int, 8> { };

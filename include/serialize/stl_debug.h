@@ -23,17 +23,17 @@
 #include "include/serialize/text_writer.h"
 
 template <typename T>
-typename std::enable_if<cpputil::is_stl_container<T>::value, std::ostream&>::type 
-		operator<<(std::ostream& os, const T& t) {
-	cpputil::TextWriter<T>()(os, t);
-	return os;
+typename std::enable_if<cpputil::is_stl_container<T>::value, std::ostream&>::type
+operator<<(std::ostream& os, const T& t) {
+  cpputil::TextWriter<T>()(os, t);
+  return os;
 }
 
 template <typename T>
-typename std::enable_if<cpputil::is_stl_container<T>::value, std::istream&>::type 
-		operator>>(std::istream& is, T& t) {
-	cpputil::TextReader<T>()(is, t);
-	return is;
+typename std::enable_if<cpputil::is_stl_container<T>::value, std::istream&>::type
+operator>>(std::istream& is, T& t) {
+  cpputil::TextReader<T>()(is, t);
+  return is;
 }
 
 #endif

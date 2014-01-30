@@ -19,21 +19,21 @@ namespace cpputil {
 
 template <char Open = '{', char Close = '}', char Quote = '"', char Etc = '.'>
 struct TextDelim {
-	static constexpr char open() {
-		return Open;
-	}
+  static constexpr char open() {
+    return Open;
+  }
 
-	static constexpr char close() {
-		return Close;
-	}
+  static constexpr char close() {
+    return Close;
+  }
 
-	static constexpr char quote() {
-		return Quote;
-	}
+  static constexpr char quote() {
+    return Quote;
+  }
 
-	static constexpr char etc() {
-		return Etc;
-	}
+  static constexpr char etc() {
+    return Etc;
+  }
 };
 
 } // namespace cpputil

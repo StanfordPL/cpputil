@@ -25,17 +25,17 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-	auto p = make_pair(1, 2.0);
-	cout << p << endl;
+  auto p = make_pair(1, 2.0);
+  cout << p << endl;
 
-	vector<int> v { 1, 2, 3, 4, 5};
-	cout << v << endl;
+  vector<int> v { 1, 2, 3, 4, 5};
+  cout << v << endl;
 
-	map<int, char> m { {1,'a'}, {2,'b'} };
-	cout << m << endl;	
+  map<int, char> m { {1, 'a'}, {2, 'b'} };
+  cout << m << endl;
 
-	auto t = make_tuple(1, 2.0, "three", p, v, m);
-	cout << t << endl;
+  auto t = make_tuple(1, 2.0, "three", p, v, m);
+  cout << t << endl;
 
-	return 0;
+  return 0;
 }

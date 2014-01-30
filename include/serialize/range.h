@@ -17,17 +17,17 @@
 
 namespace cpputil {
 
-template <typename T, T Lower, T Upper> 
+template <typename T, T Lower, T Upper>
 struct Range {
-	typedef T value_type;
+  typedef T value_type;
 
-	static constexpr T lower() {
-		return Lower;
-	}
+  static constexpr T lower() {
+    return Lower;
+  }
 
-	static constexpr T upper() {
-		return Upper;
-	}
+  static constexpr T upper() {
+    return Upper;
+  }
 };
 
 } // namespace cpputil

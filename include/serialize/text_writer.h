@@ -32,22 +32,22 @@ template <typename T, typename Delim = TextDelim<>, typename Enable = void>
 struct TextWriter;
 
 template <typename T, typename Delim>
-struct TextWriter < T, Delim, typename std::enable_if < std::is_fundamental<T>::value>::type> {
+struct TextWriter <T, Delim, typename std::enable_if <std::is_fundamental<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
     os << t;
   }
 };
 
 template <typename T, typename Delim>
-struct TextWriter<T, Delim, 
-		typename std::enable_if<is_char_pointer<T>::value || is_stl_string<T>::value>::type> {
+struct TextWriter < T, Delim,
+    typename std::enable_if < is_char_pointer<T>::value || is_stl_string<T>::value >::type > {
   void operator()(std::ostream& os, const T& t) const {
     os << Delim::quote() << t << Delim::quote();
   }
 };
 
 template <typename T, typename Delim>
-struct TextWriter<T, Delim, typename std::enable_if < is_stl_pair<T>::value>::type> {
+struct TextWriter<T, Delim, typename std::enable_if <is_stl_pair<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
     os << Delim::open() << " ";
 
@@ -65,9 +65,9 @@ struct TextWriter < T, Delim,
   void operator()(std::ostream& os, const T& t) const {
     os << Delim::open();
 
-		for (auto& elem : t ) {
+    for (auto& elem : t) {
       os << " ";
-    	TextWriter<typename T::value_type, Delim>()(os, elem);
+      TextWriter<typename T::value_type, Delim>()(os, elem);
     }
 
     os << " " << Delim::close();
@@ -75,28 +75,28 @@ struct TextWriter < T, Delim,
 };
 
 template <typename T, typename Delim>
-class TextWriter <T, Delim, typename std::enable_if < is_stl_tuple<T>::value>::type > {
-	public:
-		void operator()(std::ostream& os, const T& t) const {
-			os << Delim::open();
-			Helper<T, 0, std::tuple_size<T>::value>()(os, t);
-			os << " " << Delim::close();
-		}
+class TextWriter <T, Delim, typename std::enable_if <is_stl_tuple<T>::value>::type> {
+ public:
+  void operator()(std::ostream& os, const T& t) const {
+    os << Delim::open();
+    Helper<T, 0, std::tuple_size<T>::value>()(os, t);
+    os << " " << Delim::close();
+  }
 
-	private:
-	template <typename Tuple, size_t Begin, size_t End>
-		struct Helper {
-			void operator()(std::ostream& os, const Tuple& t) {
-				os << " ";
-				TextWriter<typename std::tuple_element<Begin, Tuple>::type, Delim>()(os, std::get<Begin>(t));
-				Helper<Tuple, Begin+1, End>()(os, t);
-			}	
-		};
+ private:
+  template <typename Tuple, size_t Begin, size_t End>
+  struct Helper {
+    void operator()(std::ostream& os, const Tuple& t) {
+      os << " ";
+      TextWriter<typename std::tuple_element<Begin, Tuple>::type, Delim>()(os, std::get<Begin>(t));
+      Helper < Tuple, Begin + 1, End > ()(os, t);
+    }
+  };
 
-	template <typename Tuple, size_t End>
-		struct Helper<Tuple, End, End> {
-			void operator()(std::ostream& os, const Tuple& t) { }
-		};
+  template <typename Tuple, size_t End>
+  struct Helper<Tuple, End, End> {
+    void operator()(std::ostream& os, const Tuple& t) { }
+  };
 };
 
 } // namespace cpputil

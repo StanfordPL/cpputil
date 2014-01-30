@@ -33,14 +33,14 @@ auto& s = ValueArg<string>::create("s")
           .usage("\"...\"")
           .default_val("Hello, world");
 
-auto& v = ValueArg<vector<int>, RangeReader<vector<int>, Range<int,1,10>>>::create("v")
+auto& v = ValueArg<vector<int>, RangeReader<vector<int>, Range<int, 1, 10>>>::create("v")
           .alternate("vector")
           .usage("{ 1 2 3 }")
           .default_val({1, 2, 3});
 
-auto& sc = ValueArg<set<char>, RangeReader<set<char>, Range<char,'a','z'>>>::create("sc")
-            .usage("{ a b c }")
-            .default_val({'a', 'b', 'c'});
+auto& sc = ValueArg<set<char>, RangeReader<set<char>, Range<char, 'a', 'z'>>>::create("sc")
+           .usage("{ a b c }")
+           .default_val({'a', 'b', 'c'});
 
 int main(int argc, char** argv) {
   CommandLineConfig::strict_with_convenience(argc, argv);

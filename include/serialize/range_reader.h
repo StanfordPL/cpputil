@@ -42,101 +42,101 @@ struct RangeReader;
 
 template <typename T, typename Range, typename Delim>
 class RangeReader<T, Range, Delim, typename std::enable_if<is_stl_sequence<T>::value>::type> {
-	public:
-		void operator()(std::istream& is, T& t) const {
-			die_unless(Delim::open());
-			die_unless(' ');
+ public:
+  void operator()(std::istream& is, T& t) const {
+    die_unless(Delim::open());
+    die_unless(' ');
 
-			t.clear();
-			auto range = false;
+    t.clear();
+    auto range = false;
 
-			while (is.peek() != Delim::close()) {
-				if (is.peek() == Delim::etc()) {
-					range = true;
-					while (is.peek() == Delim::etc()) {
-						is.get();
-					}
-				} else {
-					typename T::value_type v;
-					TextReader<typename T::value_type, Delim>()(is, v);
-					die_outside(Range::lower(), Range::upper());
+    while (is.peek() != Delim::close()) {
+      if (is.peek() == Delim::etc()) {
+        range = true;
+        while (is.peek() == Delim::etc()) {
+          is.get();
+        }
+      } else {
+        typename T::value_type v;
+        TextReader<typename T::value_type, Delim>()(is, v);
+        die_outside(Range::lower(), Range::upper());
 
-					if (range) {
-						range = false;
-						fill_until(t, v);
-					}
-					t.emplace_back(v);
-				}
+        if (range) {
+          range = false;
+          fill_until(t, v);
+        }
+        t.emplace_back(v);
+      }
 
-				die_unless(' ');
-			}
-			die_unless(Delim::close());
+      die_unless(' ');
+    }
+    die_unless(Delim::close());
 
-			if (range) {
-				fill_until(t, Range::upper());
-			}
-		}
+    if (range) {
+      fill_until(t, Range::upper());
+    }
+  }
 
-	private:
-		void fill_until(T& t, const typename T::value_type& v) const {
-			if (t.empty()) {
-				t.emplace_back(Range::lower());
-			}
-			auto last = t.back();
-			for (++last; last <= v; ++last) {
-				t.emplace_back(last);
-			}	
-		}
+ private:
+  void fill_until(T& t, const typename T::value_type& v) const {
+    if (t.empty()) {
+      t.emplace_back(Range::lower());
+    }
+    auto last = t.back();
+    for (++last; last <= v; ++last) {
+      t.emplace_back(last);
+    }
+  }
 };
 
 template <typename T, typename Range, typename Delim>
 struct RangeReader<T, Range, Delim, typename std::enable_if<is_stl_set<T>::value>::type> {
-	public:
-		void operator()(std::istream& is, T& t) const {
-			die_unless(Delim::open());
-			die_unless(' ');
+ public:
+  void operator()(std::istream& is, T& t) const {
+    die_unless(Delim::open());
+    die_unless(' ');
 
-			t.clear();
-			auto range = false;
-			auto last = Range::lower();
+    t.clear();
+    auto range = false;
+    auto last = Range::lower();
 
-			while (is.peek() != Delim::close()) {
-				if (is.peek() == Delim::etc()) {
-					range = true;
-					while (is.peek() == Delim::etc()) {
-						is.get();
-					}
-				} else {
-					typename T::value_type v;
-					TextReader<typename T::value_type, Delim>()(is, v);
-					die_outside(Range::lower(), Range::upper());
+    while (is.peek() != Delim::close()) {
+      if (is.peek() == Delim::etc()) {
+        range = true;
+        while (is.peek() == Delim::etc()) {
+          is.get();
+        }
+      } else {
+        typename T::value_type v;
+        TextReader<typename T::value_type, Delim>()(is, v);
+        die_outside(Range::lower(), Range::upper());
 
-					if (range) {
-						range = false;
-						fill_until(t, last, v);
-					}
-					t.emplace(v);
-					last = v;
-				}
+        if (range) {
+          range = false;
+          fill_until(t, last, v);
+        }
+        t.emplace(v);
+        last = v;
+      }
 
-				die_unless(' ');
-			}
-			die_unless(Delim::close());
+      die_unless(' ');
+    }
+    die_unless(Delim::close());
 
-			if (range) {
-				fill_until(t, last, Range::upper());
-			}
-		}
+    if (range) {
+      fill_until(t, last, Range::upper());
+    }
+  }
 
-	private:
-		void fill_until(T& t, typename T::value_type last, const typename T::value_type& v) const {
-			if (t.empty()) {
-				t.emplace(Range::lower());
-			}
-			for (++last; last <= v; ++last) {
-				t.emplace(last);
-			}	
-		}
+ private:
+  void fill_until(T& t, typename T::value_type last, const typename T::value_type& v) const {
+    if (t.empty()) {
+      t.emplace(Range::lower());
+    }
+    for (++last; last <= v; ++last) {
+      t.emplace(last);
+    }
+  }
 };
 
 #undef die_unless

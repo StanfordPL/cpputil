@@ -33,20 +33,20 @@ template <typename T, size_t Group = 2, typename Enable = void>
 struct HexReader;
 
 template <typename T, size_t Group>
-struct HexReader < T, Group, typename std::enable_if < std::is_integral<T>::value>::type> {
+struct HexReader <T, Group, typename std::enable_if <std::is_integral<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-		t = 0;
+    t = 0;
 
-		for (size_t i = bit_width<T>::value/4; i > 0; --i) {
-			if (i < bit_width<T>::value/4 && i % Group == 0) {
-				die_if(is.get() != ' ');
-			} 
-			const auto c = is.get();
-			die_if(!isxdigit(c));
-	
-			const T temp = (c >= '0' && c <= '9') ? (c - '0') : (c - 'a' + 10);
-			t |= (temp << (4*i-4));
-		}
+    for (size_t i = bit_width<T>::value / 4; i > 0; --i) {
+      if (i < bit_width<T>::value / 4 && i % Group == 0) {
+        die_if(is.get() != ' ');
+      }
+      const auto c = is.get();
+      die_if(!isxdigit(c));
+
+      const T temp = (c >= '0' && c <= '9') ? (c - '0') : (c - 'a' + 10);
+      t |= (temp << (4 * i - 4));
+    }
   }
 };
 

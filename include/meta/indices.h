@@ -17,11 +17,11 @@
 
 namespace cpputil {
 
-template<size_t... Is> 
+template<size_t... Is>
 struct Indices {
-	static constexpr size_t size() {
-		return sizeof...(Is);
-	}
+  static constexpr size_t size() {
+    return sizeof...(Is);
+  }
 };
 
 template<size_t N, size_t... Is>
