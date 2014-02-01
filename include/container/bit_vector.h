@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_CONTAINER_BIT_ARRAY_H
-#define CPPUTIL_INCLUDE_CONTAINER_BIT_ARRAY_H
+#ifndef CPPUTIL_INCLUDE_CONTAINER_BIT_VECTOR_H
+#define CPPUTIL_INCLUDE_CONTAINER_BIT_VECTOR_H
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <immintrin.h>
 #include <stdint.h>
+#include <vector>
 #include <xmmintrin.h>
 
 namespace cpputil {
@@ -32,127 +32,157 @@ namespace cpputil {
 	#define ALIGN
 #endif
 
-template <size_t N>
-class ALIGN BitArray : public std::array<uint8_t, N> {
+class ALIGN BitVector : public std::vector<uint8_t> {
 	public:
 		// Inherit constructors
-		using std::array<uint8_t, N>::array;
+		using std::vector<uint8_t>::vector;
+
+    /** Resizes this BitVector to contain n fixed bytes. */
+    void resize_for_fixed_bytes(size_t n) {
+			resize(n);
+		}
+
+    /** Resizes this BitVector to contain n fixed words. */
+    void resize_for_fixed_words(size_t n) {
+			resize(n*2);
+		}
+
+    /** Resizes this BitVector to contain n fixed doubles. */
+    void resize_for_fixed_doubles(size_t n) {
+			resize(n*4);
+		}
+
+    /** Resizes this BitVector to contain n fixed quads. */
+    void resize_for_fixed_quads(size_t n) {
+			resize(n*8);
+		}
+
+    /** Resizes this BitVector to contain n float singles. */
+    void resize_for_float_singles(size_t n) {
+			resize(n*4);
+		}
+
+    /** Resizes this BitVector to contain n float doubles. */
+    void resize_for_float_doubles(size_t n) {
+			resize(n*8);
+		}
 
 		/** Returns the number of bytes in this array. */
-		constexpr size_t num_fixed_bytes() {
-			return N;
+		size_t num_fixed_bytes() const {
+			return size();
 		}
 
 		/** Returns the number of words in this array. */
-		constexpr size_t num_fixed_words() {
-			return N / 2;
+		size_t num_fixed_words() const {
+			return size() / 2;
 		}
 
 		/** Returns the number of doubles in this array. */
-		constexpr size_t num_fixed_doubles() {
-			return N / 4;
+		size_t num_fixed_doubles() const {
+			return size() / 4;
 		}
 
 		/** Returns the number of quads in this array. */
-		constexpr size_t num_fixed_quads() {
-			return N / 8;
+		size_t num_fixed_quads() const {
+			return size() / 8;
 		}
 
 		/** Returns the number of floats in this array. */
-		constexpr size_t num_float_singles() {
-			return N / 4;
+		size_t num_float_singles() const {
+			return size() / 4;
 		}
 
 		/** Returns the number of doubles in this array. */
-		constexpr size_t num_float_doubles() {
-			return N / 8;
+		size_t num_float_doubles() const {
+			return size() / 8;
 		}
 
 		/** Returns a fixed point byte value. */
 		uint8_t& get_fixed_byte(size_t i) {
 			assert(i < num_fixed_bytes());
-			return ((uint8_t*) this->begin())[i];
+			return ((uint8_t*) &*begin())[i];
 		}
 
 		/** Returns a fixed point word value. */
 		uint16_t& get_fixed_word(size_t i) {
 			assert(i < num_fixed_words());
-			return ((uint16_t*) this->begin())[i];
+			return ((uint16_t*) &*begin())[i];
 		}
 
 		/** Returns a fixed point double value. */
 		uint32_t& get_fixed_double(size_t i) {
 			assert(i < num_fixed_doubles());
-			return ((uint32_t*) this->begin())[i];
+			return ((uint32_t*) &*begin())[i];
 		}
 
 		/** Returns a fixed point quad value. */
 		uint64_t& get_fixed_quad(size_t i) {
 			assert(i < num_fixed_quads());
-			return ((uint64_t*) this->begin())[i];
+			return ((uint64_t*) &*begin())[i];
 		}
 
 		/** Returns a single precision floating point value. */
 		float& get_float_single(size_t i) {
 			assert(i < num_float_singles());
-			return ((float*) this->begin())[i];
+			return ((float*) &*begin())[i];
 		}
 
 		/** Returns a double precision floating point value. */
 		double& get_float_double(size_t i) {
 			assert(i < num_float_doubles());
-			return ((double*) this->begin())[i];
+			return ((double*) &*begin())[i];
 		}
 
 		/** Returns a const fixed point byte value. */
 		uint8_t get_fixed_byte(size_t i) const {
 			assert(i < num_fixed_bytes());
-			return ((uint8_t*) this->begin())[i];
+			return ((uint8_t*) &*begin())[i];
 		}
 
 		/** Returns a const fixed point word value. */
 		uint16_t get_fixed_word(size_t i) const {
 			assert(i < num_fixed_words());
-			return ((uint16_t*) this->begin())[i];
+			return ((uint16_t*) &*begin())[i];
 		}
 
 		/** Returns a const fixed point double value. */
 		uint32_t get_fixed_double(size_t i) const {
 			assert(i < num_fixed_doubles());
-			return ((uint32_t*) this->begin())[i];
+			return ((uint32_t*) &*begin())[i];
 		}
 
 		/** Returns a const fixed point quad value. */
 		uint64_t get_fixed_quad(size_t i) const {
 			assert(i < num_fixed_quads());
-			return ((uint64_t*) this->begin())[i];
+			return ((uint64_t*) &*begin())[i];
 		}
 
 		/** Returns a const single precision floating point value. */
 		float get_float_single(size_t i) const {
 			assert(i < num_float_singles());
-			return ((float*) this->begin())[i];
+			return ((float*) &*begin())[i];
 		}
 
 		/** Returns a const double precision floating point value. */
 		double get_float_double(size_t i) const {
 			assert(i < num_float_doubles());
-			return ((double*) this->begin())[i];
+			return ((double*) &*begin())[i];
 		}
 
-    /** Bit-wise and. */
-		BitArray& operator&=(const BitArray& rhs) {
+    /** Bit-wise and for as many bytes as possible. */
+		BitVector& operator&=(const BitVector& rhs) {
+			const auto n = std::min(size(), rhs.size());
 			auto i = 0;
-
+			
       #if defined(__AVX2__) && defined(__AVX__)
-			for ( ; i+32 <= N ; i += 32 ) {
+			for ( ; i+32 <= n; i += 32 ) {
 				auto x = _mm256_load_si256((__m256i*) &(*this)[i]);
 				auto y = _mm256_load_si256((__m256i*) &rhs[i]);
 				x = _mm256_and_si256(x,y);
 				_mm256_store_si256((__m256i*)(&(*this)[i], x);
 			}
       #elif defined(__AVX__)
-			for ( ; i+16 <= N ; i += 16 ) {
+			for ( ; i+16 <= n; i += 16 ) {
 				auto x = _mm_load_si128((__m128i*) &(*this)[i]);
 				auto y = _mm_load_si128((__m128i*) &rhs[i]);
 				x = _mm_and_si128(x,y);
@@ -160,47 +190,48 @@ class ALIGN BitArray : public std::array<uint8_t, N> {
 			}
       #endif
 
-			for ( ; i+8 <= N; i += 8 ) {
+			for ( ; i+8 <= n; i += 8 ) {
 				get_fixed_quad(i/8) &= rhs.get_fixed_quad(i/8);
 			}
-			for ( ; i+4 <= N; i += 4 ) {
+			for ( ; i+4 <= n; i += 4 ) {
 				get_fixed_double(i/4) &= rhs.get_fixed_double(i/4);
 			} 
-			for ( ; i+2 <= N; i += 2 ) {
+			for ( ; i+2 <= n; i += 2 ) {
 				get_fixed_word(i/2) &= rhs.get_fixed_word(i/2);
 			}
-			if ( i < N ) {
+			if ( i < n ) {
 				get_fixed_byte(i) &= rhs.get_fixed_byte(i);
 			}
 
 			return *this;
 		}
 
-    /** Bit-wise and. */
-    BitArray operator&(const BitArray& rhs) const {
+    /** Bit-wise and for as many bytes as possible. */
+    BitVector operator&(const BitVector& rhs) const {
 			auto ret = *this;
 			return ret += rhs;
 		}
 
-    /** Bit-wise and. */
-    BitArray operator&(BitArray&& rhs) const {
-			auto ret = BitArray(std::move(rhs));
+    /** Bit-wise and for as many bytes as possible. */
+    BitVector operator&(BitVector&& rhs) const {
+			auto ret = BitVector(std::move(rhs));
 			return ret += *this;
 		}
 
-    /** Bit-wise or. */
-    BitArray& operator|=(const BitArray& rhs) {
+    /** Bit-wise or for as many bytes as possible. */
+    BitVector& operator|=(const BitVector& rhs) {
+			const auto n = std::min(size(), rhs.size());
 			auto i = 0;
 
       #if defined(__AVX2__) && defined(__AVX__)
-			for ( ; i+32 <= N ; i += 32 ) {
+			for ( ; i+32 <= n; i += 32 ) {
 				auto x = _mm256_load_si256((__m256i*) &(*this)[i]);
 				auto y = _mm256_load_si256((__m256i*) &rhs[i]);
 				x = _mm256_or_si256(x,y);
 				_mm256_store_si256((__m256i*)(&(*this)[i], x);
 			}
       #elif defined(__AVX__)
-			for ( ; i+16 <= N ; i += 16 ) {
+			for ( ; i+16 <= n; i += 16 ) {
 				auto x = _mm_load_si128((__m128i*) &(*this)[i]);
 				auto y = _mm_load_si128((__m128i*) &rhs[i]);
 				x = _mm_or_si128(x,y);
@@ -208,47 +239,48 @@ class ALIGN BitArray : public std::array<uint8_t, N> {
 			}
       #endif
 
-			for ( ; i+8 <= N; i += 8 ) {
+			for ( ; i+8 <= n; i += 8 ) {
 				get_fixed_quad(i/8) |= rhs.get_fixed_quad(i/8);
 			}
-			for ( ; i+4 <= N; i += 4 ) {
+			for ( ; i+4 <= n; i += 4 ) {
 				get_fixed_double(i/4) |= rhs.get_fixed_double(i/4);
 			} 
-			for ( ; i+2 <= N; i += 2 ) {
+			for ( ; i+2 <= n; i += 2 ) {
 				get_fixed_word(i/2) |= rhs.get_fixed_word(i/2);
 			}
-			if ( i < N ) {
+			if ( i < n ) {
 				get_fixed_byte(i) |= rhs.get_fixed_byte(i);
 			}
 
 			return *this;
 		}
 
-    /** Bit-wise or. */
-    BitArray operator|(const BitArray& rhs) const {
+    /** Bit-wise or for as many bytes as possible. */
+    BitVector operator|(const BitVector& rhs) const {
 			auto ret = *this;
 			return ret |= rhs;
 		}
 
-    /** Bit-wise or. */
-    BitArray operator|(BitArray&& rhs) const {
-			auto ret = BitArray(std::move(rhs));
+    /** Bit-wise or for as many bytes as possible. */
+    BitVector operator|(BitVector&& rhs) const {
+			auto ret = BitVector(std::move(rhs));
 			return ret |= *this;
 		}
 
-    /** Bit-wise xor. */
-    BitArray& operator^=(const BitArray& rhs) {
+    /** Bit-wise xor for as many bytes as possible. */
+    BitVector& operator^=(const BitVector& rhs) {
+			const auto n = std::min(size(), rhs.size());
 			auto i = 0;
 
       #if defined(__AVX2__) && defined(__AVX__)
-			for ( ; i+32 <= N ; i += 32 ) {
+			for ( ; i+32 <= n ; i += 32 ) {
 				auto x = _mm256_load_si256((__m256i*) &(*this)[i]);
 				auto y = _mm256_load_si256((__m256i*) &rhs[i]);
 				x = _mm256_xor_si256(x,y);
 				_mm256_store_si256((__m256i*)(&(*this)[i], x);
 			}
       #elif defined(__AVX__)
-			for ( ; i+16 <= N ; i += 16 ) {
+			for ( ; i+16 <= n ; i += 16 ) {
 				auto x = _mm_load_si128((__m128i*) &(*this)[i]);
 				auto y = _mm_load_si128((__m128i*) &rhs[i]);
 				x = _mm_xor_si128(x,y);
@@ -256,51 +288,51 @@ class ALIGN BitArray : public std::array<uint8_t, N> {
 			}
       #endif
 
-			for ( ; i+8 <= N; i += 8 ) {
+			for ( ; i+8 <= n; i += 8 ) {
 				get_fixed_quad(i/8) ^= rhs.get_fixed_quad(i/8);
 			}
-			for ( ; i+4 <= N; i += 4 ) {
+			for ( ; i+4 <= n; i += 4 ) {
 				get_fixed_double(i/4) ^= rhs.get_fixed_double(i/4);
 			} 
-			for ( ; i+2 <= N; i += 2 ) {
+			for ( ; i+2 <= n; i += 2 ) {
 				get_fixed_word(i/2) ^= rhs.get_fixed_word(i/2);
 			}
-			if ( i < N ) {
+			if ( i < n ) {
 				get_fixed_byte(i) ^= rhs.get_fixed_byte(i);
 			}
 
 			return *this;
 		}
 
-    /** Bit-wise xor. */
-    BitArray operator^(const BitArray& rhs) const {
+    /** Bit-wise xor for as many bytes as possible. */
+    BitVector operator^(const BitVector& rhs) const {
 			auto ret = *this;
 			return ret ^= rhs;
 		}
 
-    /** Bit-wise xor. */
-    BitArray operator^(BitArray&& rhs) const {
-			auto ret = BitArray(std::move(rhs));
+    /** Bit-wise xor for as many bytes as possible. */
+    BitVector operator^(BitVector&& rhs) const {
+			auto ret = BitVector(std::move(rhs));
 			return ret ^= *this;
 		}
 
     /** Bit-wise not. */
-    BitArray operator~() const {
+    BitVector operator~() const {
 			auto ret = *this;
 			auto i = 0;
 
 			// Any good ideas for how to vectorize this effectively?
 
-			for ( ; i+8 <= N; i += 8 ) {
+			for ( ; i+8 <= size(); i += 8 ) {
 				ret.get_fixed_quad(i/8) = ~ret.get_fixed_quad(i/8);
 			}
-			for ( ; i+4 <= N; i += 4 ) {
+			for ( ; i+4 <= size(); i += 4 ) {
 				ret.get_fixed_double(i/4) = ~ret.get_fixed_double(i/4);
 			} 
-			for ( ; i+2 <= N; i += 2 ) {
+			for ( ; i+2 <= size(); i += 2 ) {
 				ret.get_fixed_word(i/2) = ~ret.get_fixed_word(i/2);
 			}
-			if ( i < N ) {
+			if ( i < size() ) {
 				ret.get_fixed_byte(i) = ~ret.get_fixed_byte(i);
 			}
 
@@ -308,13 +340,24 @@ class ALIGN BitArray : public std::array<uint8_t, N> {
 		}
 
 		/** Concatenation. */
-		template <size_t M>
-		BitArray<N+M> operator+(const BitArray<M>& rhs) const {
-			BitArray<N+M> ret;
-			std::copy(this->begin(), this->end(), ret.begin());
-			std::copy(rhs.begin(), rhs.end(), ret.begin()+N);
+		BitVector& operator+=(const BitVector& rhs) {
+			const auto n = size();
+			resize(n + rhs.size());
+			std::copy(rhs.begin(), rhs.end(), begin()+n);
 
-			return ret;
+			return *this;
+		}
+
+		/** Concatenation. */
+		BitVector operator+(const BitVector& rhs) {
+			auto ret = *this;
+			return ret += rhs;
+		}
+
+		/** Concatenation. */
+		BitVector operator+(BitVector&& rhs) {
+			auto ret = BitVector(std::move(rhs));
+			return ret += *this;
 		}
 };
 

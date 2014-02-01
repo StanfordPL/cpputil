@@ -21,6 +21,7 @@ LIB =
 EX  = command_line/command_line \
 			container/bijection \
 			container/bit_array \
+			container/bit_vector \
 			container/maputil \
 			container/tokenizer \
 			io/column \
