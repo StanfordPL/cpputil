@@ -66,6 +66,11 @@ class basic_ifilterbuf : public std::basic_streambuf<Ch, Tr> {
   F filter_;
 };
 
+template <typename T>
+using ifilterbuf = basic_ifilterbuf<T, char, std::char_traits<char>>;
+template <typename T>
+using wifilterbuf = basic_ifilterbuf<T, wchar_t, std::char_traits<wchar_t>>;
+
 template <typename F, typename Ch, typename Tr>
 class basic_ofilterbuf : public std::basic_streambuf<Ch, Tr> {
  public:
@@ -97,6 +102,10 @@ class basic_ofilterbuf : public std::basic_streambuf<Ch, Tr> {
   F filter_;
 };
 
+template <typename T>
+using ofilterbuf = basic_ofilterbuf<T, char, std::char_traits<char>>;
+template <typename T>
+using wofilterbuf = basic_ofilterbuf<T, wchar_t, std::char_traits<wchar_t>>;
 
 } // namespace cpputil
 

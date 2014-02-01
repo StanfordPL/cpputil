@@ -73,6 +73,9 @@ class basic_redirectbuf : public std::basic_streambuf<Ch, Tr> {
   std::basic_streambuf<Ch, Tr>* buf_;
 };
 
+typedef basic_redirectbuf<char, std::char_traits<char>> redirectbuf;
+typedef basic_redirectbuf<wchar_t, std::char_traits<wchar_t>> wredirectbuf;
+
 } // namespace cpputil
 
 #endif

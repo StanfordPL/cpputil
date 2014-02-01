@@ -20,8 +20,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 namespace cpputil {
 
 class Column {

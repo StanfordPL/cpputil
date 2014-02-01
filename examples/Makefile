@@ -39,7 +39,8 @@ EX  = command_line/command_line \
 			serialize/hex \
 			serialize/stl_debug \
 			serialize/text \
-			signal/debug_handler
+			signal/debug_handler \
+			system/terminal
 
 ##### TOP LEVEL TARGETS
 

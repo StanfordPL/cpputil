@@ -70,6 +70,9 @@ class basic_multibuf : public std::basic_streambuf<Ch, Tr> {
   std::unordered_set<std::basic_streambuf<Ch, Tr>*> bufs_;
 };
 
+typedef basic_multibuf<char, std::char_traits<char>> multibuf;
+typedef basic_multibuf<wchar_t, std::char_traits<wchar_t>> wmultibuf;
+
 } // namespace cpputil
 
 #endif
