@@ -20,6 +20,7 @@ INC = -I../
 LIB = 
 EX  = command_line/command_line \
 			container/bijection \
+			container/bit_array \
 			container/maputil \
 			container/tokenizer \
 			io/column \
