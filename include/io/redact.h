@@ -36,7 +36,7 @@ class Redact {
   }
 
   void operator()(std::streambuf* sb, char c) {
-    sb->sputc(on_ && !isspace(c) ? 'x' : c);
+    sb->sputc(on_ && isgraph(c) ? 'x' : c);
   }
 
  private:

@@ -32,6 +32,7 @@ EX  = command_line/command_line \
 			io/redirectstream \
 			io/shunt \
 			io/nopstream \
+			io/wrap \
 			lazy/thunk \
 			memory/interner \
 			meta/indices \
