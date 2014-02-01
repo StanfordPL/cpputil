@@ -32,40 +32,40 @@ class Wrap {
   }
 
   void operator()(std::streambuf* sb, char c) {
-		if (isgraph(c)) {
-			word_ += c;
-		} else {
-			const auto next = current_ + word_.length();
-			const auto space = isblank(c);
+    if (isgraph(c)) {
+      word_ += c;
+    } else {
+      const auto next = current_ + word_.length();
+      const auto space = isblank(c);
 
-			if (next < limit_) {
-				write(sb, word_);
-				sb->sputc(c);
-				current_ = space ? current_ + word_.length() + 1 : 0;
-			} else if ( next == limit_ ) {
-				write(sb, word_);
-				sb->sputc('\n');
-				current_  = 0;
-			} else {
-				sb->sputc('\n');
-				write(sb, word_);
-				sb->sputc(c);
-				current_ = word_.length() + (space ? 1 : 0);
-			}
-			word_ = "";
-		}
+      if (next < limit_) {
+        write(sb, word_);
+        sb->sputc(c);
+        current_ = space ? current_ + word_.length() + 1 : 0;
+      } else if (next == limit_) {
+        write(sb, word_);
+        sb->sputc('\n');
+        current_  = 0;
+      } else {
+        sb->sputc('\n');
+        write(sb, word_);
+        sb->sputc(c);
+        current_ = word_.length() + (space ? 1 : 0);
+      }
+      word_ = "";
+    }
   }
 
  private:
   size_t limit_;
-	size_t current_;
-	std::string word_;
+  size_t current_;
+  std::string word_;
 
-	void write(std::streambuf* sb, const std::string& word) {
-		for ( auto l : word ) {
-			sb->sputc(l);
-		}
-	}
+  void write(std::streambuf* sb, const std::string& word) {
+    for (auto l : word) {
+      sb->sputc(l);
+    }
+  }
 };
 
 } // namespace cpputil

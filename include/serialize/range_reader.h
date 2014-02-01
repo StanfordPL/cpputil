@@ -42,10 +42,10 @@ struct RangeReader;
 
 template <typename T, typename Range, typename Delim>
 struct RangeReader<T, Range, Delim, typename std::enable_if<std::is_integral<T>::value>::type> {
-	void operator()(std::istream& is, T& t) const {
-		is >> t;
-		die_outside(t, Range::lower(), Range::upper());		
-	}
+  void operator()(std::istream& is, T& t) const {
+    is >> t;
+    die_outside(t, Range::lower(), Range::upper());
+  }
 };
 
 template <typename T, typename Range, typename Delim>

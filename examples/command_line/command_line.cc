@@ -31,9 +31,9 @@ auto& i = ValueArg<int, RangeReader<int, Range<int, 1, 10>>>::create("i")
           .default_val(5);
 
 auto& h = ValueArg<uint64_t, HexReader<uint64_t, 4>, HexWriter<uint64_t, 4>>::create("j")
-					.alternate("hex")
-					.usage("0123 4567 89ab cdef")
-					.default_val(0);
+          .alternate("hex")
+          .usage("0123 4567 89ab cdef")
+          .default_val(0);
 
 auto& s = ValueArg<string>::create("s")
           .alternate("str")

@@ -26,35 +26,35 @@
 namespace cpputil {
 
 class Terminal : public std::ostream {
-	private:
-		struct Filter {
-			Filter() : result_(-1) { }
+ private:
+  struct Filter {
+    Filter() : result_(-1) { }
 
-			void operator()(std::streambuf* sb, char c) {
-				if ( c == '\n' ) {
-					auto strbuf = (std::stringbuf*) sb;
-					result_ = system(strbuf->str().c_str());
-					strbuf->str(std::string());
-				} else {
-					sb->sputc(c);
-				}
-			}
-			
-			int result_;
-		};
+    void operator()(std::streambuf* sb, char c) {
+      if (c == '\n') {
+        auto strbuf = (std::stringbuf*) sb;
+        result_ = system(strbuf->str().c_str());
+        strbuf->str(std::string());
+      } else {
+        sb->sputc(c);
+      }
+    }
 
-	public:
-		Terminal() : std::ostream(&buf_), buf_(&strbuf_) { }
+    int result_;
+  };
 
-		virtual ~Terminal() { }
+ public:
+  Terminal() : std::ostream(&buf_), buf_(&strbuf_) { }
 
-		int result() {
-			return buf_.filter().result_;
-		}
+  virtual ~Terminal() { }
 
-	private:
-		std::stringbuf strbuf_;
-		ofilterbuf<Filter> buf_;	
+  int result() {
+    return buf_.filter().result_;
+  }
+
+ private:
+  std::stringbuf strbuf_;
+  ofilterbuf<Filter> buf_;
 };
 
 } // namespace cpputil

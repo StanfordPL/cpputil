@@ -20,14 +20,14 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-	Terminal term;
-	term << "sleep " << (1+2);
+  Terminal term;
+  term << "sleep " << (1 + 2);
 
-	cout << "Hello, world!" << endl;
-	term << endl;
+  cout << "Hello, world!" << endl;
+  term << endl;
 
-	term << "echo \"Goodbye, world!\"" << endl;
+  term << "echo \"Goodbye, world!\"" << endl;
 
-	return 0;
+  return 0;
 }
 
