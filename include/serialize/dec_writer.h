@@ -26,9 +26,9 @@ struct DecWriter;
 template <typename T>
 struct DecWriter <T, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
-		const auto f = os.flags(std::ios::dec);
-		os << t;
-		os.setf(f);
+    const auto f = os.flags(std::ios::dec);
+    os << t;
+    os.setf(f);
   }
 };
 

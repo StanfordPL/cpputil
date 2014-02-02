@@ -36,11 +36,11 @@ struct TextWriter;
 template <typename T, typename Style>
 struct TextWriter <T, Style, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
-		if ( Style::dec() ) {
-			DecWriter<T>()(os, t);
-		} else {
-			HexWriter<T, Style::hex_group()>()(os, t);
-		}
+    if (Style::dec()) {
+      DecWriter<T>()(os, t);
+    } else {
+      HexWriter<T, Style::hex_group()>()(os, t);
+    }
   }
 };
 

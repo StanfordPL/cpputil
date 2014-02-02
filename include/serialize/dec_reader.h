@@ -26,7 +26,7 @@ struct DecReader;
 template <typename T>
 struct DecReader <T, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-		is >> t;
+    is >> t;
   }
 };
 

@@ -42,11 +42,11 @@ struct TextReader;
 template <typename T, typename Style>
 struct TextReader <T, Style, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-		if ( Style::dec() ) {
-			DecReader<T>()(is, t);
-		} else {
-			HexReader<T, Style::hex_group()>()(is, t);
-		}
+    if (Style::dec()) {
+      DecReader<T>()(is, t);
+    } else {
+      HexReader<T, Style::hex_group()>()(is, t);
+    }
   }
 };
 

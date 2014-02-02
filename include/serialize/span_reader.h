@@ -75,7 +75,7 @@ class SpanReader<T, Range, Style, typename std::enable_if<is_stl_sequence<T>::va
 
     if (range) {
       fill_until(t, Range::upper());
-			t.emplace_back(Range::upper());
+      t.emplace_back(Range::upper());
     }
   }
 
@@ -127,7 +127,7 @@ struct SpanReader<T, Range, Style, typename std::enable_if<is_stl_set<T>::value>
 
     if (range) {
       fill_until(t, last, Range::upper());
-			t.emplace(Range::upper());
+      t.emplace(Range::upper());
     }
   }
 

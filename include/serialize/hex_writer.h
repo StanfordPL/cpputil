@@ -36,7 +36,7 @@ struct HexWriter <T, Group, typename std::enable_if <std::is_arithmetic<T>::valu
         os << " ";
       }
 
-			os << ((((uint8_t*) &t)[(i-1)/2] >> (i % 2 == 0 ? 4 : 0)) & 0x0f);
+      os << ((((uint8_t*) &t)[(i - 1) / 2] >> (i % 2 == 0 ? 4 : 0)) & 0x0f);
     }
 
     os.setf(f);

@@ -51,11 +51,11 @@ auto& sc = ValueArg<set<char>, SpanReader<set<char>, Range<char, 'a', 'z'>>>::cr
            .usage("{ a b c }")
            .default_val({'a', 'b', 'c'});
 
-auto& vh = ValueArg<vector<int>, 
-	                  SpanReader<vector<int>, Range<int, 0, 32>, TextStyle<false>>,
-										TextWriter<vector<int>, TextStyle<false>>>::create("vh")
-					 .usage("{ 00000000 00000001 ... }")
-					 .default_val({0, 1, 2});
+auto& vh = ValueArg<vector<int>,
+      SpanReader<vector<int>, Range<int, 0, 32>, TextStyle<false>>,
+      TextWriter<vector<int>, TextStyle<false>>>::create("vh")
+      .usage("{ 00000000 00000001 ... }")
+      .default_val({0, 1, 2});
 
 int main(int argc, char** argv) {
   CommandLineConfig::strict_with_convenience(argc, argv);

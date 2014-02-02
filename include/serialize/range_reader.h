@@ -30,10 +30,10 @@ struct RangeReader;
 template <typename T, typename Range, typename Style>
 struct RangeReader<T, Range, Style, typename std::enable_if<std::is_arithmetic<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-		TextReader<T, Style>()(is, t);
-		if ( t < Range::lower() || t > Range::upper() ) {
-			is.setstate(std::ios::failbit); 
-		}
+    TextReader<T, Style>()(is, t);
+    if (t < Range::lower() || t > Range::upper()) {
+      is.setstate(std::ios::failbit);
+    }
   }
 };
 

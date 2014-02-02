@@ -17,16 +17,16 @@
 
 namespace cpputil {
 
-template <char Dec = true, size_t HexGroup = 8, 
-				  char Open = '{', char Close = '}', char Quote = '"', char Etc = '.'>
+template <char Dec = true, size_t HexGroup = 8,
+          char Open = '{', char Close = '}', char Quote = '"', char Etc = '.'>
 struct TextStyle {
-	static constexpr bool dec() {
-		return Dec;
-	}
+  static constexpr bool dec() {
+    return Dec;
+  }
 
-	static constexpr size_t hex_group() {
-		return HexGroup;
-	}
+  static constexpr size_t hex_group() {
+    return HexGroup;
+  }
 
   static constexpr char open() {
     return Open;
