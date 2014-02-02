@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include "include/io/filterstream.h"
+#include "include/io/column.h"
 #include "include/io/wrap.h"
 
 using namespace cpputil;
@@ -30,9 +31,28 @@ const char* s = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, "
                 "deserunt mollit anim id est laborum.";
 
 int main() {
-  ofilterstream<Wrap> os(cout);
-  os.filter().limit(20);
-  os << s << endl;
+	ofilterstream<Column> col(cout);
+	col.filter().padding(5);
+
+  ofilterstream<Wrap> wrap(col);
+
+  wrap.filter().limit(20);
+	wrap << "Width = 20" << endl;
+	wrap << endl;
+  wrap << s << endl;
+	col.filter().next();
+
+	wrap.filter().limit(40);
+	wrap << "Width = 40" << endl;
+	wrap << endl;
+	wrap << s << endl;
+	col.filter().next();
+
+	wrap.filter().limit(80);
+	wrap << "Width = 80" << endl;
+	wrap << endl;
+	wrap << s << endl;
+	col.filter().done();
 
   return 0;
 }
