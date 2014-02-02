@@ -23,7 +23,11 @@
 #include <vector>
 
 #include "include/command_line/arg.h"
+#include "include/command_line/arg_group.h"
 #include "include/command_line/arg_registry.h"
+#include "include/command_line/heading.h"
+#include "include/io/filterstream.h"
+#include "include/io/line_comment.h"
 #include "include/patterns/singleton.h"
 
 namespace cpputil {
@@ -48,12 +52,12 @@ class Args {
 
   /** First registered arg */
   static arg_iterator arg_begin() {
-    return Singleton<ArgRegistry>::get().arg_begin();
+    return Singleton<ArgRegistry>::get().args_.begin();
   }
 
   /** Last registered arg */
   static arg_iterator arg_end() {
-    return Singleton<ArgRegistry>::get().arg_end();
+    return Singleton<ArgRegistry>::get().args_.end();
   }
 
   /** Iterator over registered arg groups */
@@ -61,12 +65,12 @@ class Args {
 
   /** First registered group */
   static group_iterator group_begin() {
-    return Singleton<ArgRegistry>::get().group_begin();
+    return Singleton<ArgRegistry>::get().groups_.begin();
   }
 
   /** Last registered group */
   static group_iterator group_end() {
-    return Singleton<ArgRegistry>::get().group_end();
+    return Singleton<ArgRegistry>::get().groups_.end();
   }
 
   /** Did any args signal errors? */
@@ -75,7 +79,7 @@ class Args {
   }
 
   /** Iterator over args that signaled errors */
-  typedef std::vector<Arg*>::iterator error_iterator;
+  typedef std::vector<Arg*>::const_iterator error_iterator;
 
   /** First arg that signaled error */
   static error_iterator error_begin() {
@@ -93,7 +97,7 @@ class Args {
   }
 
   /** Iterator over args with duplicate appearances */
-  typedef std::vector<Arg*>::iterator duplicate_iterator;
+  typedef std::vector<Arg*>::const_iterator duplicate_iterator;
 
   /** First duplicate arg */
   static duplicate_iterator duplicate_begin() {
@@ -144,14 +148,16 @@ class Args {
   /** Sort arg groups */
   template <typename Comp>
   static void sort_groups(Comp c) {
-    std::sort(group_begin(), group_end(), c);
+    auto& ar = Singleton<ArgRegistry>::get();
+    std::sort(ar.groups_.begin(), ar.groups_.end(), c);
   }
 
   /** Sort args within groups */
   template <typename Comp>
   static void sort_args(Comp c) {
-    for (auto g = group_begin(); g != group_end(); ++g) {
-      std::sort(g->arg_begin(), g->arg_end(), c);
+    auto& ar = Singleton<ArgRegistry>::get();
+    for (auto g = ar.groups_.begin(); g != ar.groups_.end(); ++g) {
+      std::sort(g->args_.begin(), g->args_.end(), c);
     }
   }
 
@@ -163,9 +169,9 @@ class Args {
     parse.unrecognized.clear();
     parse.anonymous.clear();
 
-    auto& arg_reg = Singleton<ArgRegistry>::get();
+    auto& ar = Singleton<ArgRegistry>::get();
     std::vector<bool> used(argc);
-    for (auto a = arg_reg.arg_begin(), ae = arg_reg.arg_end(); a != ae; ++a) {
+    for (auto a = ar.args_.begin(), ae = ar.args_.end(); a != ae; ++a) {
       const auto res = (*a)->read(argc, argv);
       for (auto i = res.first; i <= res.second; ++i) {
         used[i] = true;
@@ -196,29 +202,28 @@ class Args {
 
   /** Read arguments from an istream */
   static void read(std::istream& is) {
-    std::stringstream contents;
-    contents << is.rdbuf();
-
-    std::ostringstream stripped;
-    for (size_t i = 0, ie = contents.str().length(); i < ie; ++i)
-      if (contents.str()[i] == '#') {
-        while (i < ie && contents.str()[i++] != '\n');
-        stripped << '\n';
-        --i;
-      } else {
-        stripped << contents.str()[i];
-      }
-
     std::vector<char*> argv;
     argv.push_back(strdup("<ignore>"));
 
-    std::istringstream iss(stripped.str());
+    std::stringstream ss;
+    ss << is.rdbuf();
+		ifilterstream<LineComment<'#'>> fs(ss);
+
     std::string s;
-    while (true) {
-      iss >> s;
-      if (iss.eof()) {
-        break;
-      }
+    while (fs >> s) {
+			if ( s.front() == '"' ) {
+				s = s.substr(1);
+
+				std::string s2;
+				while (fs >> s2 && s2.back() != '"') {
+					s = s + " " + s2;
+				}
+
+				if ( fs.good() ) {
+					s = s + " " + s2.substr(0, s2.length()-1);
+				}
+			}
+
       argv.push_back(strdup(s.c_str()));
     }
 

@@ -12,41 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_ARG_REGISTRY_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_ARG_REGISTRY_H
+#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_ARG_GROUP_H
+#define CPPUTIL_INCLUDE_COMMAND_LINE_ARG_GROUP_H
 
-#include "include/command_line/arg_group.h"
+#include <string>
+#include <vector>
 
 namespace cpputil {
 
 class Arg;
-class Heading;
 
-class ArgRegistry {
-	friend class Arg;
+class ArgGroup {
+	friend class ArgRegistry;
 	friend class Args;
-	friend class Heading;
 
-	private:	
-		typedef std::vector<ArgGroup>::const_iterator group_iterator;
+	public:
+		const std::string& heading() const {
+			return heading_;
+		}
+
 		typedef std::vector<Arg*>::const_iterator arg_iterator;
 
+		arg_iterator arg_begin() const {
+			return args_.begin();
+		}
+
+		arg_iterator arg_end() const {
+			return args_.end();
+		}
+
+	private:
+		ArgGroup(const std::string& heading) : heading_{heading} { }
+
+		std::string heading_;
 		std::vector<Arg*> args_;
-		std::vector<Heading*> headings_;
-		std::vector<ArgGroup> groups_;
-
-		void insert(Arg* arg) {
-			groups_.back().args_.push_back(arg);
-			args_.push_back(arg);
-		}
-
-		void insert(Heading* heading, const std::string& text) {
-			headings_.push_back(heading);
-			groups_.push_back(ArgGroup(text));
-		}
 };
 
 } // namespace cpputil
 
 #endif
-

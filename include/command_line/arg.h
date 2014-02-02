@@ -15,6 +15,7 @@
 #ifndef CPPUTIL_INCLUDE_COMMAND_LINE_ARG_H
 #define CPPUTIL_INCLUDE_COMMAND_LINE_ARG_H
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -89,41 +90,59 @@ class Arg {
   virtual void debug(std::ostream& os) const = 0;
 
  protected:
+	/** Creating a singleton of this class will ensure Args aren't leaked. */
+	struct ArgCleanup {
+		~ArgCleanup() {
+			for ( auto a : Singleton<ArgRegistry>::get().args_ ) {
+				delete a;
+			}
+		}
+	};
+
   /** An arg must be assigned at least one alias */
   Arg(const std::string& opt) {
     alternate(opt);
     usage("");
     description("(no description provided)");
-    survivable_error("");
+    error("");
 
-    auto& arg_reg = Singleton<ArgRegistry>::get();
-    arg_reg.insert_arg(this);
+    auto& ar = Singleton<ArgRegistry>::get();
+    ar.insert(this);
+		Singleton<ArgCleanup>::get();
+  }
+
+  /** Record indices in argv where arg aliases occur */
+  std::vector<size_t>& get_appearances(int argc, char** argv) {
+    appearances_.clear();
+    for (auto i = 1; i < argc; ++i) {
+      for (const auto& o : opts_) {
+        if (o == argv[i]) {
+          appearances_.push_back(i);
+        }
+      }
+    }
+
+    return appearances_;
   }
 
   /** Create a new arg alias (dashes implicit; chars get 1, strings 2) */
   Arg& alternate(const std::string& a) {
     std::string alt = "";
 
-    if (a.length() == 0) {
-      fatal_error("Unable to register an arg named \"\"!");
-    } else if (a.length() == 1) {
-      if (a[0] == '-') {
-        fatal_error("Unable to register an arg named \"-\"!");
-      } else {
-        alt = std::string("-") + a;
-      }
-    } else if (a.length() == 2 && a == "--") {
-      fatal_error("Unable to register an arg named \"--\"!");
+		assert(a.length() != 0 && "Cannot register arg with no name!");
+		assert(a.length() != 1 || a != "-" && "Cannot register arg with no name!");
+		assert(a.length() != 2 || a != "--" && "Cannot register arg with no name!");
+
+		if (a.length() == 1) {
+      alt = std::string("-") + a;
     } else {
       alt = std::string("--") + a;
     }
 
-    auto& arg_reg = Singleton<ArgRegistry>::get();
-    for (auto i = arg_reg.arg_begin(), ie = arg_reg.arg_end(); i != ie; ++i) {
+    auto& ar = Singleton<ArgRegistry>::get();
+    for (auto i = ar.args_.begin(), ie = ar.args_.end(); i != ie; ++i) {
       if ((*i)->opts_.find(alt) != (*i)->opts_.end()) {
-        std::ostringstream oss;
-        oss << "Unable to register duplicate arg name \"" << alt << "\"!";
-        fatal_error(oss.str());
+				assert(false && "Cannot register arg with pre-existing name!");
       }
     }
 
@@ -142,29 +161,9 @@ class Arg {
     description_ = d;
   }
 
-  /** Record indices in argv where arg aliases occur */
-  std::vector<size_t>& get_appearances(int argc, char** argv) {
-    appearances_.clear();
-    for (auto i = 1; i < argc; ++i) {
-      for (const auto& o : opts_) {
-        if (o == argv[i]) {
-          appearances_.push_back(i);
-        }
-      }
-    }
-
-    return appearances_;
-  }
-
   /** Places a value in error_ to indicate trouble of some kind */
-  void survivable_error(const std::string& error) {
+  void error(const std::string& error) {
     error_ = error;
-  }
-
-  /** Forces immediate program termination with message. */
-  void fatal_error(const std::string& error) const {
-    std::cerr << "FATAL ARGS ERROR: " << error << std::endl;
-    exit(1);
   }
 
  private:

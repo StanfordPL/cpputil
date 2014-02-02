@@ -25,6 +25,7 @@
 #include "include/command_line/value_arg.h"
 #include "include/io/filterstream.h"
 #include "include/io/indent.h"
+#include "include/io/wrap.h"
 
 namespace cpputil {
 
@@ -32,35 +33,29 @@ class CommandLineConfig {
  public:
   /** Strict parse with help, config, and debug support */
   static void strict_with_convenience(int argc, char** argv) {
-    auto& heading = Heading::create("Help and argument utilities:");
+		Heading::create("Help and argument utilities:");
     auto& help = FlagArg::create("h")
                  .alternate("help")
                  .description("Print this message and quit");
-    auto& debug = FlagArg::create("write_args")
+    auto& debug = FlagArg::create("debug_args")
                   .description("Print program arguments and quit");
-    auto& read_config = ValueArg<std::string>::create("read_config")
+    auto& read_config = ValueArg<std::string>::create("config")
                         .usage("<path/to/file.dat>")
                         .default_val("")
                         .description("Read program args from a configuration file");
-    auto& write_config = ValueArg<std::string>::create("write_config")
+    auto& write_config = ValueArg<std::string>::create("example_config")
                          .usage("<path/to/file.dat>")
                          .default_val("")
                          .description("Print an example configuration file");
 
-    auto alpha = [](Arg * a1, Arg * a2) {
-      return *(a1->alias_begin()) < *(a2->alias_begin());
-    };
-    Args::sort_args(alpha);
-
+    Args::sort_args([](Arg* a1, Arg* a2) {return *(a1->alias_begin()) < *(a2->alias_begin());});
     Args::read(argc, argv);
 
     if (help) {
       std::cout << std::endl;
       std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
       std::cout << std::endl;
-
       write_help(std::cout);
-
       exit(0);
     }
 
@@ -77,12 +72,10 @@ class CommandLineConfig {
       std::cerr << std::endl;
       std::cerr << "Errors:" << std::endl;
       std::cerr << std::endl;
-
       write_errors(std::cerr);
       write_duplicates(std::cerr);
       write_unrecognized(std::cerr);
       write_anonymous(std::cerr);
-
       exit(1);
     }
 
@@ -90,9 +83,7 @@ class CommandLineConfig {
       std::clog << std::endl;
       std::clog << "Arg Values:" << std::endl;
       std::clog << std::endl;
-
       write_arg_vals(std::clog);
-
       exit(0);
     }
 
@@ -177,8 +168,6 @@ class CommandLineConfig {
       ofs << "Ignoring dangling value!" << std::endl;
       ofs.filter().unindent(2);
     }
-
-    ofs.filter().unindent();
   }
 
   /** Prints arg aliases, usages, and descriptions */
@@ -187,21 +176,23 @@ class CommandLineConfig {
     ofs.filter().indent();
 
     for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
-      ofs << g->heading << std::endl;
+      ofs << g->heading() << std::endl;
       ofs << std::endl;
       for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
         write_arg(ofs, *a);
         ofs << std::endl;
 
         ofs.filter().indent(2);
-        (*a)->description(ofs);
-        ofs << std::endl;
+
+				ofilterstream<Wrap> wrap(ofs);
+				wrap.filter().limit(60);
+        (*a)->description(wrap);
+        wrap << std::endl;
+
         ofs.filter().unindent(2);
       }
       ofs << std::endl;
     }
-
-    ofs.filter().unindent();
   }
 
   /** Prints args and their corresponding values */
@@ -210,23 +201,25 @@ class CommandLineConfig {
     ofs.filter().indent();
 
     for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
-      ofs << g->heading << std::endl;
+      ofs << g->heading() << std::endl;
       ofs << std::endl;
       for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
         write_arg(ofs, *a);
         ofs << std::endl;
 
         ofs.filter().indent(2);
-        (*a)->description(ofs);
-        ofs << std::endl;
-        (*a)->debug(ofs);
-        ofs << std::endl;
+
+				ofilterstream<Wrap> wrap(ofs);
+				wrap.filter().limit(60);
+        (*a)->description(wrap);
+        wrap << std::endl;
+        (*a)->debug(wrap);
+        wrap << std::endl;
+
         ofs.filter().unindent(2);
       }
       ofs << std::endl;
     }
-
-    ofs.filter().unindent();
   }
 
   /** Prints a config file with descriptions, aliases, and usages */
@@ -235,7 +228,7 @@ class CommandLineConfig {
     os << std::endl;
 
     for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
-      os << "##### " << g->heading << std::endl;
+      os << "##### " << g->heading() << std::endl;
       os << std::endl;
       for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
         os << "# ";

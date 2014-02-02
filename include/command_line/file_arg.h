@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_VALUE_ARG_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_VALUE_ARG_H
+#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_FILE_ARG_H
+#define CPPUTIL_INCLUDE_COMMAND_LINE_FILE_ARG_H
 
 #include <string>
 
@@ -24,13 +24,13 @@
 namespace cpputil {
 
 template <typename T, typename R = TextReader<T>, typename W = TextWriter<T>>
-class ValueArg : public Arg {
+class FileArg : public Arg {
  public:
-  virtual ~ValueArg() = default;
+  virtual ~FileArg() = default;
 
   /** Creates and registers a new flag */
-  static ValueArg& create(const std::string& opt) {
-    return *(new ValueArg(opt));
+  static FileArg& create(const std::string& opt) {
+    return *(new FileArg(opt));
   }
 
   /** Consumes indices from first alias to next - */
@@ -41,15 +41,19 @@ class ValueArg : public Arg {
         return std::make_pair(i, i);
       }
 
-      std::istringstream iss(argv[i + 1]);
-      T temp;
-      R()(iss, temp);
+			std::ifstream ifs(argv[i + 1]);
+			if ( !ifs.is_open() ) {
+				error(file_error_);
+			} else {
+				T temp;
+				R()(ifs, temp);
 
-      if (iss.fail()) {
-        error(parse_error_);
-      } else {
-        val_ = temp;
-      }
+				if (ifs.fail()) {
+					error(parse_error_);
+				} else {
+					val_ = temp;
+				}
+			}
       return std::make_pair(i, i + 1);
     }
 
@@ -57,32 +61,38 @@ class ValueArg : public Arg {
   }
 
   /** Create a new arg alias (hashes implicit; chars get 1, strings 2) */
-  ValueArg& alternate(const std::string& a) {
+  FileArg& alternate(const std::string& a) {
     Arg::alternate(a);
     return *this;
   }
 
   /** Reset arg usage */
-  ValueArg& usage(const std::string& u) {
+  FileArg& usage(const std::string& u) {
     Arg::usage(u);
     return *this;
   }
 
   /** Reset arg description */
-  ValueArg& description(const std::string& d) {
+  FileArg& description(const std::string& d) {
     Arg::description(d);
     return *this;
   }
 
   /** Resets arg default value */
-  ValueArg& default_val(const T& t) {
+  FileArg& default_val(const T& t) {
     val_ = t;
     return *this;
   }
 
   /** Resets parse error message */
-  ValueArg& parse_error(const std::string& pe) {
+  FileArg& parse_error(const std::string& pe) {
     parse_error_ = pe;
+    return *this;
+  }
+
+  /** Resets file error message */
+  FileArg& file_error(const std::string& fe) {
+    file_error_ = fe;
     return *this;
   }
 
@@ -106,16 +116,20 @@ class ValueArg : public Arg {
   T val_;
   /** String to emit if an error occurs during read() */
   std::string parse_error_;
+	/** String to emit if unable to open source file during read() */
+	std::string file_error_;
 
-  /** ValueArgs are assigned default constructor values by default */
-  ValueArg(const std::string& opt) :
+  /** FileArgs are assigned default constructor values by default */
+  FileArg(const std::string& opt) :
     Arg {opt} {
     usage("<value>");
     parse_error("Unable to parse value!");
+		file_error("Unable to open source file!");
   }
 };
 
 } // namespace cpputil
 
 #endif
+
 

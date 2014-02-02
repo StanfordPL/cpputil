@@ -1,0 +1,36 @@
+##### ./command_line/command_line
+
+##### Program-specific arguments
+
+# A 16 digit hex value, grouped 8 digits at a time. ie: 01234567 89abcdef
+--hex "ffffffff ffffffff"
+
+# i | 1 <= i <= 10
+--int 7
+
+# A set of characters, each between a and z, inclusive. May include ellipses as shorthand. ie: { a ... d }
+--sc "{ a ... z }"
+
+# (no description provided)
+--str "Hello, world!"
+
+# A sequence of integers, each between 1 and 10, inclusive
+--vector "{ 5 ... 10 }"
+
+# A sequence of 8 digit hex values. May include ellipses as shorthand. ie:{ 00000000 00000001 ... }
+--vh vh.dat
+
+##### Help and argument utilities:
+
+# Print this message and quit
+# --help 
+
+# Read program args from a configuration file
+# --config <path/to/file.dat>
+
+# Print program arguments and quit
+--debug_args 
+
+# Print an example configuration file
+# --example_config <path/to/file.dat>
+
