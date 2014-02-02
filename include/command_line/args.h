@@ -207,22 +207,22 @@ class Args {
 
     std::stringstream ss;
     ss << is.rdbuf();
-		ifilterstream<LineComment<'#'>> fs(ss);
+    ifilterstream<LineComment<'#'>> fs(ss);
 
     std::string s;
     while (fs >> s) {
-			if ( s.front() == '"' ) {
-				s = s.substr(1);
+      if (s.front() == '"') {
+        s = s.substr(1);
 
-				std::string s2;
-				while (fs >> s2 && s2.back() != '"') {
-					s = s + " " + s2;
-				}
+        std::string s2;
+        while (fs >> s2 && s2.back() != '"') {
+          s = s + " " + s2;
+        }
 
-				if ( fs.good() ) {
-					s = s + " " + s2.substr(0, s2.length()-1);
-				}
-			}
+        if (fs.good()) {
+          s = s + " " + s2.substr(0, s2.length() - 1);
+        }
+      }
 
       argv.push_back(strdup(s.c_str()));
     }

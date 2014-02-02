@@ -41,19 +41,19 @@ class FileArg : public Arg {
         return std::make_pair(i, i);
       }
 
-			std::ifstream ifs(argv[i + 1]);
-			if ( !ifs.is_open() ) {
-				error(file_error_);
-			} else {
-				T temp;
-				R()(ifs, temp);
+      std::ifstream ifs(argv[i + 1]);
+      if (!ifs.is_open()) {
+        error(file_error_);
+      } else {
+        T temp;
+        R()(ifs, temp);
 
-				if (ifs.fail()) {
-					error(parse_error_);
-				} else {
-					val_ = temp;
-				}
-			}
+        if (ifs.fail()) {
+          error(parse_error_);
+        } else {
+          val_ = temp;
+        }
+      }
       return std::make_pair(i, i + 1);
     }
 
@@ -116,15 +116,15 @@ class FileArg : public Arg {
   T val_;
   /** String to emit if an error occurs during read() */
   std::string parse_error_;
-	/** String to emit if unable to open source file during read() */
-	std::string file_error_;
+  /** String to emit if unable to open source file during read() */
+  std::string file_error_;
 
   /** FileArgs are assigned default constructor values by default */
   FileArg(const std::string& opt) :
     Arg {opt} {
     usage("<value>");
     parse_error("Unable to parse value!");
-		file_error("Unable to open source file!");
+    file_error("Unable to open source file!");
   }
 };
 

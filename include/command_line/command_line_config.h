@@ -33,7 +33,7 @@ class CommandLineConfig {
  public:
   /** Strict parse with help, config, and debug support */
   static void strict_with_convenience(int argc, char** argv) {
-		Heading::create("Help and argument utilities:");
+    Heading::create("Help and argument utilities:");
     auto& help = FlagArg::create("h")
                  .alternate("help")
                  .description("Print this message and quit");
@@ -48,7 +48,9 @@ class CommandLineConfig {
                          .default_val("")
                          .description("Print an example configuration file");
 
-    Args::sort_args([](Arg* a1, Arg* a2) {return *(a1->alias_begin()) < *(a2->alias_begin());});
+    Args::sort_args([](Arg * a1, Arg * a2) {
+      return *(a1->alias_begin()) < *(a2->alias_begin());
+    });
     Args::read(argc, argv);
 
     if (help) {
@@ -184,8 +186,8 @@ class CommandLineConfig {
 
         ofs.filter().indent(2);
 
-				ofilterstream<Wrap> wrap(ofs);
-				wrap.filter().limit(60);
+        ofilterstream<Wrap> wrap(ofs);
+        wrap.filter().limit(60);
         (*a)->description(wrap);
         wrap << std::endl;
 
@@ -209,8 +211,8 @@ class CommandLineConfig {
 
         ofs.filter().indent(2);
 
-				ofilterstream<Wrap> wrap(ofs);
-				wrap.filter().limit(60);
+        ofilterstream<Wrap> wrap(ofs);
+        wrap.filter().limit(60);
         (*a)->description(wrap);
         wrap << std::endl;
         (*a)->debug(wrap);

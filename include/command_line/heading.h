@@ -23,26 +23,26 @@
 namespace cpputil {
 
 class Heading {
-	public:
-		static Heading& create(const std::string& text) {
-			return *(new Heading(text));
-		}
+ public:
+  static Heading& create(const std::string& text) {
+    return *(new Heading(text));
+  }
 
-	private:
-		/** Creating a singleton of this class will ensure Headings aren't leaked. */
-		struct HeadingCleanup {
-			~HeadingCleanup() {
-				for ( auto h : Singleton<ArgRegistry>::get().headings_ ) {
-					delete h;
-				}
-			}
-		};
+ private:
+  /** Creating a singleton of this class will ensure Headings aren't leaked. */
+  struct HeadingCleanup {
+    ~HeadingCleanup() {
+      for (auto h : Singleton<ArgRegistry>::get().headings_) {
+        delete h;
+      }
+    }
+  };
 
-		Heading(const std::string& text) {
-			auto& ar = Singleton<ArgRegistry>::get();
-			ar.insert(this, text);
-			Singleton<HeadingCleanup>::get();
-		}
+  Heading(const std::string& text) {
+    auto& ar = Singleton<ArgRegistry>::get();
+    ar.insert(this, text);
+    Singleton<HeadingCleanup>::get();
+  }
 };
 
 } // namespace cpputil

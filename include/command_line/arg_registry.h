@@ -23,27 +23,27 @@ class Arg;
 class Heading;
 
 class ArgRegistry {
-	friend class Arg;
-	friend class Args;
-	friend class Heading;
+  friend class Arg;
+  friend class Args;
+  friend class Heading;
 
-	private:	
-		typedef std::vector<ArgGroup>::const_iterator group_iterator;
-		typedef std::vector<Arg*>::const_iterator arg_iterator;
+ private:
+  typedef std::vector<ArgGroup>::const_iterator group_iterator;
+  typedef std::vector<Arg*>::const_iterator arg_iterator;
 
-		std::vector<Arg*> args_;
-		std::vector<Heading*> headings_;
-		std::vector<ArgGroup> groups_;
+  std::vector<Arg*> args_;
+  std::vector<Heading*> headings_;
+  std::vector<ArgGroup> groups_;
 
-		void insert(Arg* arg) {
-			groups_.back().args_.push_back(arg);
-			args_.push_back(arg);
-		}
+  void insert(Arg* arg) {
+    groups_.back().args_.push_back(arg);
+    args_.push_back(arg);
+  }
 
-		void insert(Heading* heading, const std::string& text) {
-			headings_.push_back(heading);
-			groups_.push_back(ArgGroup(text));
-		}
+  void insert(Heading* heading, const std::string& text) {
+    headings_.push_back(heading);
+    groups_.push_back(ArgGroup(text));
+  }
 };
 
 } // namespace cpputil

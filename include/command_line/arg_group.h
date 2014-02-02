@@ -23,29 +23,29 @@ namespace cpputil {
 class Arg;
 
 class ArgGroup {
-	friend class ArgRegistry;
-	friend class Args;
+  friend class ArgRegistry;
+  friend class Args;
 
-	public:
-		const std::string& heading() const {
-			return heading_;
-		}
+ public:
+  const std::string& heading() const {
+    return heading_;
+  }
 
-		typedef std::vector<Arg*>::const_iterator arg_iterator;
+  typedef std::vector<Arg*>::const_iterator arg_iterator;
 
-		arg_iterator arg_begin() const {
-			return args_.begin();
-		}
+  arg_iterator arg_begin() const {
+    return args_.begin();
+  }
 
-		arg_iterator arg_end() const {
-			return args_.end();
-		}
+  arg_iterator arg_end() const {
+    return args_.end();
+  }
 
-	private:
-		ArgGroup(const std::string& heading) : heading_{heading} { }
+ private:
+  ArgGroup(const std::string& heading) : heading_ {heading} { }
 
-		std::string heading_;
-		std::vector<Arg*> args_;
+  std::string heading_;
+  std::vector<Arg*> args_;
 };
 
 } // namespace cpputil

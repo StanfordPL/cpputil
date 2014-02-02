@@ -90,14 +90,14 @@ class Arg {
   virtual void debug(std::ostream& os) const = 0;
 
  protected:
-	/** Creating a singleton of this class will ensure Args aren't leaked. */
-	struct ArgCleanup {
-		~ArgCleanup() {
-			for ( auto a : Singleton<ArgRegistry>::get().args_ ) {
-				delete a;
-			}
-		}
-	};
+  /** Creating a singleton of this class will ensure Args aren't leaked. */
+  struct ArgCleanup {
+    ~ArgCleanup() {
+      for (auto a : Singleton<ArgRegistry>::get().args_) {
+        delete a;
+      }
+    }
+  };
 
   /** An arg must be assigned at least one alias */
   Arg(const std::string& opt) {
@@ -108,7 +108,7 @@ class Arg {
 
     auto& ar = Singleton<ArgRegistry>::get();
     ar.insert(this);
-		Singleton<ArgCleanup>::get();
+    Singleton<ArgCleanup>::get();
   }
 
   /** Record indices in argv where arg aliases occur */
@@ -129,11 +129,11 @@ class Arg {
   Arg& alternate(const std::string& a) {
     std::string alt = "";
 
-		assert(a.length() != 0 && "Cannot register arg with no name!");
-		assert(a.length() != 1 || a != "-" && "Cannot register arg with no name!");
-		assert(a.length() != 2 || a != "--" && "Cannot register arg with no name!");
+    assert(a.length() != 0 && "Cannot register arg with no name!");
+    assert(a.length() != 1 || a != "-" && "Cannot register arg with no name!");
+    assert(a.length() != 2 || a != "--" && "Cannot register arg with no name!");
 
-		if (a.length() == 1) {
+    if (a.length() == 1) {
       alt = std::string("-") + a;
     } else {
       alt = std::string("--") + a;
@@ -142,7 +142,7 @@ class Arg {
     auto& ar = Singleton<ArgRegistry>::get();
     for (auto i = ar.args_.begin(), ie = ar.args_.end(); i != ie; ++i) {
       if ((*i)->opts_.find(alt) != (*i)->opts_.end()) {
-				assert(false && "Cannot register arg with pre-existing name!");
+        assert(false && "Cannot register arg with pre-existing name!");
       }
     }
 
