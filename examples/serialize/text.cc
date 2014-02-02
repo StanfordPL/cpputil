@@ -20,7 +20,7 @@
 #include <tuple>
 #include <vector>
 
-#include "include/serialize/stl_debug.h"
+#include "include/debug/stl_print.h"
 #include "include/serialize/text_reader.h"
 #include "include/serialize/text_writer.h"
 

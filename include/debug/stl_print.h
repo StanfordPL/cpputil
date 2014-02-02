@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_SERIALIZE_STL_DEBUG_H
-#define CPPUTIL_INCLUDE_SERIALIZE_STL_DEBUG_H
+#ifndef CPPUTIL_INCLUDE_DEBUG_STL_PRINT_H
+#define CPPUTIL_INCLUDE_DEBUG_STL_PRINT_H
 
 #include <iostream>
 #include <type_traits>

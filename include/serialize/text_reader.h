@@ -24,7 +24,9 @@
 #include "include/meta/is_stl_set.h"
 #include "include/meta/is_stl_string.h"
 #include "include/meta/is_stl_tuple.h"
-#include "include/serialize/text_delim.h"
+#include "include/serialize/dec_reader.h"
+#include "include/serialize/hex_reader.h"
+#include "include/serialize/text_style.h"
 
 namespace cpputil {
 
@@ -34,105 +36,109 @@ namespace cpputil {
 		return; \
 	}
 
-template <typename T, typename Delim = TextDelim<>, typename Enable = void>
+template <typename T, typename Style = TextStyle<>, typename Enable = void>
 struct TextReader;
 
-template <typename T, typename Delim>
-struct TextReader <T, Delim, typename std::enable_if <std::is_fundamental<T>::value>::type> {
+template <typename T, typename Style>
+struct TextReader <T, Style, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-    is >> t;
+		if ( Style::dec() ) {
+			DecReader<T>()(is, t);
+		} else {
+			HexReader<T, Style::hex_group()>()(is, t);
+		}
   }
 };
 
-template <typename T, typename Delim>
-struct TextReader<T, Delim, typename std::enable_if<is_stl_string<T>::value>::type> {
+template <typename T, typename Style>
+struct TextReader<T, Style, typename std::enable_if<is_stl_string<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-    if (is.peek() == Delim::quote()) {
+    if (is.peek() == Style::quote()) {
       is.get();
-      std::getline(is, t, Delim::quote());
+      std::getline(is, t, Style::quote());
     } else {
       is >> t;
     }
   }
 };
 
-template <typename T, typename Delim>
-struct TextReader<T, Delim, typename std::enable_if <is_stl_pair<T>::value>::type> {
+template <typename T, typename Style>
+struct TextReader<T, Style, typename std::enable_if <is_stl_pair<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-    die_unless(Delim::open());
+    die_unless(Style::open());
     die_unless(' ');
 
-    TextReader<typename T::first_type, Delim>()(is, t.first);
+    TextReader<typename T::first_type, Style>()(is, t.first);
     die_unless(' ');
-    TextReader<typename T::second_type, Delim>()(is, t.second);
+    TextReader<typename T::second_type, Style>()(is, t.second);
 
     die_unless(' ');
-    die_unless(Delim::close());
+    die_unless(Style::close());
   }
 };
 
-template <typename T, typename Delim>
-struct TextReader<T, Delim, typename std::enable_if<is_stl_sequence<T>::value>::type> {
+template <typename T, typename Style>
+struct TextReader<T, Style, typename std::enable_if<is_stl_sequence<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-    die_unless(Delim::open());
+    die_unless(Style::open());
     die_unless(' ');
 
     t.clear();
-    while (is.peek() != Delim::close()) {
+    while (is.peek() != Style::close()) {
       typename T::value_type v;
-      TextReader<decltype(v), Delim>()(is, v);
+      TextReader<decltype(v), Style>()(is, v);
       t.emplace_back(v);
 
       die_unless(' ');
     }
-    die_unless(Delim::close());
+    die_unless(Style::close());
   }
 };
 
-template <typename T, typename Delim>
-struct TextReader<T, Delim, typename std::enable_if<is_stl_set<T>::value>::type> {
+template <typename T, typename Style>
+struct TextReader<T, Style, typename std::enable_if<is_stl_set<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-    die_unless(Delim::open());
+    die_unless(Style::open());
     die_unless(' ');
 
     t.clear();
-    while (is.peek() != Delim::close()) {
+    while (is.peek() != Style::close()) {
       typename T::value_type v;
-      TextReader<decltype(v), Delim>()(is, v);
+      TextReader<decltype(v), Style>()(is, v);
       t.emplace(v);
 
       die_unless(' ');
     }
-    die_unless(Delim::close());
+    die_unless(Style::close());
   }
 };
 
-template <typename T, typename Delim>
-struct TextReader<T, Delim, typename std::enable_if<is_stl_map<T>::value>::type> {
+template <typename T, typename Style>
+struct TextReader<T, Style, typename std::enable_if<is_stl_map<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-    die_unless(Delim::open());
+    die_unless(Style::open());
     die_unless(' ');
 
     t.clear();
-    while (is.peek() != Delim::close()) {
+    while (is.peek() != Style::close()) {
       std::pair<typename std::remove_const<typename T::key_type>::type, typename T::mapped_type> v;
-      TextReader<decltype(v), Delim>()(is, v);
+      TextReader<decltype(v), Style>()(is, v);
       t.emplace(v);
 
       die_unless(' ');
     }
-    die_unless(Delim::close());
+    die_unless(Style::close());
   }
 };
 
-template <typename T, typename Delim>
-class TextReader <T, Delim, typename std::enable_if <is_stl_tuple<T>::value>::type> {
+template <typename T, typename Style>
+class TextReader <T, Style, typename std::enable_if <is_stl_tuple<T>::value>::type> {
  public:
   void operator()(std::istream& is, const T& t) const {
-    die_unless(Delim::open());
+    die_unless(Style::open());
     Helper<T, 0, std::tuple_size<T>::value>()(is, t);
     die_unless(' ');
-    die_unless(Delim::close());
+    die_unless(Style::close());
   }
 
  private:
@@ -140,7 +146,7 @@ class TextReader <T, Delim, typename std::enable_if <is_stl_tuple<T>::value>::ty
   struct Helper {
     void operator()(std::istream& is, const Tuple& t) {
       die_unless(' ');
-      TextReader<typename std::tuple_element<Begin, Tuple>::type, Delim>()(is, std::get<Begin>(t));
+      TextReader<typename std::tuple_element<Begin, Tuple>::type, Style>()(is, std::get<Begin>(t));
       Helper < Tuple, Begin + 1, End > ()(is, t);
     }
   };

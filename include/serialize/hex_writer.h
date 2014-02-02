@@ -22,11 +22,11 @@
 
 namespace cpputil {
 
-template <typename T, size_t Group = 2, typename Enable = void>
+template <typename T, size_t Group = 8, typename Enable = void>
 struct HexWriter;
 
 template <typename T, size_t Group>
-struct HexWriter <T, Group, typename std::enable_if <std::is_integral<T>::value>::type> {
+struct HexWriter <T, Group, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
     const auto f = os.flags(std::ios::hex);
     os.unsetf(std::ios::showbase);
@@ -35,7 +35,8 @@ struct HexWriter <T, Group, typename std::enable_if <std::is_integral<T>::value>
       if (i < bit_width<T>::value / 4 && i % Group == 0) {
         os << " ";
       }
-      os << ((t >> (4 * i - 4)) & 0x0f);
+
+			os << ((((uint8_t*) &t)[(i-1)/2] >> (i % 2 == 0 ? 4 : 0)) & 0x0f);
     }
 
     os.setf(f);

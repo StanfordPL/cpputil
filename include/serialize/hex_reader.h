@@ -15,6 +15,7 @@
 #ifndef CPPUTIL_INCLUDE_SERIALIZE_HEX_READER_H
 #define CPPUTIL_INCLUDE_SERIALIZE_HEX_READER_H
 
+#include <array>
 #include <cctype>
 #include <iostream>
 #include <type_traits>
@@ -29,13 +30,14 @@ namespace cpputil {
 		return; \
 	}
 
-template <typename T, size_t Group = 2, typename Enable = void>
+template <typename T, size_t Group = 8, typename Enable = void>
 struct HexReader;
 
 template <typename T, size_t Group>
-struct HexReader <T, Group, typename std::enable_if <std::is_integral<T>::value>::type> {
+struct HexReader <T, Group, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::istream& is, T& t) const {
-    t = 0;
+		std::array<uint8_t, bit_width<T>::value / 8> buffer;
+		buffer.fill(0);
 
     for (size_t i = bit_width<T>::value / 4; i > 0; --i) {
       if (i < bit_width<T>::value / 4 && i % Group == 0) {
@@ -44,9 +46,11 @@ struct HexReader <T, Group, typename std::enable_if <std::is_integral<T>::value>
       const auto c = is.get();
       die_if(!isxdigit(c));
 
-      const T temp = (c >= '0' && c <= '9') ? (c - '0') : (c - 'a' + 10);
-      t |= (temp << (4 * i - 4));
+      const uint8_t temp = (c >= '0' && c <= '9') ? (c - '0') : (c - 'a' + 10);
+      buffer[(i-1)/2] |= (temp << (i % 2 == 0 ? 4 : 0));
     }
+
+		t = *((T*) buffer.data());
   }
 };
 

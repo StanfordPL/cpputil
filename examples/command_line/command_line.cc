@@ -19,6 +19,8 @@
 #include "include/serialize/hex_reader.h"
 #include "include/serialize/hex_writer.h"
 #include "include/serialize/range_reader.h"
+#include "include/serialize/span_reader.h"
+#include "include/serialize/text_style.h"
 
 using namespace cpputil;
 using namespace std;
@@ -30,9 +32,9 @@ auto& i = ValueArg<int, RangeReader<int, Range<int, 1, 10>>>::create("i")
           .usage("| 0 <= i <= 10")
           .default_val(5);
 
-auto& h = ValueArg<uint64_t, HexReader<uint64_t, 4>, HexWriter<uint64_t, 4>>::create("j")
+auto& h = ValueArg<uint64_t, HexReader<uint64_t>, HexWriter<uint64_t>>::create("j")
           .alternate("hex")
-          .usage("0123 4567 89ab cdef")
+          .usage("01234567 89abcdef")
           .default_val(0);
 
 auto& s = ValueArg<string>::create("s")
@@ -40,14 +42,20 @@ auto& s = ValueArg<string>::create("s")
           .usage("\"...\"")
           .default_val("Hello, world");
 
-auto& v = ValueArg<vector<int>, RangeReader<vector<int>, Range<int, 1, 10>>>::create("v")
+auto& v = ValueArg<vector<int>, SpanReader<vector<int>, Range<int, 1, 10>>>::create("v")
           .alternate("vector")
           .usage("{ 1 2 3 }")
           .default_val({1, 2, 3});
 
-auto& sc = ValueArg<set<char>, RangeReader<set<char>, Range<char, 'a', 'z'>>>::create("sc")
+auto& sc = ValueArg<set<char>, SpanReader<set<char>, Range<char, 'a', 'z'>>>::create("sc")
            .usage("{ a b c }")
            .default_val({'a', 'b', 'c'});
+
+auto& vh = ValueArg<vector<int>, 
+	                  SpanReader<vector<int>, Range<int, 0, 32>, TextStyle<false>>,
+										TextWriter<vector<int>, TextStyle<false>>>::create("vh")
+					 .usage("{ 00000000 00000001 ... }")
+					 .default_val({0, 1, 2});
 
 int main(int argc, char** argv) {
   CommandLineConfig::strict_with_convenience(argc, argv);

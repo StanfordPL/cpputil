@@ -41,6 +41,12 @@ struct is_32_bit<int32_t> : public std::true_type { };
 template <>
 struct is_32_bit<const int32_t> : public std::true_type { };
 
+template <>
+struct is_32_bit<float> : public std::true_type { };
+
+template <>
+struct is_32_bit<const float> : public std::true_type { };
+
 } // namespace cpputil
 
 #endif

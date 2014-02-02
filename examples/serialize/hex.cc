@@ -40,11 +40,15 @@ int main() {
   char16_t c16 = 0xabcd;
   char32_t c32 = 0xabcdef01;
   uint64_t u64 = 0xabcdef0123456789;
+	float f = 1234.0;
+	double d = -5678.0;
 
   check(c);
   check(c16);
   check(c32);
   check(u64);
+	check(f);
+	check(d);
 
   return 0;
 };

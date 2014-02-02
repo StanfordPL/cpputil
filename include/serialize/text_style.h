@@ -12,38 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_META_IS_64_BIT_H
-#define CPPUTIL_INCLUDE_META_IS_64_BIT_H
-
-#include <stdint.h>
-#include <type_traits>
+#ifndef CPPUTIL_INCLUDE_SERIALIZE_TEXT_STYLE_H
+#define CPPUTIL_INCLUDE_SERIALIZE_TEXT_STYLE_H
 
 namespace cpputil {
 
-template <typename T>
-struct is_64_bit : public std::false_type { };
+template <char Dec = true, size_t HexGroup = 8, 
+				  char Open = '{', char Close = '}', char Quote = '"', char Etc = '.'>
+struct TextStyle {
+	static constexpr bool dec() {
+		return Dec;
+	}
 
-template <>
-struct is_64_bit<uint64_t> : public std::true_type { };
+	static constexpr size_t hex_group() {
+		return HexGroup;
+	}
 
-template <>
-struct is_64_bit<const uint64_t> : public std::true_type { };
+  static constexpr char open() {
+    return Open;
+  }
 
-template <>
-struct is_64_bit<int64_t> : public std::true_type { };
+  static constexpr char close() {
+    return Close;
+  }
 
-template <>
-struct is_64_bit<const int64_t> : public std::true_type { };
+  static constexpr char quote() {
+    return Quote;
+  }
 
-template <>
-struct is_64_bit<double> : public std::true_type { };
-
-template <>
-struct is_64_bit<const double> : public std::true_type { };
+  static constexpr char etc() {
+    return Etc;
+  }
+};
 
 } // namespace cpputil
 
 #endif
-
-
 

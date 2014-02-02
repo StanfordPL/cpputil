@@ -12,30 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_SERIALIZE_TEXT_DELIM_H
-#define CPPUTIL_INCLUDE_SERIALIZE_TEXT_DELIM_H
+#ifndef CPPUTIL_INCLUDE_SERIALIZE_DEC_READER_H
+#define CPPUTIL_INCLUDE_SERIALIZE_DEC_READER_H
+
+#include <iostream>
+#include <type_traits>
 
 namespace cpputil {
 
-template <char Open = '{', char Close = '}', char Quote = '"', char Etc = '.'>
-struct TextDelim {
-  static constexpr char open() {
-    return Open;
-  }
+template <typename T, typename Enable = void>
+struct DecReader;
 
-  static constexpr char close() {
-    return Close;
-  }
-
-  static constexpr char quote() {
-    return Quote;
-  }
-
-  static constexpr char etc() {
-    return Etc;
+template <typename T>
+struct DecReader <T, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
+  void operator()(std::istream& is, T& t) const {
+		is >> t;
   }
 };
 
 } // namespace cpputil
 
 #endif
+
+

@@ -24,63 +24,69 @@
 #include "include/meta/is_stl_pair.h"
 #include "include/meta/is_stl_string.h"
 #include "include/meta/is_stl_tuple.h"
-#include "include/serialize/text_delim.h"
+#include "include/serialize/dec_writer.h"
+#include "include/serialize/hex_writer.h"
+#include "include/serialize/text_style.h"
 
 namespace cpputil {
 
-template <typename T, typename Delim = TextDelim<>, typename Enable = void>
+template <typename T, typename Style = TextStyle<>, typename Enable = void>
 struct TextWriter;
 
-template <typename T, typename Delim>
-struct TextWriter <T, Delim, typename std::enable_if <std::is_fundamental<T>::value>::type> {
+template <typename T, typename Style>
+struct TextWriter <T, Style, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
-    os << t;
+		if ( Style::dec() ) {
+			DecWriter<T>()(os, t);
+		} else {
+			HexWriter<T, Style::hex_group()>()(os, t);
+		}
   }
 };
 
-template <typename T, typename Delim>
-struct TextWriter < T, Delim,
+template <typename T, typename Style>
+struct TextWriter < T, Style,
     typename std::enable_if < is_char_pointer<T>::value || is_stl_string<T>::value >::type > {
   void operator()(std::ostream& os, const T& t) const {
-    os << Delim::quote() << t << Delim::quote();
+    os << Style::quote() << t << Style::quote();
   }
 };
 
-template <typename T, typename Delim>
-struct TextWriter<T, Delim, typename std::enable_if <is_stl_pair<T>::value>::type> {
+template <typename T, typename Style>
+struct TextWriter<T, Style, typename std::enable_if <is_stl_pair<T>::value>::type> {
   void operator()(std::ostream& os, const T& t) const {
-    os << Delim::open() << " ";
+    os << Style::open() << " ";
 
-    TextWriter<typename T::first_type, Delim>()(os, t.first);
+    TextWriter<typename T::first_type, Style>()(os, t.first);
     os << " ";
-    TextWriter<typename T::second_type, Delim>()(os, t.second);
+    TextWriter<typename T::second_type, Style>()(os, t.second);
 
-    os << " " << Delim::close();
+    os << " " << Style::close();
   }
 };
 
-template <typename T, typename Delim>
-struct TextWriter < T, Delim,
+template <typename T, typename Style>
+struct TextWriter < T, Style,
     typename std::enable_if < is_stl_sequence<T>::value || is_stl_associative<T>::value >::type > {
   void operator()(std::ostream& os, const T& t) const {
-    os << Delim::open();
+    os << Style::open();
 
     for (auto& elem : t) {
       os << " ";
-      TextWriter<typename T::value_type, Delim>()(os, elem);
+      TextWriter<typename T::value_type, Style>()(os, elem);
     }
 
-    os << " " << Delim::close();
+    os << " " << Style::close();
   }
 };
 
-template <typename T, typename Delim>
-class TextWriter <T, Delim, typename std::enable_if <is_stl_tuple<T>::value>::type> {
+template <typename T, typename Style>
+class TextWriter <T, Style, typename std::enable_if <is_stl_tuple<T>::value>::type> {
  public:
   void operator()(std::ostream& os, const T& t) const {
-    os << Delim::open();
+    os << Style::open();
     Helper<T, 0, std::tuple_size<T>::value>()(os, t);
-    os << " " << Delim::close();
+    os << " " << Style::close();
   }
 
  private:
@@ -88,7 +94,7 @@ class TextWriter <T, Delim, typename std::enable_if <is_stl_tuple<T>::value>::ty
   struct Helper {
     void operator()(std::ostream& os, const Tuple& t) {
       os << " ";
-      TextWriter<typename std::tuple_element<Begin, Tuple>::type, Delim>()(os, std::get<Begin>(t));
+      TextWriter<typename std::tuple_element<Begin, Tuple>::type, Style>()(os, std::get<Begin>(t));
       Helper < Tuple, Begin + 1, End > ()(os, t);
     }
   };

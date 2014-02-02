@@ -45,10 +45,10 @@ template <>
 struct bit_width<int8_t> : public std::integral_constant<int, 8> { };
 
 template <>
-struct bit_width<uint8_t> : public std::integral_constant<int, 8> { };
+struct bit_width<const int8_t> : public std::integral_constant<int, 8> { };
 
 template <>
-struct bit_width<const int8_t> : public std::integral_constant<int, 8> { };
+struct bit_width<uint8_t> : public std::integral_constant<int, 8> { };
 
 template <>
 struct bit_width<const uint8_t> : public std::integral_constant<int, 8> { };
@@ -57,10 +57,10 @@ template <>
 struct bit_width<int16_t> : public std::integral_constant<int, 16> { };
 
 template <>
-struct bit_width<uint16_t> : public std::integral_constant<int, 16> { };
+struct bit_width<const int16_t> : public std::integral_constant<int, 16> { };
 
 template <>
-struct bit_width<const int16_t> : public std::integral_constant<int, 16> { };
+struct bit_width<uint16_t> : public std::integral_constant<int, 16> { };
 
 template <>
 struct bit_width<const uint16_t> : public std::integral_constant<int, 16> { };
@@ -69,25 +69,37 @@ template <>
 struct bit_width<int32_t> : public std::integral_constant<int, 32> { };
 
 template <>
-struct bit_width<uint32_t> : public std::integral_constant<int, 32> { };
+struct bit_width<const int32_t> : public std::integral_constant<int, 32> { };
 
 template <>
-struct bit_width<const int32_t> : public std::integral_constant<int, 32> { };
+struct bit_width<uint32_t> : public std::integral_constant<int, 32> { };
 
 template <>
 struct bit_width<const uint32_t> : public std::integral_constant<int, 32> { };
 
 template <>
-struct bit_width<int64_t> : public std::integral_constant<int, 64> { };
+struct bit_width<float> : public std::integral_constant<int, 32> { };
 
 template <>
-struct bit_width<uint64_t> : public std::integral_constant<int, 64> { };
+struct bit_width<const float> : public std::integral_constant<int, 32> { };
+
+template <>
+struct bit_width<int64_t> : public std::integral_constant<int, 64> { };
 
 template <>
 struct bit_width<const int64_t> : public std::integral_constant<int, 64> { };
 
 template <>
+struct bit_width<uint64_t> : public std::integral_constant<int, 64> { };
+
+template <>
 struct bit_width<const uint64_t> : public std::integral_constant<int, 64> { };
+
+template <>
+struct bit_width<double> : public std::integral_constant<int, 64> { };
+
+template <>
+struct bit_width<const double> : public std::integral_constant<int, 64> { };
 
 } // namespace cpputil
 

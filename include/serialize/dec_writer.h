@@ -12,34 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_META_IS_64_BIT_H
-#define CPPUTIL_INCLUDE_META_IS_64_BIT_H
+#ifndef CPPUTIL_INCLUDE_SERIALIZE_DEC_WRITER_H
+#define CPPUTIL_INCLUDE_SERIALIZE_DEC_WRITER_H
 
-#include <stdint.h>
+#include <iostream>
 #include <type_traits>
 
 namespace cpputil {
 
+template <typename T, typename Enable = void>
+struct DecWriter;
+
 template <typename T>
-struct is_64_bit : public std::false_type { };
-
-template <>
-struct is_64_bit<uint64_t> : public std::true_type { };
-
-template <>
-struct is_64_bit<const uint64_t> : public std::true_type { };
-
-template <>
-struct is_64_bit<int64_t> : public std::true_type { };
-
-template <>
-struct is_64_bit<const int64_t> : public std::true_type { };
-
-template <>
-struct is_64_bit<double> : public std::true_type { };
-
-template <>
-struct is_64_bit<const double> : public std::true_type { };
+struct DecWriter <T, typename std::enable_if <std::is_arithmetic<T>::value>::type> {
+  void operator()(std::ostream& os, const T& t) const {
+		const auto f = os.flags(std::ios::dec);
+		os << t;
+		os.setf(f);
+  }
+};
 
 } // namespace cpputil
 

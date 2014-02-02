@@ -24,6 +24,7 @@ EX  = command_line/command_line \
 			container/bit_vector \
 			container/maputil \
 			container/tokenizer \
+			debug/stl_print \
 			io/column \
 			io/filterstream \
 			io/indent \
@@ -39,7 +40,6 @@ EX  = command_line/command_line \
 			meta/indices \
 			patterns/singleton \
 			serialize/hex \
-			serialize/stl_debug \
 			serialize/text \
 			signal/debug_handler \
 			system/terminal
