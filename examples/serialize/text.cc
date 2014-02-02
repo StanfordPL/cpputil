@@ -36,32 +36,32 @@ struct C {
 
 namespace cpputil {
 
-template <typename Delim>
-struct TextWriter<C, Delim> {
+template <typename Style>
+struct TextWriter<C, Style> {
   void operator()(ostream& os, const C& c) const {
-    os << Delim::open();
-    TextWriter<int, Delim>()(os, c.x);
+    os << Style::open();
+    TextWriter<int, Style>()(os, c.x);
     os << " ";
-    TextWriter<char, Delim>()(os, c.c);
+    TextWriter<char, Style>()(os, c.c);
     os << " ";
-    TextWriter<double, Delim>()(os, c.d);
+    TextWriter<double, Style>()(os, c.d);
     os << " ";
-    TextWriter<string, Delim>()(os, c.s);
-    os << Delim::close();
+    TextWriter<string, Style>()(os, c.s);
+    os << Style::close();
   }
 };
 
-template <typename Delim>
-struct TextReader<C, Delim> {
+template <typename Style>
+struct TextReader<C, Style> {
   void operator()(istream& is, C& c) const {
     is.get();
-    TextReader<int, Delim>()(is, c.x);
+    TextReader<int, Style>()(is, c.x);
     is.get();
-    TextReader<char, Delim>()(is, c.c);
+    TextReader<char, Style>()(is, c.c);
     is.get();
-    TextReader<double, Delim>()(is, c.d);
+    TextReader<double, Style>()(is, c.d);
     is.get();
-    TextReader<string, Delim>()(is, c.s);
+    TextReader<string, Style>()(is, c.s);
     is.get();
   }
 };
