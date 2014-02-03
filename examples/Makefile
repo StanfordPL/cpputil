@@ -14,7 +14,7 @@
 
 ##### CONSTANT DEFINITIONS
 
-GCC = ccache g++ -std=c++0x
+GCC = ccache g++ -std=c++11
 OPT = -Werror -O3
 INC = -I../
 LIB = 
