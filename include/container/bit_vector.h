@@ -172,7 +172,7 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise and for as many bytes as possible. */
   BitVector& operator&=(const BitVector& rhs) {
     const auto n = std::min(size(), rhs.size());
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 32 <= n; i += 32) {
@@ -221,7 +221,7 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise or for as many bytes as possible. */
   BitVector& operator|=(const BitVector& rhs) {
     const auto n = std::min(size(), rhs.size());
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 32 <= n; i += 32) {
@@ -270,7 +270,7 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise xor for as many bytes as possible. */
   BitVector& operator^=(const BitVector& rhs) {
     const auto n = std::min(size(), rhs.size());
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 32 <= n ; i += 32) {
@@ -319,7 +319,7 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise not. */
   BitVector operator~() const {
     auto ret = *this;
-    auto i = 0;
+    size_t i = 0;
 
     // Any good ideas for how to vectorize this effectively?
 
