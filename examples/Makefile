@@ -36,6 +36,7 @@ EX  = command_line/command_line \
 			io/nopstream \
 			io/wrap \
 			lazy/thunk \
+			math/online_stats \
 			memory/interner \
 			meta/indices \
 			patterns/singleton \
