@@ -25,32 +25,32 @@ class OnlineStats;
 
 template <typename T>
 class OnlineStats <T, typename std::enable_if<std::is_arithmetic<T>::value>::type> {
-	public:
-		OnlineStats() : n_(0), mean_(0) { }
+ public:
+  OnlineStats() : n_(0), mean_(0) { }
 
-		void push_back(T t) {
-			n_++;
-			const auto delta = t - mean_;
-			mean_ += delta / n_;
-			m2_ += delta * (t - mean_);
-		}
+  void push_back(T t) {
+    n_++;
+    const auto delta = t - mean_;
+    mean_ += delta / n_;
+    m2_ += delta * (t - mean_);
+  }
 
-		size_t size() const {
-			return n_;
-		}
+  size_t size() const {
+    return n_;
+  }
 
-		T mean() const {
-			return mean_;
-		}
-	
-		T variance() const {
-			return n_ < 2 ? 0 : m2_ / (n_-1);
-		}	
+  T mean() const {
+    return mean_;
+  }
 
-	private:
-		size_t n_;
-		T mean_;
-		T m2_;
+  T variance() const {
+    return n_ < 2 ? 0 : m2_ / (n_ - 1);
+  }
+
+ private:
+  size_t n_;
+  T mean_;
+  T m2_;
 };
 
 } // namespace cpputil

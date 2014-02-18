@@ -20,24 +20,24 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-	OnlineStats<float> os;
-	for ( size_t i = 0; i < 10; ++i ) {
-		os.push_back(i);
-	}
+  OnlineStats<float> os;
+  for (size_t i = 0; i < 10; ++i) {
+    os.push_back(i);
+  }
 
-	float mean = 0;
-	float var = 0;
-	for ( size_t i = 0; i < 10; ++i ) {
-		mean += i;
-	}
-	mean /= 10;
-	for ( size_t i = 0; i < 10; ++i ) {
-		var += (i-mean) * (i-mean);
-	}
-	var /= 9;
+  float mean = 0;
+  float var = 0;
+  for (size_t i = 0; i < 10; ++i) {
+    mean += i;
+  }
+  mean /= 10;
+  for (size_t i = 0; i < 10; ++i) {
+    var += (i - mean) * (i - mean);
+  }
+  var /= 9;
 
-	cout << "mean = " << os.mean() << " (should be " << mean << ")" << endl;
-	cout << "sig2 = " << os.variance() << " (should be " << var << ")" << endl;
+  cout << "mean = " << os.mean() << " (should be " << mean << ")" << endl;
+  cout << "sig2 = " << os.variance() << " (should be " << var << ")" << endl;
 
-	return 0;
+  return 0;
 }
