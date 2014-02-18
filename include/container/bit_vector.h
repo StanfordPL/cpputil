@@ -172,21 +172,21 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise and for as many bytes as possible. */
   BitVector& operator&=(const BitVector& rhs) {
     const auto n = std::min(size(), rhs.size());
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 32 <= n; i += 32) {
       auto x = _mm256_load_si256((__m256i*) & (*this)[i]);
       auto y = _mm256_load_si256((__m256i*) &rhs[i]);
       x = _mm256_and_si256(x, y);
-      _mm256_store_si256((__m256i*)(&(*this)[i], x);
+      _mm256_store_si256((__m256i*)(&(*this)[i]), x);
     }
 #elif defined(__AVX__)
     for (; i + 16 <= n; i += 16) {
       auto x = _mm_load_si128((__m128i*) & (*this)[i]);
       auto y = _mm_load_si128((__m128i*) &rhs[i]);
       x = _mm_and_si128(x, y);
-      _mm_store_si128((__m128i*) & (*this)[i]), x);
+      _mm_store_si128((__m128i*)(& (*this)[i]), x);
     }
 #endif
 
@@ -221,21 +221,21 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise or for as many bytes as possible. */
   BitVector& operator|=(const BitVector& rhs) {
     const auto n = std::min(size(), rhs.size());
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 32 <= n; i += 32) {
       auto x = _mm256_load_si256((__m256i*) & (*this)[i]);
       auto y = _mm256_load_si256((__m256i*) &rhs[i]);
       x = _mm256_or_si256(x, y);
-      _mm256_store_si256((__m256i*)(&(*this)[i], x);
+      _mm256_store_si256((__m256i*)(&(*this)[i]), x);
     }
 #elif defined(__AVX__)
     for (; i + 16 <= n; i += 16) {
       auto x = _mm_load_si128((__m128i*) & (*this)[i]);
       auto y = _mm_load_si128((__m128i*) &rhs[i]);
       x = _mm_or_si128(x, y);
-      _mm_store_si128((__m128i*) & (*this)[i]), x);
+      _mm_store_si128((__m128i*)( & (*this)[i]), x);
     }
 #endif
 
@@ -270,21 +270,21 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise xor for as many bytes as possible. */
   BitVector& operator^=(const BitVector& rhs) {
     const auto n = std::min(size(), rhs.size());
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 32 <= n ; i += 32) {
       auto x = _mm256_load_si256((__m256i*) & (*this)[i]);
       auto y = _mm256_load_si256((__m256i*) &rhs[i]);
       x = _mm256_xor_si256(x, y);
-      _mm256_store_si256((__m256i*)(&(*this)[i], x);
+      _mm256_store_si256((__m256i*)(&(*this)[i]), x);
     }
 #elif defined(__AVX__)
     for (; i + 16 <= n ; i += 16) {
       auto x = _mm_load_si128((__m128i*) & (*this)[i]);
       auto y = _mm_load_si128((__m128i*) &rhs[i]);
       x = _mm_xor_si128(x, y);
-      _mm_store_si128((__m128i*) & (*this)[i]), x);
+      _mm_store_si128((__m128i*)(& (*this)[i]), x);
     }
 #endif
 
@@ -319,7 +319,7 @@ class ALIGN BitVector : public std::vector<uint8_t> {
   /** Bit-wise not. */
   BitVector operator~() const {
     auto ret = *this;
-    auto i = 0;
+    size_t i = 0;
 
     // Any good ideas for how to vectorize this effectively?
 
