@@ -21,8 +21,8 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-  BitArray<9*8> b1;
-  BitArray<9*8> b2;
+  BitArray<9 * 8> b1;
+  BitArray<9 * 8> b2;
 
   for (auto i = 0; i < 9; ++i) {
     b1.get_fixed_byte(i) = 0xff;
@@ -54,10 +54,10 @@ int main() {
   }
   cout << endl;
 
-	for ( auto i = b1.set_bit_index_begin(); i != b1.set_bit_index_end(); ++i ) {
-		cout << dec << *i << " ";
-	}
-	cout << endl;
+  for (auto i = b1.set_bit_index_begin(); i != b1.set_bit_index_end(); ++i) {
+    cout << dec << *i << " ";
+  }
+  cout << endl;
 
   return 0;
 }

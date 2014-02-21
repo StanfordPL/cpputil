@@ -35,18 +35,18 @@ class CommandLineConfig {
   static void strict_with_convenience(int argc, char** argv) {
     Heading::create("Help and argument utilities:");
     auto& help = FlagArg::create("h")
-      .alternate("help")
-      .description("Print this message and quit");
+                 .alternate("help")
+                 .description("Print this message and quit");
     auto& debug = FlagArg::create("debug_args")
-      .description("Print program arguments and quit");
+                  .description("Print program arguments and quit");
     auto& read_config = ValueArg<std::string>::create("config")
-      .usage("<path/to/file.dat>")
-      .default_val("")
-      .description("Read program args from a configuration file");
+                        .usage("<path/to/file.dat>")
+                        .default_val("")
+                        .description("Read program args from a configuration file");
     auto& write_config = ValueArg<std::string>::create("example_config")
-      .usage("<path/to/file.dat>")
-      .default_val("")
-      .description("Print an example configuration file");
+                         .usage("<path/to/file.dat>")
+                         .default_val("")
+                         .description("Print an example configuration file");
 
     Args::sort_args([](Arg * a1, Arg * a2) {
       return *(a1->alias_begin()) < *(a2->alias_begin());

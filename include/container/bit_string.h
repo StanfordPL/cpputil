@@ -38,111 +38,111 @@ namespace cpputil {
 template <typename T>
 class ALIGN BitString {
  public:
-	typedef uint8_t* fixed_byte_iterator;
-	typedef const uint8_t* const_fixed_byte_iterator;
-	typedef uint16_t* fixed_word_iterator;
-	typedef const uint16_t* const_fixed_word_iterator;
-	typedef uint32_t* fixed_double_iterator;
-	typedef const uint32_t* const_fixed_double_iterator;
-	typedef uint64_t* fixed_quad_iterator;
-	typedef const uint64_t* const_fixed_quad_iterator;
-	typedef float* float_single_iterator;
-	typedef const float* const_float_single_iterator;
-	typedef double* float_double_iterator;
-	typedef const double* const_float_double_iterator;
+  typedef uint8_t* fixed_byte_iterator;
+  typedef const uint8_t* const_fixed_byte_iterator;
+  typedef uint16_t* fixed_word_iterator;
+  typedef const uint16_t* const_fixed_word_iterator;
+  typedef uint32_t* fixed_double_iterator;
+  typedef const uint32_t* const_fixed_double_iterator;
+  typedef uint64_t* fixed_quad_iterator;
+  typedef const uint64_t* const_fixed_quad_iterator;
+  typedef float* float_single_iterator;
+  typedef const float* const_float_single_iterator;
+  typedef double* float_double_iterator;
+  typedef const double* const_float_double_iterator;
 
-	class const_set_bit_index_iterator {
-		friend class BitString;
+  class const_set_bit_index_iterator {
+    friend class BitString;
 
-		public:
-			/** Return the index of the current set bit. */
-			size_t operator*() const {
-				return 64 * offset_ + BitManip<uint64_t>::ntz(current_);
-			}
-			/** Increment. */
-			const_set_bit_index_iterator& operator++() {
-				if ( BitManip<uint64_t>::unset_rightmost(current_) == 0 ) {
-					for ( ++itr_, ++offset_; itr_ != end_ && *itr_ == 0; ++itr_, ++offset_ );
-					current_ = itr_ == end_ ? 0 : *itr_;
-				}
-				return *this;
-			}
-			/** Equality. */
-			bool operator==(const const_set_bit_index_iterator& rhs) const {
-				return itr_ == rhs.itr_ && current_ == rhs.current_;
-			}
-			/** Inequality. */
-			bool operator!=(const const_set_bit_index_iterator& rhs) const {
-				return !(*this == rhs);
-			}
+   public:
+    /** Return the index of the current set bit. */
+    size_t operator*() const {
+      return 64 * offset_ + BitManip<uint64_t>::ntz(current_);
+    }
+    /** Increment. */
+    const_set_bit_index_iterator& operator++() {
+      if (BitManip<uint64_t>::unset_rightmost(current_) == 0) {
+        for (++itr_, ++offset_; itr_ != end_ && *itr_ == 0; ++itr_, ++offset_);
+        current_ = itr_ == end_ ? 0 : *itr_;
+      }
+      return *this;
+    }
+    /** Equality. */
+    bool operator==(const const_set_bit_index_iterator& rhs) const {
+      return itr_ == rhs.itr_ && current_ == rhs.current_;
+    }
+    /** Inequality. */
+    bool operator!=(const const_set_bit_index_iterator& rhs) const {
+      return !(*this == rhs);
+    }
 
-		private:
-			/** Begin constructor. */
-			const_set_bit_index_iterator(typename T::const_iterator itr, typename T::const_iterator end) : 
-					itr_(itr), end_(end), offset_(0) {
-				for ( ; itr_ != end_ && *itr_ == 0; ++offset_, ++itr_ );
-				current_ = itr_ != end_ ? *itr_ : 0;
-			}
-			/** End constructor. */
-			const_set_bit_index_iterator(typename T::const_iterator end) : 
-					itr_(end), end_(end), offset_(0), current_(0) { }
+   private:
+    /** Begin constructor. */
+    const_set_bit_index_iterator(typename T::const_iterator itr, typename T::const_iterator end) :
+      itr_(itr), end_(end), offset_(0) {
+      for (; itr_ != end_ && *itr_ == 0; ++offset_, ++itr_);
+      current_ = itr_ != end_ ? *itr_ : 0;
+    }
+    /** End constructor. */
+    const_set_bit_index_iterator(typename T::const_iterator end) :
+      itr_(end), end_(end), offset_(0), current_(0) { }
 
-			typename T::const_iterator itr_;
-			typename T::const_iterator end_;
-			size_t offset_;
-			uint64_t current_;
-	};
+    typename T::const_iterator itr_;
+    typename T::const_iterator end_;
+    size_t offset_;
+    uint64_t current_;
+  };
 
-	/** Default constructor. */
-	BitString() : contents_(), num_bytes_(0) { }
-	/** Copy constructor. */
-	BitString(const BitString& rhs) {
-		contents_ = rhs.contents_;
-		num_bytes_ = rhs.num_bytes_;
-	}
-	/** Move constructor. */
-	BitString(BitString&& rhs) {
-		contents_ = std::move(rhs.contents_);	
-		num_bytes_ = rhs.num_bytes_;
-	}
-	/** Assignment operator. */
-	BitString& operator=(const BitString& rhs) {
-		BitString(rhs).swap(*this);
-		return *this;
-	}
-	/** Move assignment operator. */
-	BitString& operator=(const BitString&& rhs) {
-		BitString(std::move(rhs)).swap(*this);
-		return *this;
-	}
+  /** Default constructor. */
+  BitString() : contents_(), num_bytes_(0) { }
+  /** Copy constructor. */
+  BitString(const BitString& rhs) {
+    contents_ = rhs.contents_;
+    num_bytes_ = rhs.num_bytes_;
+  }
+  /** Move constructor. */
+  BitString(BitString&& rhs) {
+    contents_ = std::move(rhs.contents_);
+    num_bytes_ = rhs.num_bytes_;
+  }
+  /** Assignment operator. */
+  BitString& operator=(const BitString& rhs) {
+    BitString(rhs).swap(*this);
+    return *this;
+  }
+  /** Move assignment operator. */
+  BitString& operator=(const BitString && rhs) {
+    BitString(std::move(rhs)).swap(*this);
+    return *this;
+  }
 
-	/** Returns the number of bits in this array. */
-	size_t num_bits() const {
-		return 64 * num_bytes_;
-	}
+  /** Returns the number of bits in this array. */
+  size_t num_bits() const {
+    return 64 * num_bytes_;
+  }
   /** Returns the number of bytes in this array. */
   size_t num_fixed_bytes() const {
-    return num_bytes_; 
+    return num_bytes_;
   }
   /** Returns the number of words in this array. */
   size_t num_fixed_words() const {
-    return (num_bytes_+1) / 2;
+    return (num_bytes_ + 1) / 2;
   }
   /** Returns the number of doubles in this array. */
   size_t num_fixed_doubles() const {
-    return (num_bytes_+3) / 4;
+    return (num_bytes_ + 3) / 4;
   }
   /** Returns the number of quads in this array. */
   size_t num_fixed_quads() const {
-    return (num_bytes_+7) / 8;
+    return (num_bytes_ + 7) / 8;
   }
   /** Returns the number of floats in this array. */
   size_t num_float_singles() const {
-    return (num_bytes_+3) / 4;
+    return (num_bytes_ + 3) / 4;
   }
   /** Returns the number of doubles in this array. */
   size_t num_float_doubles() const {
-    return (num_bytes_+7) / 8;
+    return (num_bytes_ + 7) / 8;
   }
 
   /** Returns a fixed point byte value. */
@@ -176,10 +176,10 @@ class ALIGN BitString {
     return ((double*) contents_.data())[i];
   }
 
-	/** Returns a const bool value. */
-	bool get_bit(size_t i) const {
-		return contents_[i/64] & (0x00000001 << (i%64));
-	}
+  /** Returns a const bool value. */
+  bool get_bit(size_t i) const {
+    return contents_[i / 64] & (0x00000001 << (i % 64));
+  }
   /** Returns a const fixed point byte value. */
   uint8_t get_fixed_byte(size_t i) const {
     assert(i < num_fixed_bytes());
@@ -211,116 +211,116 @@ class ALIGN BitString {
     return ((double*) contents_.data())[i];
   }
 
-	/** Set bit iterator. */
-	const_set_bit_index_iterator set_bit_index_begin() const {
-		return const_set_bit_index_iterator(contents_.begin(), contents_.end());
-	}
-	/** Set bit iterator. */
-	const_set_bit_index_iterator set_bit_index_end() const {
-		return const_set_bit_index_iterator(contents_.end());
-	}
+  /** Set bit iterator. */
+  const_set_bit_index_iterator set_bit_index_begin() const {
+    return const_set_bit_index_iterator(contents_.begin(), contents_.end());
+  }
+  /** Set bit iterator. */
+  const_set_bit_index_iterator set_bit_index_end() const {
+    return const_set_bit_index_iterator(contents_.end());
+  }
 
-	/** Byte iterator. */
-	fixed_byte_iterator fixed_byte_begin() { 
-		return (uint8_t*) contents_.data();
-	}
-	/** Byte iterator. */
-	fixed_byte_iterator fixed_byte_end() {
-		return (uint8_t*) contents_.data() + num_fixed_bytes();
-	}
-	/** Byte iterator. */
-	const_fixed_byte_iterator fixed_byte_begin() const { 
-		return (uint8_t*) contents_.data();
-	}
-	/** Byte iterator. */
-	const_fixed_byte_iterator fixed_byte_end() const {
-		return (uint8_t*) contents_.data() + num_fixed_bytes();
-	}
+  /** Byte iterator. */
+  fixed_byte_iterator fixed_byte_begin() {
+    return (uint8_t*) contents_.data();
+  }
+  /** Byte iterator. */
+  fixed_byte_iterator fixed_byte_end() {
+    return (uint8_t*) contents_.data() + num_fixed_bytes();
+  }
+  /** Byte iterator. */
+  const_fixed_byte_iterator fixed_byte_begin() const {
+    return (uint8_t*) contents_.data();
+  }
+  /** Byte iterator. */
+  const_fixed_byte_iterator fixed_byte_end() const {
+    return (uint8_t*) contents_.data() + num_fixed_bytes();
+  }
 
-	/** Word iterator. */
-	fixed_word_iterator fixed_word_begin() { 
-		return (uint16_t*) contents_.data();
-	}
-	/** Word iterator. */
-	fixed_word_iterator fixed_word_end() {
-		return (uint16_t*) contents_.data() + num_fixed_words();
-	}
-	/** Word iterator. */
-	const_fixed_word_iterator fixed_word_begin() const { 
-		return (uint16_t*) contents_.data();
-	}
-	/** Word iterator. */
-	const_fixed_word_iterator fixed_word_end() const {
-		return (uint16_t*) contents_.data() + num_fixed_words();
-	}
+  /** Word iterator. */
+  fixed_word_iterator fixed_word_begin() {
+    return (uint16_t*) contents_.data();
+  }
+  /** Word iterator. */
+  fixed_word_iterator fixed_word_end() {
+    return (uint16_t*) contents_.data() + num_fixed_words();
+  }
+  /** Word iterator. */
+  const_fixed_word_iterator fixed_word_begin() const {
+    return (uint16_t*) contents_.data();
+  }
+  /** Word iterator. */
+  const_fixed_word_iterator fixed_word_end() const {
+    return (uint16_t*) contents_.data() + num_fixed_words();
+  }
 
-	/** Double iterator. */
-	fixed_double_iterator fixed_double_begin() { 
-		return (uint32_t*) contents_.data();
-	}
-	/** Double iterator. */
-	fixed_double_iterator fixed_double_end() {
-		return (uint32_t*) contents_.data() + num_fixed_doubles();
-	}
-	/** Double iterator. */
-	const_fixed_double_iterator fixed_double_begin() const { 
-		return (uint32_t*) contents_.data();
-	}
-	/** Double iterator. */
-	const_fixed_double_iterator fixed_double_end() const {
-		return (uint32_t*) contents_.data() + num_fixed_doubles();
-	}
+  /** Double iterator. */
+  fixed_double_iterator fixed_double_begin() {
+    return (uint32_t*) contents_.data();
+  }
+  /** Double iterator. */
+  fixed_double_iterator fixed_double_end() {
+    return (uint32_t*) contents_.data() + num_fixed_doubles();
+  }
+  /** Double iterator. */
+  const_fixed_double_iterator fixed_double_begin() const {
+    return (uint32_t*) contents_.data();
+  }
+  /** Double iterator. */
+  const_fixed_double_iterator fixed_double_end() const {
+    return (uint32_t*) contents_.data() + num_fixed_doubles();
+  }
 
-	/** Quad iterator. */
-	fixed_quad_iterator fixed_quad_begin() { 
-		return (uint64_t*) contents_.data();
-	}
-	/** Quad iterator. */
-	fixed_quad_iterator fixed_quad_end() {
-		return (uint64_t*) contents_.data() + num_fixed_quads();
-	}
-	/** Quad iterator. */
-	const_fixed_quad_iterator fixed_quad_begin() const { 
-		return (uint64_t*) contents_.data();
-	}
-	/** Quad iterator. */
-	const_fixed_quad_iterator fixed_quad_end() const {
-		return (uint64_t*) contents_.data() + num_fixed_quads();
-	}
+  /** Quad iterator. */
+  fixed_quad_iterator fixed_quad_begin() {
+    return (uint64_t*) contents_.data();
+  }
+  /** Quad iterator. */
+  fixed_quad_iterator fixed_quad_end() {
+    return (uint64_t*) contents_.data() + num_fixed_quads();
+  }
+  /** Quad iterator. */
+  const_fixed_quad_iterator fixed_quad_begin() const {
+    return (uint64_t*) contents_.data();
+  }
+  /** Quad iterator. */
+  const_fixed_quad_iterator fixed_quad_end() const {
+    return (uint64_t*) contents_.data() + num_fixed_quads();
+  }
 
-	/** Float iterator. */
-	float_single_iterator float_single_begin() { 
-		return (float*) contents_.data();
-	}
-	/** Float iterator. */
-	float_single_iterator float_single_end() {
-		return (float*) contents_.data() + num_float_singles();
-	}
-	/** Float iterator. */
-	const_float_single_iterator float_single_begin() const { 
-		return (float*) contents_.data();
-	}
-	/** Float iterator. */
-	const_float_single_iterator float_single_end() const {
-		return (float*) contents_.data() + num_float_singles();
-	}
+  /** Float iterator. */
+  float_single_iterator float_single_begin() {
+    return (float*) contents_.data();
+  }
+  /** Float iterator. */
+  float_single_iterator float_single_end() {
+    return (float*) contents_.data() + num_float_singles();
+  }
+  /** Float iterator. */
+  const_float_single_iterator float_single_begin() const {
+    return (float*) contents_.data();
+  }
+  /** Float iterator. */
+  const_float_single_iterator float_single_end() const {
+    return (float*) contents_.data() + num_float_singles();
+  }
 
-	/** Double iterator. */
-	float_double_iterator float_double_begin() { 
-		return (double*) contents_.data();
-	}
-	/** Double iterator. */
-	float_double_iterator float_double_end() {
-		return (double*) contents_.data() + num_float_doubles();
-	}
-	/** Double iterator. */
-	const_float_double_iterator float_double_begin() const { 
-		return (double*) contents_.data();
-	}
-	/** Double iterator. */
-	const_float_double_iterator float_double_end() const {
-		return (double*) contents_.data() + num_float_doubles();
-	}
+  /** Double iterator. */
+  float_double_iterator float_double_begin() {
+    return (double*) contents_.data();
+  }
+  /** Double iterator. */
+  float_double_iterator float_double_end() {
+    return (double*) contents_.data() + num_float_doubles();
+  }
+  /** Double iterator. */
+  const_float_double_iterator float_double_begin() const {
+    return (double*) contents_.data();
+  }
+  /** Double iterator. */
+  const_float_double_iterator float_double_end() const {
+    return (double*) contents_.data() + num_float_doubles();
+  }
 
   /** Bit-wise and. */
   BitString& operator&=(const BitString& rhs) {
@@ -341,7 +341,7 @@ class ALIGN BitString {
       _mm_store_si128((__m128i*)&contents_[i], x);
     }
 #endif
-    for (; i < contents_.size(); ++i ) {
+    for (; i < contents_.size(); ++i) {
       get_fixed_quad(i) &= rhs.get_fixed_quad(i);
     }
 
@@ -440,15 +440,15 @@ class ALIGN BitString {
     return ret;
   }
 
-	/** STL-compliant swap. */
-	void swap(BitString& rhs) {
-		std::swap(contents_, rhs.contents_);
-		std::swap(num_bytes_, rhs.num_bytes_);
-	}
+  /** STL-compliant swap. */
+  void swap(BitString& rhs) {
+    std::swap(contents_, rhs.contents_);
+    std::swap(num_bytes_, rhs.num_bytes_);
+  }
 
  protected:
-	T contents_;
-	size_t num_bytes_;
+  T contents_;
+  size_t num_bytes_;
 };
 
 #undef ALIGN
@@ -460,9 +460,9 @@ namespace std {
 /** STL-compliant swap. */
 template <typename T>
 void swap(cpputil::BitString<T>& lhs, cpputil::BitString<T>& rhs) {
-	lhs.swap(rhs);
+  lhs.swap(rhs);
 }
 
-} // namespace 
+} // namespace
 
 #endif

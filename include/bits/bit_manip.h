@@ -26,23 +26,23 @@ class BitManip;
 
 template <>
 class BitManip<uint64_t> {
-	public:
-		static size_t ntz(uint64_t x) {
-#ifdef __BMI__	
-			return _tzcnt_u64(x);
-#else
-			assert(false);
-			return 0;
-#endif
-		}
-
-		static uint64_t& unset_rightmost(uint64_t& x) {
+ public:
+  static size_t ntz(uint64_t x) {
 #ifdef __BMI__
-			return (x = _blsr_u64(x));
+    return _tzcnt_u64(x);
 #else
-			return (x &= (x-1));
+    assert(false);
+    return 0;
 #endif
-		}
+  }
+
+  static uint64_t& unset_rightmost(uint64_t& x) {
+#ifdef __BMI__
+    return (x = _blsr_u64(x));
+#else
+    return (x &= (x - 1));
+#endif
+  }
 };
 
 } // namespace cpputil

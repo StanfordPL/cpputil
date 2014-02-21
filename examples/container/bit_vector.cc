@@ -21,8 +21,8 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-  BitVector b1(63*8);
-  BitVector b2(63*8);
+  BitVector b1(63 * 8);
+  BitVector b2(63 * 8);
 
   for (auto i = 0; i < 63; ++i) {
     b1.get_fixed_byte(i) = 0xff;
