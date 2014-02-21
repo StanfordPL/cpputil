@@ -21,38 +21,43 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-  BitArray<63*8> b1;
-  BitArray<63*8> b2;
+  BitArray<9*8> b1;
+  BitArray<9*8> b2;
 
-  for (auto i = 0; i < 63; ++i) {
+  for (auto i = 0; i < 9; ++i) {
     b1.get_fixed_byte(i) = 0xff;
   }
 
-  for (auto i = b1.byte_begin(), ie = b1.byte_end(); i != ie; ++i) {
+  for (auto i = b1.fixed_byte_begin(), ie = b1.fixed_byte_end(); i != ie; ++i) {
     cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
-  for (auto i = b2.byte_begin(), ie = b2.byte_end(); i != ie; ++i) {
+  for (auto i = b2.fixed_byte_begin(), ie = b2.fixed_byte_end(); i != ie; ++i) {
     cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
 
   b2 |= b1;
 
-  for (auto i = b1.byte_begin(), ie = b1.byte_end(); i != ie; ++i) {
+  for (auto i = b1.fixed_byte_begin(), ie = b1.fixed_byte_end(); i != ie; ++i) {
     cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
-  for (auto i = b2.byte_begin(), ie = b2.byte_end(); i != ie; ++i) {
+  for (auto i = b2.fixed_byte_begin(), ie = b2.fixed_byte_end(); i != ie; ++i) {
     cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
 
   auto  b3 = ~b2;
-  for (auto i = b3.byte_begin(), ie = b3.byte_end(); i != ie; ++i) {
+  for (auto i = b3.fixed_byte_begin(), ie = b3.fixed_byte_end(); i != ie; ++i) {
     cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
+
+	for ( auto i = b1.set_bit_index_begin(); i != b1.set_bit_index_end(); ++i ) {
+		cout << dec << *i << " ";
+	}
+	cout << endl;
 
   return 0;
 }

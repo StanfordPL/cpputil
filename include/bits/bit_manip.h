@@ -12,23 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_CONTAINER_BIT_ARRAY_H
-#define CPPUTIL_INCLUDE_CONTAINER_BIT_ARRAY_H
+#ifndef CPPUTIL_INCLUDE_BITS_BIT_MANIP_H
+#define CPPUTIL_INCLUDE_BITS_BIT_MANIP_H
 
 #include <stdint.h>
 
-#include <array>
-
-#include "include/container/bit_string.h"
+#include <immintrin.h>
 
 namespace cpputil {
 
-template <size_t N>
-class BitArray : public BitString<std::array<uint64_t, (N+63)/64>> {
+template <typename T>
+class BitManip;
+
+template <>
+class BitManip<uint64_t> {
 	public:
-		/** Creates an empty bit array. */
-		BitArray() : BitString<std::array<uint64_t, (N+63)/64>>() { 
-			BitString<std::array<uint64_t, (N+63)/64>>::num_bytes_ = N/8;
+		static size_t ntz(uint64_t x) {
+#ifdef __BMI__	
+			return _tzcnt_u64(x);
+#else
+			assert(false);
+			return 0;
+#endif
+		}
+
+		static uint64_t& unset_rightmost(uint64_t& x) {
+#ifdef __BMI__
+			return (x = _blsr_u64(x));
+#else
+			return (x &= (x-1));
+#endif
 		}
 };
 
