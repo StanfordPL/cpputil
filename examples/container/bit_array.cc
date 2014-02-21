@@ -21,40 +21,36 @@ using namespace cpputil;
 using namespace std;
 
 int main() {
-  BitArray<63> b1;
-  BitArray<63> b2;
+  BitArray<63*8> b1;
+  BitArray<63*8> b2;
 
-  b1.fill(0xff);
+  for (auto i = 0; i < 63; ++i) {
+    b1.get_fixed_byte(i) = 0xff;
+  }
 
-  for (auto x : b1) {
-    cout << hex << setw(2) << setfill(' ') << (int) x << " ";
+  for (auto i = b1.byte_begin(), ie = b1.byte_end(); i != ie; ++i) {
+    cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
-  for (auto x : b2) {
-    cout << hex << setw(2) << setfill(' ') << (int) x << " ";
+  for (auto i = b2.byte_begin(), ie = b2.byte_end(); i != ie; ++i) {
+    cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
 
   b2 |= b1;
 
-  for (auto x : b1) {
-    cout << hex << setw(2) << setfill(' ') << (int) x << " ";
+  for (auto i = b1.byte_begin(), ie = b1.byte_end(); i != ie; ++i) {
+    cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
-  for (auto x : b2) {
-    cout << hex << setw(2) << setfill(' ') << (int) x << " ";
+  for (auto i = b2.byte_begin(), ie = b2.byte_end(); i != ie; ++i) {
+    cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
 
   auto  b3 = ~b2;
-  for (auto x : b3) {
-    cout << hex << setw(2) << setfill(' ') << (int) x << " ";
-  }
-  cout << endl;
-
-  auto b4 = b2 + b3;
-  for (auto x : b4) {
-    cout << hex << setw(2) << setfill(' ') << (int) x << " ";
+  for (auto i = b3.byte_begin(), ie = b3.byte_end(); i != ie; ++i) {
+    cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
   }
   cout << endl;
 
