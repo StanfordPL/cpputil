@@ -557,6 +557,15 @@ class ALIGN BitString {
     return ret;
   }
 
+	/** Equality. */
+	bool operator==(const BitString& rhs) const {
+		return contents_ == rhs.contents_ && num_bits_ == rhs.num_bits_;
+	}
+	/** Inequality. */
+	bool operator!=(const BitString& rhs) const {
+		return contents_ != rhs.contents_ || num_bits_ != rhs.num_bits_;
+	}
+
   /** STL-compliant swap. */
   void swap(BitString& rhs) {
     std::swap(contents_, rhs.contents_);
