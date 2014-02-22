@@ -68,6 +68,16 @@ class BitVector : public BitString<std::vector<uint64_t>> {
     contents_.resize(n);
     num_bits_ = 64 * n;
   }
+
+	/** Set all elements to zero. */
+	void unset() {
+		contents_.assign(contents_.size(), 0);
+	}
+
+	/** Set all elements to one. */
+	void set() {
+		contents_.assign(contents_.size(), -1);
+	}
 };
 
 } // namespace cpputil

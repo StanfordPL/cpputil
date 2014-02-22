@@ -28,8 +28,18 @@ class BitArray : public BitString < std::array < uint64_t, (N + 63) / 64 >> {
  public:
   /** Creates an empty bit array. */
   BitArray() : BitString < std::array < uint64_t, (N + 63) / 64 >> () {
-    BitString < std::array < uint64_t, (N + 63) / 64 >>::num_bits_ = N;
+    this->num_bits_ = N;
   }
+
+	/** Set all elements to zero. */
+	void unset() {
+		this->contents_.fill(0);
+	}
+
+	/** Set all elements to one. */
+	void set() {
+		this->contents_.fill(-1);
+	}
 };
 
 } // namespace cpputil

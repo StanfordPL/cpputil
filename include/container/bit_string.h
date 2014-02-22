@@ -133,6 +133,7 @@ class ALIGN BitString {
 				} else {
 					val_ &= ~mask_;
 				}
+				return *this;
 			}
 			/** Implicit conversion to bool. */
 			operator bool() const {
@@ -560,6 +561,15 @@ class ALIGN BitString {
 	/** Underlying data. */
 	void* data() {
 		return contents_.data();
+	}
+
+	/** Subscript operator. */
+	bit_type operator[](size_t i) {
+		return get_bit(i);
+	}
+	/** Subscript operator. */
+	bool operator[](size_t i) const {
+		return get_bit(i);
 	}
 
 	/** Equality. */
