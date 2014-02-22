@@ -557,6 +557,11 @@ class ALIGN BitString {
     return ret;
   }
 
+	/** Underlying data. */
+	void* data() {
+		return contents_.data();
+	}
+
 	/** Equality. */
 	bool operator==(const BitString& rhs) const {
 		return contents_ == rhs.contents_ && num_bits_ == rhs.num_bits_;
