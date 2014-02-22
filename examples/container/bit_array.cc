@@ -54,29 +54,29 @@ int main() {
   }
   cout << endl;
 
-	b3.get_bit(0) = false;
-	b3.get_bit(2) = false;
-	b3.get_bit(4) = true;
-	b3.get_bit(20) = true;
-	b3.get_bit(70) = true;
+  b3.get_bit(0) = false;
+  b3.get_bit(2) = false;
+  b3.get_bit(4) = true;
+  b3.get_bit(20) = true;
+  b3.get_bit(70) = true;
 
-	cout << "Bit indices: ";
+  cout << "Bit indices: ";
   for (auto i = b3.set_bit_index_begin(); i != b3.set_bit_index_end(); ++i) {
     cout << dec << *i << " ";
   }
   cout << endl;
 
-	cout << "Word indices: ";
-	for (auto i = b3.set_word_index_begin(); i != b3.set_word_index_end(); ++i ) {
-		cout << dec << *i << " ";
-	}
-	cout << endl;
+  cout << "Word indices: ";
+  for (auto i = b3.set_word_index_begin(); i != b3.set_word_index_end(); ++i) {
+    cout << dec << *i << " ";
+  }
+  cout << endl;
 
-	cout << "Quad indices: ";
-	for (auto i = b3.set_quad_index_begin(); i != b3.set_quad_index_end(); ++i ) {
-		cout << dec << *i << " ";
-	}
-	cout << endl;
+  cout << "Quad indices: ";
+  for (auto i = b3.set_quad_index_begin(); i != b3.set_quad_index_end(); ++i) {
+    cout << dec << *i << " ";
+  }
+  cout << endl;
 
   return 0;
 }

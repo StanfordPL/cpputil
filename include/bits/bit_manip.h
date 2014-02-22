@@ -45,14 +45,14 @@ class BitManip<uint64_t> {
 #endif
   }
 
-	static uint64_t& unset_rightmost(uint64_t& x, size_t n) {
-		assert(n <= 64);
-		if ( n == 64 ) {
-			return (x = 0);
-		} else {
-			return (x &= ~((0x1ul << n)-1));
-		}
-	}
+  static uint64_t& unset_rightmost(uint64_t& x, size_t n) {
+    assert(n <= 64);
+    if (n == 64) {
+      return (x = 0);
+    } else {
+      return (x &= ~((0x1ul << n) - 1));
+    }
+  }
 };
 
 } // namespace cpputil
