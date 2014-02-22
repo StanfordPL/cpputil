@@ -28,7 +28,7 @@ class BitArray : public BitString < std::array < uint64_t, (N + 63) / 64 >> {
  public:
   /** Creates an empty bit array. */
   BitArray() : BitString < std::array < uint64_t, (N + 63) / 64 >> () {
-    BitString < std::array < uint64_t, (N + 63) / 64 >>::num_bytes_ = N / 8;
+    BitString < std::array < uint64_t, (N + 63) / 64 >>::num_bits_ = N;
   }
 };
 

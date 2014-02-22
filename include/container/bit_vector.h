@@ -30,43 +30,43 @@ class BitVector : public BitString<std::vector<uint64_t>> {
   /** Creates a bit vector to hold n bits. */
   BitVector(size_t n) : BitString<std::vector<uint64_t>>() {
     contents_.resize((n + 63) / 64);
-    num_bytes_ = n / 8;
+    num_bits_ = n;
   }
 
   /** Resizes a BitVector to contain n bits. */
   void resize_for_bits(size_t n) {
     contents_.resize((n + 63) / 64);
-    num_bytes_ = n / 8;
+    num_bits_ = n;
   }
   /** Resizes a BitVector to contain n fixed bytes. */
   void resize_for_fixed_bytes(size_t n) {
     contents_.resize(n + 7 / 8);
-    num_bytes_ = n;
+    num_bits_ = 8 * n;
   }
   /** Resizes a BitVector to contain n fixed words. */
   void resize_for_fixed_words(size_t n) {
     contents_.resize(n + 3 / 4);
-    num_bytes_ = 2 * n;
+    num_bits_ = 16 * n;
   }
   /** Resizes a BitVector to contain n fixed doubles. */
   void resize_for_fixed_doubles(size_t n) {
     contents_.resize(n + 1 / 2);
-    num_bytes_ = 4 * n;
+    num_bits_ = 32 * n;
   }
   /** Resizes a BitVector to contain n fixed quads. */
   void resize_for_fixed_quads(size_t n) {
     contents_.resize(n);
-    num_bytes_ = 8 * n;
+    num_bits_ = 64 * n;
   }
   /** Resizes a BitVector to contain n float singles. */
   void resize_for_float_singles(size_t n) {
     contents_.resize(n + 1 / 2);
-    num_bytes_ = 4 * n;
+    num_bits_ = 32 * n;
   }
   /** Resizes a BitVector to contain n float doubles. */
   void resize_for_float_doubles(size_t n) {
     contents_.resize(n);
-    num_bytes_ = 8 * n;
+    num_bits_ = 64 * n;
   }
 };
 
