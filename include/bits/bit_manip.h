@@ -37,6 +37,15 @@ class BitManip<uint64_t> {
 #endif
   }
 
+	static size_t pop_count(uint64_t x) {
+#ifdef __POPCNT__
+		return _popcnt_u64(x);
+#else
+		assert(false);
+		return 0;
+#endif
+	}
+
   static uint64_t& unset_rightmost(uint64_t& x) {
 #ifdef __BMI__
     return (x = _blsr_u64(x));
