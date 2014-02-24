@@ -39,7 +39,7 @@ class BitManip<uint64_t> {
 
 	static size_t pop_count(uint64_t x) {
 #ifdef __POPCNT__
-		return _popcnt_u64(x);
+		return _popcnt64(x);
 #else
 		assert(false);
 		return 0;
