@@ -26,7 +26,7 @@ class OnlineStats;
 template <typename T>
 class OnlineStats <T, typename std::enable_if<std::is_arithmetic<T>::value>::type> {
  public:
-  OnlineStats() : n_(0), mean_(0) { }
+  OnlineStats() : n_(0), mean_(0), m2_(0) { }
 
   void push_back(T t) {
     n_++;

@@ -14,8 +14,8 @@
 
 ##### CONSTANT DEFINITIONS
 
-GCC = ccache g++ -std=c++11 -mavx -mavx2 -mbmi -mbmi2
-OPT = -Werror -O3
+GCC = ccache g++ -std=c++11 -mavx -mavx2 -mbmi -mbmi2 -mpopcnt 
+OPT = -Werror -Wextra -pedantic -O3
 INC = -I../
 LIB = 
 EX  = command_line/command_line \

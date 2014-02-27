@@ -23,7 +23,7 @@ using namespace std;
 
 template <typename T>
 void check(T t) {
-  T t2;
+  T t2 = T();
 
   stringstream ss;
   HexWriter<T>()(ss, t);
@@ -36,10 +36,10 @@ void check(T t) {
 }
 
 int main() {
-  char c = 0xab;
-  char16_t c16 = 0xabcd;
-  char32_t c32 = 0xabcdef01;
-  uint64_t u64 = 0xabcdef0123456789;
+  char c = 0x7b;
+  char16_t c16 = 0x7bcd;
+  char32_t c32 = 0x7bcdef01;
+  uint64_t u64 = 0x7bcdef0123456789;
   float f = 1234.0;
   double d = -5678.0;
 
@@ -51,4 +51,4 @@ int main() {
   check(d);
 
   return 0;
-};
+}

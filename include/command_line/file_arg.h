@@ -45,7 +45,7 @@ class FileArg : public Arg {
       if (!ifs.is_open()) {
         error(file_error_);
       } else {
-        T temp;
+        T temp = T();
         R()(ifs, temp);
 
         if (ifs.fail()) {

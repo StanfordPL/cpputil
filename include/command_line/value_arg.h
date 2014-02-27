@@ -42,7 +42,7 @@ class ValueArg : public Arg {
       }
 
       std::istringstream iss(argv[i + 1]);
-      T temp;
+      T temp = T();
       R()(iss, temp);
 
       if (iss.fail()) {
