@@ -70,7 +70,7 @@ class BitVector : public BitString<std::vector<uint64_t>> {
   }
 
   /** Set all elements to zero. */
-  void unset() {
+  void reset() {
     contents_.assign(contents_.size(), 0);
   }
 
