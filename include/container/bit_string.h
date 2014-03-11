@@ -100,6 +100,7 @@ class ALIGN BitString {
       const auto old_itr = itr_;
       for (++itr_; itr_ != end_ && *itr_ == 0; ++itr_);
       index_ += (itr_ - old_itr);
+			return *this;
     }
     /** Equality. */
     bool operator==(const const_set_index_iterator& rhs) const {
