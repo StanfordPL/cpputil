@@ -97,7 +97,9 @@ class Column {
         }
       }
 
-      sb_->sputc('\n');
+			if ( i+1 < height ) {
+				sb_->sputc('\n');
+			}
     }
 
     sb_->pubsync();

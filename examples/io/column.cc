@@ -71,5 +71,7 @@ int main() {
   os << "Col 3" << endl << s;
   os.filter().done();
 
+	cout << endl;
+
   return 0;
 }
