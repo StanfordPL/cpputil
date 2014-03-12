@@ -27,16 +27,8 @@
 
 namespace cpputil {
 
-#if defined(__AVX2__) && defined(__AVX__)
-#define ALIGN alignas(32)
-#elif defined(__AVX__)
-#define ALIGN alignas(16)
-#else
-#define ALIGN
-#endif
-
 template <typename T>
-class ALIGN BitString {
+class BitString {
  public:
   class const_set_bit_index_iterator {
     friend class BitString;
@@ -627,11 +619,9 @@ class ALIGN BitString {
   }
 
  protected:
-  T contents_;
+  alignas(32) T contents_;
   size_t num_bits_;
 };
-
-#undef ALIGN
 
 } // namespace cpputil
 

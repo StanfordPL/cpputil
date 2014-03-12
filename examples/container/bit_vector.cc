@@ -24,6 +24,8 @@ int main() {
   BitVector b1(63 * 8);
   BitVector b2(63 * 8);
 
+	cout << "Alignment on 32-bit boundary: " << ((uint64_t)(&b1.get_fixed_byte(0)) % 32) << endl;
+
   for (auto i = 0; i < 63; ++i) {
     b1.get_fixed_byte(i) = 0xff;
   }

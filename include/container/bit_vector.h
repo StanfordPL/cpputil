@@ -19,16 +19,17 @@
 
 #include <vector>
 
+#include "include/allocator/aligned.h"
 #include "include/container/bit_string.h"
 
 namespace cpputil {
 
-class BitVector : public BitString<std::vector<uint64_t>> {
+class BitVector : public BitString<std::vector<uint64_t, Aligned<uint64_t, 32>>> {
  public:
   /** Creates an empty bit vector. */
-  BitVector() : BitString<std::vector<uint64_t>>() { }
+  BitVector() : BitString<std::vector<uint64_t, Aligned<uint64_t, 32>>>() { }
   /** Creates a bit vector to hold n bits. */
-  BitVector(size_t n) : BitString<std::vector<uint64_t>>() {
+  BitVector(size_t n) : BitString<std::vector<uint64_t, Aligned<uint64_t, 32>>>() {
     contents_.resize((n + 63) / 64);
     num_bits_ = n;
   }

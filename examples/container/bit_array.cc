@@ -24,6 +24,8 @@ int main() {
   BitArray<9 * 8> b1;
   BitArray<9 * 8> b2;
 
+	cout << "Alignment on 32-bit boundary: " << ((uint64_t)(&b1.get_fixed_byte(0)) % 32) << endl;
+
   for (auto i = 0; i < 9; ++i) {
     b1.get_fixed_byte(i) = 0xff;
   }
