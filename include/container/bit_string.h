@@ -260,7 +260,7 @@ class ALIGN BitString {
   /** Returns a bit. */
   bit_type get_bit(size_t i) {
     assert(i < num_bits());
-    return bit_type(contents_[i / 64], 0x1ul << i % 64);
+    return bit_type(contents_[i / 64], 0x1ull << (i % 64));
   }
   /** Returns a fixed point byte value. */
   uint8_t& get_fixed_byte(size_t i) {
@@ -295,7 +295,7 @@ class ALIGN BitString {
 
   /** Returns a const bool value. */
   bool get_bit(size_t i) const {
-    return contents_[i / 64] & (0x00000001 << (i % 64));
+    return contents_[i / 64] & (0x1ull<< (i % 64));
   }
   /** Returns a const fixed point byte value. */
   uint8_t get_fixed_byte(size_t i) const {
