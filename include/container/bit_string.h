@@ -190,34 +190,72 @@ class ALIGN BitString {
     return *this;
   }
 
-  /** Returns the number of bits in this array. */
+  /** Returns the number of bits in this string. */
   size_t num_bits() const {
     return num_bits_;
   }
-  /** Returns the number of bytes in this array. */
+  /** Returns the number of bytes in this string. */
   size_t num_fixed_bytes() const {
     return num_bits_ / 8;
   }
-  /** Returns the number of words in this array. */
+  /** Returns the number of words in this string. */
   size_t num_fixed_words() const {
     return num_bits_ / 16;
   }
-  /** Returns the number of doubles in this array. */
+  /** Returns the number of doubles in this string. */
   size_t num_fixed_doubles() const {
     return num_bits_ / 32;
   }
-  /** Returns the number of quads in this array. */
+  /** Returns the number of quads in this string. */
   size_t num_fixed_quads() const {
     return num_bits_ / 64;
   }
-  /** Returns the number of floats in this array. */
+  /** Returns the number of floats in this string. */
   size_t num_float_singles() const {
     return num_bits_ / 32;
   }
-  /** Returns the number of doubles in this array. */
+  /** Returns the number of doubles in this string. */
   size_t num_float_doubles() const {
     return num_bits_ / 64;
   }
+
+	/** Returns the number of set bits in this string. */
+	size_t num_set_bits() const {
+		assert(false);
+		return 0;
+	}
+	/** Returns the number of set bytes in this string. */
+	size_t num_set_bytes() const {
+		size_t count = 0;
+		for ( auto i = fixed_byte_begin(), ie = fixed_byte_end(); i != ie; ++i ) {
+			count += (*i > 0) ? 1 : 0;
+		}
+		return count;
+	}
+	/** Returns the number of set words in this string. */
+	size_t num_set_words() const {
+		size_t count = 0;
+		for ( auto i = fixed_word_begin(), ie = fixed_word_end(); i != ie; ++i ) {
+			count += (*i > 0) ? 1 : 0;
+		}
+		return count;
+	}
+	/** Returns the number of set doubles in this string. */
+	size_t num_set_doubles() const {
+		size_t count = 0;
+		for ( auto i = fixed_double_begin(), ie = fixed_double_end(); i != ie; ++i ) {
+			count += (*i > 0) ? 1 : 0;
+		}
+		return count;
+	}
+	/** Returns the number of set quads in this string. */
+	size_t num_set_quads() const {
+		size_t count = 0;
+		for ( auto i = fixed_quad_begin(), ie = fixed_quad_end(); i != ie; ++i ) {
+			count += (*i > 0) ? 1 : 0;
+		}
+		return count;
+	}
 
   /** Returns a bit. */
   bit_type get_bit(size_t i) {
