@@ -212,16 +212,19 @@ class Args {
     std::string s;
     while (fs >> s) {
       if (s.front() == '"') {
-        s = s.substr(1);
+				if (s.back() == '"') {
+					s = s.substr(1, s.length()-2);
+				} else {
+					s = s.substr(1);
 
-        std::string s2;
-        while (fs >> s2 && s2.back() != '"') {
-          s = s + " " + s2;
-        }
-
-        if (fs.good()) {
-          s = s + " " + s2.substr(0, s2.length() - 1);
-        }
+					std::string s2;
+					while (fs >> s2 && s2.back() != '"') {
+						s = s + " " + s2;
+					}
+					if (fs.good()) {
+						s = s + " " + s2.substr(0, s2.length()-1);
+					}
+				}
       }
 
       argv.push_back(strdup(s.c_str()));
