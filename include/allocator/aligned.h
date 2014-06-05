@@ -25,11 +25,11 @@ class Aligned {
 			typedef Aligned<T2, N> other;
 		};
 
-		explicit Aligned() { }
+		Aligned() { }
 		~Aligned() { }
-		explicit Aligned(const Aligned& rhs) { }
+		Aligned(const Aligned& rhs) { }
 		template<typename T2>
-		explicit Aligned(const Aligned<T2>& rhs) { }
+		Aligned(const Aligned<T2>& rhs) { }
 
 		pointer address (reference r) {
 			return &r;
