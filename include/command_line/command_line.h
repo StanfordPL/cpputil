@@ -20,6 +20,7 @@
 #include "include/command_line/command_line_config.h"
 #include "include/command_line/file_arg.h"
 #include "include/command_line/flag_arg.h"
+#include "include/command_line/folder_arg.h"
 #include "include/command_line/heading.h"
 #include "include/command_line/value_arg.h"
 
