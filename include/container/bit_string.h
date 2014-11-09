@@ -56,9 +56,9 @@ class BitString {
         /* Iterate through the 64-bit chunks to find the next non-zero one */
         const auto old_itr = itr_;
         for (++itr_; itr_ != end_ && *itr_ == 0; ++itr_);
-        current_ = *itr_;
         if(itr_ != end_) {
           /* found it; recompute the index */
+          current_ = *itr_;
           index_ += 64 * (itr_ - old_itr) + BitManip<uint64_t>::ntz(current_);
           assert(index_ < num_bits_);
         } else {
@@ -89,9 +89,9 @@ class BitString {
       end_(end), num_bits_(num_bits) {
       /* Iterate through 64-bit chunks to find the next lowest index */
       for (itr_ = i; itr_ != end_ && *itr_ == 0; ++itr_);
-      current_ = *itr_;
       if(itr_ != end_) {
         /* found it; find the index of the lowest bit in the 64-bit chunk */
+        current_ = *itr_;
         index_ = 64 * (itr_ - begin) + BitManip<uint64_t>::ntz(current_);
         assert(index_ < num_bits_);
       } else {
