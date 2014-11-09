@@ -630,6 +630,10 @@ class BitString {
   void* data() {
     return contents_.data();
   }
+  /** Underlying data. */
+  void* data() const {
+    return contents_.data();
+  }
 
   /** Subscript operator. */
   bit_type operator[](size_t i) {
