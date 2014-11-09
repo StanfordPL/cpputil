@@ -631,7 +631,7 @@ class BitString {
     return contents_.data();
   }
   /** Underlying data. */
-  void* data() const {
+  const void* data() const {
     return contents_.data();
   }
 
