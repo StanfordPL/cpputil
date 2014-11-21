@@ -73,9 +73,11 @@ class FolderArg : public Arg {
           R()(ifs, temp);
 
           if (ifs.fail()) {
-            continue;
-            // This could be a parse error; but for now I'm opting to
-            // silently ignore files that can't be parsed.  FIXME.
+            std::string err = "Unable to parse the file '";
+            err += dirp->d_name;
+            err += "'!";
+            error(err);
+            return std::make_pair(i, i);
           } else {
             val_.push_back(temp);
           }
