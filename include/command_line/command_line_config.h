@@ -96,6 +96,7 @@ class CommandLineConfig {
         exit(1);
       }
       write_config_file(ofs, argv[0]);
+      exit(0);
     }
   }
 
