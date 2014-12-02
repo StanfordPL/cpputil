@@ -54,6 +54,8 @@ class FileArg : public Arg {
           val_ = temp;
         }
       }
+
+      set_provided();
       return std::make_pair(i, i + 1);
     }
 
@@ -81,6 +83,12 @@ class FileArg : public Arg {
   /** Resets arg default value */
   FileArg& default_val(const T& t) {
     val_ = t;
+    return *this;
+  }
+
+  /** Resets the required value. */
+  FileArg& required(const bool val = true) {
+    Arg::required(val);
     return *this;
   }
 
