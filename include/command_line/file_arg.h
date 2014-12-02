@@ -82,6 +82,7 @@ class FileArg : public Arg {
 
   /** Resets arg default value */
   FileArg& default_val(const T& t) {
+    set_has_default();
     val_ = t;
     return *this;
   }

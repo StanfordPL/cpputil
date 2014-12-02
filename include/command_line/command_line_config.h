@@ -41,11 +41,9 @@ class CommandLineConfig {
                   .description("Print program arguments and quit");
     auto& read_config = ValueArg<std::string>::create("config")
                         .usage("<path/to/file.conf>")
-                        .default_val("")
                         .description("Read program args from a configuration file");
     auto& write_config = ValueArg<std::string>::create("example_config")
                          .usage("<path/to/file.conf>")
-                         .default_val("")
                          .description("Print an example configuration file");
 
     if (sort_args) {
@@ -94,6 +92,7 @@ class CommandLineConfig {
     auto missing_arg = false;
     for (auto it = Args::arg_begin(); it != Args::arg_end(); ++it) {
       auto arg = *it;
+      assert(!(arg->is_required() && arg->has_default()) && "Arguments cannot be both required and have a default.");
       if (arg->is_required() && !arg->has_been_provided()) {
         if (!missing_arg) {
           std::cerr << "Errors:" << std::endl;
@@ -208,6 +207,19 @@ class CommandLineConfig {
         wrap.filter().limit(60);
         (*a)->description(wrap);
         wrap << std::endl;
+
+        // try to print the default value
+        if ((*a)->has_default()) {
+          std::ostringstream ss;
+          (*a)->debug(ss);
+          auto default_val = ss.str();
+          if (default_val.find("\n") == std::string::npos) {
+            // only show default argument if the default does not take more than one line
+            wrap << "Default: " << default_val << std::endl;
+          }
+        } else if ((*a)->is_required()) {
+          wrap << "Required argument" << std::endl;
+        }
 
         ofs.filter().unindent(2);
       }

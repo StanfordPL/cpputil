@@ -96,6 +96,11 @@ class Arg {
     return is_provided_;
   }
 
+  /** Does this argument have a default? */
+  bool has_default() const {
+    return has_default_;
+  }
+
   /** Prints the value of an arg */
   virtual void debug(std::ostream& os) const = 0;
 
@@ -110,7 +115,7 @@ class Arg {
   };
 
   /** An arg must be assigned at least one alias */
-  Arg(const std::string& opt) : is_provided_(false) {
+  Arg(const std::string& opt) : is_provided_(false), has_default_(false) {
     alternate(opt);
     usage("");
     description("(no description provided)");
@@ -182,6 +187,11 @@ class Arg {
     required_ = val;
   }
 
+  /** Reset whether this argument has a default. */
+  void set_has_default(const bool val = true) {
+    has_default_ = val;
+  }
+
   /** Indicate that this argument has been set now. */
   void set_provided() {
     is_provided_ = true;
@@ -203,6 +213,8 @@ class Arg {
   bool required_;
   /** Has this argument been provided in some way? */
   bool is_provided_;
+  /** Does this argument have a default? */
+  bool has_default_;
 };
 
 } // namespace cpputil
