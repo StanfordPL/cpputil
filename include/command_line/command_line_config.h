@@ -89,6 +89,21 @@ class CommandLineConfig {
       exit(0);
     }
 
+    auto missing_arg = false;
+    for (auto it = Args::arg_begin(); it != Args::arg_end(); ++it) {
+      auto arg = *it;
+      if (arg->is_required() && !arg->has_been_provided()) {
+        if (!missing_arg) {
+          std::cerr << "Errors:" << std::endl;
+        }
+        missing_arg = true;
+        std::cerr << "  Argument '" << *arg->alias_begin() << "' is required!" << std::endl;
+      }
+    }
+    if (missing_arg) {
+      exit(1);
+    }
+
     if (write_config.value() != "") {
       std::ofstream ofs(write_config.value());
       if (!ofs.is_open()) {

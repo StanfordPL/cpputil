@@ -50,6 +50,7 @@ class ValueArg : public Arg {
       } else {
         val_ = temp;
       }
+      set_provided();
       return std::make_pair(i, i + 1);
     }
 
@@ -83,6 +84,12 @@ class ValueArg : public Arg {
   /** Resets parse error message */
   ValueArg& parse_error(const std::string& pe) {
     parse_error_ = pe;
+    return *this;
+  }
+
+  /** Resets the required value. */
+  ValueArg& required(const bool val = true) {
+    Arg::required(val);
     return *this;
   }
 

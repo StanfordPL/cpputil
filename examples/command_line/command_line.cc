@@ -31,7 +31,7 @@ auto& i = ValueArg<int, RangeReader<int, Range<int, 1, 10>>>::create("i")
           .alternate("int")
           .usage("<int>")
           .description("i | 1 <= i <= 10")
-          .default_val(5);
+          .required();
 
 auto& h = ValueArg<uint64_t, HexReader<uint64_t>, HexWriter<uint64_t>>::create("j")
           .alternate("hex")
