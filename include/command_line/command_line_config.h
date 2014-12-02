@@ -32,7 +32,7 @@ namespace cpputil {
 class CommandLineConfig {
  public:
   /** Strict parse with help, config, and debug support */
-  static void strict_with_convenience(int argc, char** argv) {
+  static void strict_with_convenience(int argc, char** argv, bool sort_args = false) {
     Heading::create("Help and argument utilities:");
     auto& help = FlagArg::create("h")
                  .alternate("help")
@@ -48,9 +48,11 @@ class CommandLineConfig {
                          .default_val("")
                          .description("Print an example configuration file");
 
-    Args::sort_args([](Arg * a1, Arg * a2) {
-      return *(a1->alias_begin()) < *(a2->alias_begin());
-    });
+    if (sort_args) {
+      Args::sort_args([](Arg * a1, Arg * a2) {
+        return *(a1->alias_begin()) < *(a2->alias_begin());
+      });
+    }
     Args::read(argc, argv);
 
     if (help) {
