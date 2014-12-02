@@ -112,6 +112,7 @@ class FolderArg : public Arg {
 
   /** Resets arg default value */
   FolderArg& default_val(const std::vector<T>& t) {
+    set_has_default();
     val_ = t;
     return *this;
   }

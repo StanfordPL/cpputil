@@ -77,6 +77,7 @@ class ValueArg : public Arg {
 
   /** Resets arg default value */
   ValueArg& default_val(const T& t) {
+    set_has_default();
     val_ = t;
     return *this;
   }
