@@ -30,6 +30,7 @@ EX  = command_line/command_line \
 			io/indent \
 			io/line_comment \
 			io/multistream \
+			io/prefix \
 			io/redact \
 			io/redirectstream \
 			io/shunt \
