@@ -194,13 +194,28 @@ class CommandLineConfig {
     ofilterstream<Indent> ofs(os);
     ofs.filter().indent();
 
+    auto show_defaults = Args::show_defaults();
+
     for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
       ofs << g->heading() << std::endl;
       ofs << std::endl;
       for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
-        write_arg(ofs, *a);
-        ofs << std::endl;
+        std::string default_val;
+        bool short_default = false;
 
+        write_arg(ofs, *a);
+
+        if (show_defaults && (*a)->has_default()) {
+          std::ostringstream ss;
+          (*a)->debug(ss);
+          default_val = ss.str();
+          if (default_val.length() < 20) {
+            short_default = true;
+            ofs << " (default: " << default_val << ")";
+          }
+        }
+
+        ofs << std::endl;
         ofs.filter().indent(2);
 
         ofilterstream<Wrap> wrap(ofs);
@@ -209,15 +224,15 @@ class CommandLineConfig {
         wrap << std::endl;
 
         // try to print the default value
-        if ((*a)->has_default()) {
-          std::ostringstream ss;
-          (*a)->debug(ss);
-          auto default_val = ss.str();
+        if (show_defaults && !short_default && (*a)->has_default()) {
           if (default_val.find("\n") == std::string::npos) {
             // only show default argument if the default does not take more than one line
             wrap << "Default: " << default_val << std::endl;
+          } else {
+            wrap << "Default: use --debug_args to see this default" << std::endl;
           }
-        } else if ((*a)->is_required()) {
+        }
+        if ((*a)->is_required()) {
           wrap << "Required argument" << std::endl;
         }
 
