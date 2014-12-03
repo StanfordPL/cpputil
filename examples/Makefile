@@ -25,6 +25,7 @@ EX  = command_line/command_line \
 			container/maputil \
 			container/tokenizer \
 			debug/stl_print \
+			io/abort \
 			io/column \
 			io/filterstream \
 			io/indent \
