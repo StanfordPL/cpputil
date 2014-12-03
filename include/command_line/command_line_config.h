@@ -202,6 +202,7 @@ class CommandLineConfig {
       for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
         std::string default_val;
         bool short_default = false;
+        bool default_has_newline = false;
 
         write_arg(ofs, *a);
 
@@ -209,7 +210,9 @@ class CommandLineConfig {
           std::ostringstream ss;
           (*a)->debug(ss);
           default_val = ss.str();
-          if (default_val.length() < 20) {
+          if (default_val.find("\n") != std::string::npos) {
+            default_has_newline = true;
+          } else if (default_val.length() < 20) {
             short_default = true;
             ofs << " (default: " << default_val << ")";
           }
@@ -225,7 +228,7 @@ class CommandLineConfig {
 
         // try to print the default value
         if (show_defaults && !short_default && (*a)->has_default()) {
-          if (default_val.find("\n") == std::string::npos) {
+          if (!default_has_newline) {
             // only show default argument if the default does not take more than one line
             wrap << "Default: " << default_val << std::endl;
           } else {
