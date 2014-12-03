@@ -43,6 +43,7 @@ EX  = command_line/command_line \
 			meta/indices \
 			patterns/singleton \
 			serialize/hex \
+			serialize/line \
 			serialize/text \
 			signal/debug_handler \
 			system/terminal
