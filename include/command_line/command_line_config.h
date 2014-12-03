@@ -32,7 +32,7 @@ namespace cpputil {
 class CommandLineConfig {
  public:
   /** Strict parse with help, config, and debug support */
-  static void strict_with_convenience(int argc, char** argv, bool sort_args = false) {
+  static void strict_with_convenience(int argc, char** argv, bool sort_args = false, bool show_defaults_in_Help = true) {
     Heading::create("Help and argument utilities:");
     auto& help = FlagArg::create("h")
                  .alternate("help")
@@ -57,7 +57,7 @@ class CommandLineConfig {
       std::cout << std::endl;
       std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
       std::cout << std::endl;
-      write_help(std::cout);
+      write_help(std::cout, show_defaults_in_Help);
       exit(0);
     }
 
@@ -190,11 +190,11 @@ class CommandLineConfig {
   }
 
   /** Prints arg aliases, usages, and descriptions */
-  static void write_help(std::ostream& os) {
+  static void write_help(std::ostream& os, bool show_defaults_in_Help) {
     ofilterstream<Indent> ofs(os);
     ofs.filter().indent();
 
-    auto show_defaults = Args::show_defaults();
+    auto show_defaults = show_defaults_in_Help;
 
     for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
       ofs << g->heading() << std::endl;
