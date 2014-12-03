@@ -228,7 +228,7 @@ class CommandLineConfig {
 
         // try to print the default value
         if (show_defaults && !short_default && (*a)->has_default()) {
-          if (!default_has_newline) {
+          if (!default_has_newline && default_val.length() < 150) {
             // only show default argument if the default does not take more than one line
             wrap << "Default: " << default_val << std::endl;
           } else {
