@@ -46,6 +46,9 @@ class Args {
     std::vector<std::string> anonymous;
   };
 
+  /** Are defaults shown in the help? */
+  static bool show_defaults_;
+
  public:
   /** Iterator over registered args */
   typedef ArgRegistry::arg_iterator arg_iterator;
@@ -145,6 +148,16 @@ class Args {
     return Singleton<Parse>::get().anonymous.end();
   }
 
+  /** Set whether defaults are shown in the help. */
+  static void set_show_defaults(bool val) {
+    show_defaults_ = val;
+  }
+
+  /** Should defaults be shown in the help? */
+  static bool show_defaults() {
+    return show_defaults_;
+  }
+
   /** Sort arg groups */
   template <typename Comp>
   static void sort_groups(Comp c) {
@@ -237,6 +250,8 @@ class Args {
     }
   }
 };
+
+bool Args::show_defaults_ = true;
 
 } // namespace cpputil
 
