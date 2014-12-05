@@ -29,12 +29,13 @@ class BitManip<uint64_t> {
  public:
   static size_t ntz(uint64_t x) {
 #ifdef __BMI__
-    return _tzcnt_u64(x);
+    return __builtin_ctzll(x);
 #else
 	// See https://graphics.stanford.edu/~seander/bithacks.html
 	uint64_t res = 64; 
 	x &= -((int64_t)x);
 	if (x) res--;
+	if (x & 0x00000000ffffffff) res -= 32;
 	if (x & 0x0000ffff0000ffff) res -= 16;
 	if (x & 0x00ff00ff00ff00ff) res -= 8;
 	if (x & 0x0f0f0f0f0f0f0f0f) res -= 4;
@@ -46,7 +47,7 @@ class BitManip<uint64_t> {
 
 	static size_t pop_count(uint64_t x) {
 #ifdef __POPCNT__
-		return _popcnt64(x);
+		return __builtin_popcountll(x);
 #else
 	// See https://graphics.stanford.edu/~seander/bithacks.html
 	uint64_t res = x - ((x >> 1) & 0x5555555555555555);
