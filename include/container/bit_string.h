@@ -510,7 +510,7 @@ class BitString {
 
   /** Bit-wise and. */
   BitString& operator&=(const BitString& rhs) {
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 4 <= contents_.size(); i += 4) {
@@ -546,7 +546,7 @@ class BitString {
 
   /** Bit-wise or. */
   BitString& operator|=(const BitString& rhs) {
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 4 <= contents_.size() ; i += 4) {
@@ -582,7 +582,7 @@ class BitString {
 
   /** Bit-wise xor. */
   BitString& operator^=(const BitString& rhs) {
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 4 <= contents_.size() ; i += 4) {

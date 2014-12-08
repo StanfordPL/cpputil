@@ -43,7 +43,7 @@ class FolderArg : public Arg {
 
   /** Consumes indices from first alias to next - */
   virtual std::pair<size_t, size_t> read(int argc, char** argv) {
-    for (const auto i : get_appearances(argc, argv)) {
+    for (const int i : get_appearances(argc, argv)) {
       if (i == (argc - 1) || argv[i + 1][0] == '-') {
         error(parse_error_);
         return std::make_pair(i, i);
