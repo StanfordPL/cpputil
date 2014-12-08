@@ -32,7 +32,7 @@ namespace cpputil {
 class CommandLineConfig {
  public:
   /** Strict parse with help, config, and debug support */
-  static void strict_with_convenience(int argc, char** argv) {
+  static void strict_with_convenience(int argc, char** argv, bool sort_args = false, bool show_defaults_in_Help = true) {
     Heading::create("Help and argument utilities:");
     auto& help = FlagArg::create("h")
                  .alternate("help")
@@ -41,23 +41,23 @@ class CommandLineConfig {
                   .description("Print program arguments and quit");
     auto& read_config = ValueArg<std::string>::create("config")
                         .usage("<path/to/file.conf>")
-                        .default_val("")
                         .description("Read program args from a configuration file");
     auto& write_config = ValueArg<std::string>::create("example_config")
                          .usage("<path/to/file.conf>")
-                         .default_val("")
                          .description("Print an example configuration file");
 
-    Args::sort_args([](Arg * a1, Arg * a2) {
-      return *(a1->alias_begin()) < *(a2->alias_begin());
-    });
+    if (sort_args) {
+      Args::sort_args([](Arg * a1, Arg * a2) {
+        return *(a1->alias_begin()) < *(a2->alias_begin());
+      });
+    }
     Args::read(argc, argv);
 
     if (help) {
       std::cout << std::endl;
       std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
       std::cout << std::endl;
-      write_help(std::cout);
+      write_help(std::cout, show_defaults_in_Help);
       exit(0);
     }
 
@@ -89,6 +89,22 @@ class CommandLineConfig {
       exit(0);
     }
 
+    auto missing_arg = false;
+    for (auto it = Args::arg_begin(); it != Args::arg_end(); ++it) {
+      auto arg = *it;
+      assert(!(arg->is_required() && arg->has_default()) && "Arguments cannot be both required and have a default.");
+      if (arg->is_required() && !arg->has_been_provided()) {
+        if (!missing_arg) {
+          std::cerr << "Errors:" << std::endl;
+        }
+        missing_arg = true;
+        std::cerr << "  Argument '" << *arg->alias_begin() << "' is required!" << std::endl;
+      }
+    }
+    if (missing_arg) {
+      exit(1);
+    }
+
     if (write_config.value() != "") {
       std::ofstream ofs(write_config.value());
       if (!ofs.is_open()) {
@@ -96,6 +112,7 @@ class CommandLineConfig {
         exit(1);
       }
       write_config_file(ofs, argv[0]);
+      exit(0);
     }
   }
 
@@ -173,23 +190,54 @@ class CommandLineConfig {
   }
 
   /** Prints arg aliases, usages, and descriptions */
-  static void write_help(std::ostream& os) {
+  static void write_help(std::ostream& os, bool show_defaults_in_Help) {
     ofilterstream<Indent> ofs(os);
     ofs.filter().indent();
+
+    auto show_defaults = show_defaults_in_Help;
 
     for (auto g = Args::group_begin(); g != Args::group_end(); ++g) {
       ofs << g->heading() << std::endl;
       ofs << std::endl;
       for (auto a = g->arg_begin(); a != g->arg_end(); ++a) {
-        write_arg(ofs, *a);
-        ofs << std::endl;
+        std::string default_val;
+        bool short_default = false;
+        bool default_has_newline = false;
 
+        write_arg(ofs, *a);
+
+        if (show_defaults && (*a)->has_default()) {
+          std::ostringstream ss;
+          (*a)->debug(ss);
+          default_val = ss.str();
+          if (default_val.find("\n") != std::string::npos) {
+            default_has_newline = true;
+          } else if (default_val.length() < 20) {
+            short_default = true;
+            ofs << " (default: " << default_val << ")";
+          }
+        }
+
+        ofs << std::endl;
         ofs.filter().indent(2);
 
         ofilterstream<Wrap> wrap(ofs);
         wrap.filter().limit(60);
         (*a)->description(wrap);
         wrap << std::endl;
+
+        // try to print the default value
+        if (show_defaults && !short_default && (*a)->has_default()) {
+          if (!default_has_newline && default_val.length() < 150) {
+            // only show default argument if the default does not take more than one line
+            wrap << "Default: " << default_val << std::endl;
+          } else {
+            wrap << "Default: use --debug_args to see this default" << std::endl;
+          }
+        }
+        if ((*a)->is_required()) {
+          wrap << "Required argument" << std::endl;
+        }
 
         ofs.filter().unindent(2);
       }

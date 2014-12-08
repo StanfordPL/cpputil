@@ -12,45 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_SERIALIZE_TEXT_STYLE_H
-#define CPPUTIL_INCLUDE_SERIALIZE_TEXT_STYLE_H
+#ifndef CPPUTIL_INCLUDE_IO_PREFIX_H
+#define CPPUTIL_INCLUDE_IO_PREFIX_H
+
+#include <string>
 
 namespace cpputil {
 
-template <char Dec = true, size_t HexGroup = 8,
-          char Open = '{', char Close = '}', char Quote = '"', char Etc = '.',
-					char Eol = '\n'>
-struct TextStyle {
-  static constexpr bool dec() {
-    return Dec;
-  }
+class Prefix {
+ public:
+  Prefix() : prefix_(""), pending_(true) { }
 
-  static constexpr size_t hex_group() {
-    return HexGroup;
-  }
-
-  static constexpr char open() {
-    return Open;
-  }
-
-  static constexpr char close() {
-    return Close;
-  }
-
-  static constexpr char quote() {
-    return Quote;
-  }
-
-  static constexpr char etc() {
-    return Etc;
-  }
-
-	static constexpr char eol() {
-		return Eol;
+	Prefix& prefix(const std::string& p) {
+		prefix_ = p;
+		return *this;
 	}
+
+  void operator()(std::streambuf* sb, char c) {
+		if (pending_) {
+			for (auto p : prefix_) {
+				sb->sputc(p);
+			}
+			pending_ = false;
+		}
+		if (c == '\n') {
+			pending_ = true;
+		}
+		sb->sputc(c);
+	}
+
+ private:
+	std::string prefix_;
+	bool pending_;
 };
 
 } // namespace cpputil
 
 #endif
-

@@ -73,9 +73,11 @@ class FolderArg : public Arg {
           R()(ifs, temp);
 
           if (ifs.fail()) {
-            continue;
-            // This could be a parse error; but for now I'm opting to
-            // silently ignore files that can't be parsed.  FIXME.
+            std::string err = "Unable to parse the file '";
+            err += dirp->d_name;
+            err += "'!";
+            error(err);
+            return std::make_pair(i, i);
           } else {
             val_.push_back(temp);
           }
@@ -83,6 +85,7 @@ class FolderArg : public Arg {
       }
       closedir(dp);
 
+      set_provided();
       return std::make_pair(i, i + 1);
     }
 
@@ -109,7 +112,14 @@ class FolderArg : public Arg {
 
   /** Resets arg default value */
   FolderArg& default_val(const std::vector<T>& t) {
+    set_has_default();
     val_ = t;
+    return *this;
+  }
+
+  /** Resets the required value. */
+  FolderArg& required(const bool val = true) {
+    Arg::required(val);
     return *this;
   }
 
