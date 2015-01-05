@@ -89,6 +89,16 @@ class CommandLineConfig {
       exit(0);
     }
 
+    if (write_config.value() != "") {
+      std::ofstream ofs(write_config.value());
+      if (!ofs.is_open()) {
+        std::cerr << "Unable to write config file!" << std::endl;
+        exit(1);
+      }
+      write_config_file(ofs, argv[0]);
+      exit(0);
+    }
+
     auto missing_arg = false;
     for (auto it = Args::arg_begin(); it != Args::arg_end(); ++it) {
       auto arg = *it;
@@ -103,16 +113,6 @@ class CommandLineConfig {
     }
     if (missing_arg) {
       exit(1);
-    }
-
-    if (write_config.value() != "") {
-      std::ofstream ofs(write_config.value());
-      if (!ofs.is_open()) {
-        std::cerr << "Unable to write config file!" << std::endl;
-        exit(1);
-      }
-      write_config_file(ofs, argv[0]);
-      exit(0);
     }
   }
 
