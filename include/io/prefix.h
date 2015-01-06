@@ -12,16 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_COMMAND_LINE_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_COMMAND_LINE_H
+#ifndef CPPUTIL_INCLUDE_IO_PREFIX_H
+#define CPPUTIL_INCLUDE_IO_PREFIX_H
 
-#include "include/command_line/arg.h"
-#include "include/command_line/args.h"
-#include "include/command_line/command_line_config.h"
-#include "include/command_line/file_arg.h"
-#include "include/command_line/flag_arg.h"
-#include "include/command_line/folder_arg.h"
-#include "include/command_line/heading.h"
-#include "include/command_line/value_arg.h"
+#include <string>
+
+namespace cpputil {
+
+class Prefix {
+ public:
+  Prefix() : prefix_(""), pending_(true) { }
+
+	Prefix& prefix(const std::string& p) {
+		prefix_ = p;
+		return *this;
+	}
+
+  void operator()(std::streambuf* sb, char c) {
+		if (pending_) {
+			for (auto p : prefix_) {
+				sb->sputc(p);
+			}
+			pending_ = false;
+		}
+		if (c == '\n') {
+			pending_ = true;
+		}
+		sb->sputc(c);
+	}
+
+ private:
+	std::string prefix_;
+	bool pending_;
+};
+
+} // namespace cpputil
 
 #endif

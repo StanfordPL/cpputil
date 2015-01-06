@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_FILE_ARG_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_FILE_ARG_H
+#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_FOLDER_ARG_H
+#define CPPUTIL_INCLUDE_COMMAND_LINE_FOLDER_ARG_H
 
 #include <string>
+#include <vector>
+
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include <cstdio>
 
 #include "include/command_line/arg.h"
 #include "include/serialize/text_reader.h"
@@ -24,13 +32,13 @@
 namespace cpputil {
 
 template <typename T, typename R = TextReader<T>, typename W = TextWriter<T>>
-class FileArg : public Arg {
+class FolderArg : public Arg {
  public:
-  virtual ~FileArg() = default;
+  virtual ~FolderArg() = default;
 
   /** Creates and registers a new flag */
-  static FileArg& create(const std::string& opt) {
-    return *(new FileArg(opt));
+  static FolderArg& create(const std::string& opt) {
+    return *(new FolderArg(opt));
   }
 
   /** Consumes indices from first alias to next - */
@@ -41,19 +49,41 @@ class FileArg : public Arg {
         return std::make_pair(i, i);
       }
 
-      std::ifstream ifs(argv[i + 1]);
-      if (!ifs.is_open()) {
-        error(file_error_);
-      } else {
-        T temp = T();
-        R()(ifs, temp);
+      // some code borrowed from 
+      // http://www.cplusplus.com/forum/beginner/10292/
+      DIR *dp = opendir(argv[i+1]);
+      if(dp == NULL) {
+        perror("could not open directory");
+        error(folder_error_);        
+      }
 
-        if (ifs.fail()) {
-          error(parse_error_);
+      struct dirent *dirp;
+      while((dirp = readdir(dp))) {
+        std::string filepath = std::string(argv[i+1]) + "/" + dirp->d_name;
+
+        struct stat filestat;
+        if (stat(filepath.c_str(), &filestat)) continue;
+        if (S_ISDIR(filestat.st_mode)) continue;
+
+        std::ifstream ifs(filepath);
+        if (!ifs.is_open()) {
+          error(file_error_);
         } else {
-          val_ = temp;
+          T temp = T();
+          R()(ifs, temp);
+
+          if (ifs.fail()) {
+            std::string err = "Unable to parse the file '";
+            err += dirp->d_name;
+            err += "'!";
+            error(err);
+            return std::make_pair(i, i);
+          } else {
+            val_.push_back(temp);
+          }
         }
       }
+      closedir(dp);
 
       set_provided();
       return std::make_pair(i, i + 1);
@@ -63,77 +93,91 @@ class FileArg : public Arg {
   }
 
   /** Create a new arg alias (hashes implicit; chars get 1, strings 2) */
-  FileArg& alternate(const std::string& a) {
+  FolderArg& alternate(const std::string& a) {
     Arg::alternate(a);
     return *this;
   }
 
   /** Reset arg usage */
-  FileArg& usage(const std::string& u) {
+  FolderArg& usage(const std::string& u) {
     Arg::usage(u);
     return *this;
   }
 
   /** Reset arg description */
-  FileArg& description(const std::string& d) {
+  FolderArg& description(const std::string& d) {
     Arg::description(d);
     return *this;
   }
 
   /** Resets arg default value */
-  FileArg& default_val(const T& t) {
+  FolderArg& default_val(const std::vector<T>& t) {
     set_has_default();
     val_ = t;
     return *this;
   }
 
   /** Resets the required value. */
-  FileArg& required(const bool val = true) {
+  FolderArg& required(const bool val = true) {
     Arg::required(val);
     return *this;
   }
 
   /** Resets parse error message */
-  FileArg& parse_error(const std::string& pe) {
+  FolderArg& parse_error(const std::string& pe) {
     parse_error_ = pe;
     return *this;
   }
 
   /** Resets file error message */
-  FileArg& file_error(const std::string& fe) {
+  FolderArg& file_error(const std::string& fe) {
     file_error_ = fe;
     return *this;
   }
 
+  /** Resets folder error message */
+  FolderArg & folder_error(const std::string& fe) {
+    folder_error_ = fe;
+    return *this;
+  }
+
   /** Implicit conversion to underlying type */
-  operator T& () {
+  operator std::vector<T>& () {
     return val_;
   }
 
   /** Explicit conversion to underlying type */
-  T& value() {
+  std::vector<T>& value() {
     return val_;
   }
 
   /** Prints underlying value using writer */
   virtual void debug(std::ostream& os) const {
-    W()(os, val_);
+    os << "[" << std::endl;
+    for (auto& it : val_) {
+      W()(os, it);
+      os << std::endl;
+    }
+    os << "]";
   }
 
  private:
   /** Underlying value, optionally specified on command line */
-  T val_;
+  std::vector<T> val_;
   /** String to emit if an error occurs during read() */
   std::string parse_error_;
   /** String to emit if unable to open source file during read() */
   std::string file_error_;
+  /** String to emit if unable to open directory */
+  std::string folder_error_;
 
-  /** FileArgs are assigned default constructor values by default */
-  FileArg(const std::string& opt) :
+  /** FolderArgs are assigned default constructor values by default */
+  FolderArg(const std::string& opt) :
     Arg {opt} {
     usage("<value>");
     parse_error("Unable to parse value!");
-    file_error("Unable to open source file!");
+    file_error("Unable to open one of the files!");
+    folder_error("Unable to open drectory!");
   }
 };
 

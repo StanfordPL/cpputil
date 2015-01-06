@@ -12,16 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_COMMAND_LINE_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_COMMAND_LINE_H
+#ifndef CPPUTIL_INCLUDE_IO_ABORT_H
+#define CPPUTIL_INCLUDE_IO_ABORT_H
 
-#include "include/command_line/arg.h"
-#include "include/command_line/args.h"
-#include "include/command_line/command_line_config.h"
-#include "include/command_line/file_arg.h"
-#include "include/command_line/flag_arg.h"
-#include "include/command_line/folder_arg.h"
-#include "include/command_line/heading.h"
-#include "include/command_line/value_arg.h"
+#include <cstdlib>
+
+namespace cpputil {
+
+class Abort {
+ public:
+  Abort() : code_(0) { }
+
+	Abort& code(int c) {
+		code_ = c;
+		return *this;
+	}
+
+  void operator()(std::streambuf* sb, char c) {
+		sb->sputc(c);
+		if (c == '\n') {
+			exit(code_);
+		}
+	}
+
+ private:
+	int code_;
+};
+
+} // namespace cpputil
 
 #endif

@@ -25,11 +25,13 @@ EX  = command_line/command_line \
 			container/maputil \
 			container/tokenizer \
 			debug/stl_print \
+			io/abort \
 			io/column \
 			io/filterstream \
 			io/indent \
 			io/line_comment \
 			io/multistream \
+			io/prefix \
 			io/redact \
 			io/redirectstream \
 			io/shunt \
@@ -41,6 +43,7 @@ EX  = command_line/command_line \
 			meta/indices \
 			patterns/singleton \
 			serialize/hex \
+			serialize/line \
 			serialize/text \
 			signal/debug_handler \
 			system/terminal

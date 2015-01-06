@@ -16,9 +16,8 @@
 #define CPPUTIL_INCLUDE_BITS_BIT_MANIP_H
 
 #include <cassert>
-#include <stdint.h>
-
 #include <immintrin.h>
+#include <stdint.h>
 
 namespace cpputil {
 
@@ -30,19 +29,34 @@ class BitManip<uint64_t> {
  public:
   static size_t ntz(uint64_t x) {
 #ifdef __BMI__
-    return _tzcnt_u64(x);
+    return __builtin_ctzll(x);
 #else
-    assert(false);
-    return 0;
+	// See https://graphics.stanford.edu/~seander/bithacks.html
+	uint64_t res = 64; 
+	x &= -((int64_t)x);
+	if (x) res--;
+	if (x & 0x00000000ffffffff) res -= 32;
+	if (x & 0x0000ffff0000ffff) res -= 16;
+	if (x & 0x00ff00ff00ff00ff) res -= 8;
+	if (x & 0x0f0f0f0f0f0f0f0f) res -= 4;
+	if (x & 0x3333333333333333) res -= 2;
+	if (x & 0x5555555555555555) res -= 1;
+	return res;
 #endif
   }
 
 	static size_t pop_count(uint64_t x) {
 #ifdef __POPCNT__
-		return _popcnt64(x);
+		return __builtin_popcountll(x);
 #else
-		assert(false);
-		return 0;
+	// See https://graphics.stanford.edu/~seander/bithacks.html
+	uint64_t res = x - ((x >> 1) & 0x5555555555555555);
+	res = ((res >> 2) & 0x3333333333333333) + (res & 0x3333333333333333);
+	res = ((res >> 4) + res) & 0x0f0f0f0f0f0f0f0f;
+	res = ((res >> 8) + res) & 0x00ff00ff00ff00ff;
+	res = ((res >> 16) + res) & 0x0000ffff0000ffff;
+	res = ((res >> 32) + res) & 0x00000000ffffffff;
+	return res;
 #endif
 	}
 

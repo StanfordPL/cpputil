@@ -86,6 +86,21 @@ class Arg {
     os << error_;
   }
 
+  /** Is this argument required? */
+  bool is_required() const {
+    return required_;
+  }
+
+  /** Has this argument been set (or does it have a default value)? */
+  bool has_been_provided() const {
+    return is_provided_;
+  }
+
+  /** Does this argument have a default? */
+  bool has_default() const {
+    return has_default_;
+  }
+
   /** Prints the value of an arg */
   virtual void debug(std::ostream& os) const = 0;
 
@@ -100,11 +115,12 @@ class Arg {
   };
 
   /** An arg must be assigned at least one alias */
-  Arg(const std::string& opt) {
+  Arg(const std::string& opt) : is_provided_(false), has_default_(false) {
     alternate(opt);
     usage("");
     description("(no description provided)");
     error("");
+    required(false);
 
     auto& ar = Singleton<ArgRegistry>::get();
     ar.insert(this);
@@ -166,6 +182,21 @@ class Arg {
     error_ = error;
   }
 
+  /** Reset the required argument. */
+  void required(const bool val = true) {
+    required_ = val;
+  }
+
+  /** Reset whether this argument has a default. */
+  void set_has_default(const bool val = true) {
+    has_default_ = val;
+  }
+
+  /** Indicate that this argument has been set now. */
+  void set_provided() {
+    is_provided_ = true;
+  }
+
  private:
   /** Aliases for this arg ,ie: "-h --help" */
   std::set<std::string> opts_;
@@ -178,6 +209,12 @@ class Arg {
   std::string description_;
   /** A non-empty value here indicates that a survivable error occurred */
   std::string error_;
+  /** Is this argument mandatory? */
+  bool required_;
+  /** Has this argument been provided in some way? */
+  bool is_provided_;
+  /** Does this argument have a default? */
+  bool has_default_;
 };
 
 } // namespace cpputil

@@ -12,16 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_COMMAND_LINE_COMMAND_LINE_H
-#define CPPUTIL_INCLUDE_COMMAND_LINE_COMMAND_LINE_H
+#include <iostream>
+#include <sstream>
+#include <string>
 
-#include "include/command_line/arg.h"
-#include "include/command_line/args.h"
-#include "include/command_line/command_line_config.h"
-#include "include/command_line/file_arg.h"
-#include "include/command_line/flag_arg.h"
-#include "include/command_line/folder_arg.h"
-#include "include/command_line/heading.h"
-#include "include/command_line/value_arg.h"
+#include "include/serialize/line_reader.h"
 
-#endif
+using namespace cpputil;
+using namespace std;
+
+int main() {
+	stringstream ss;
+	ss << "Line 1: You should see this." << endl;
+	ss << "Line 2: You shouldn't see this." << endl;
+
+	string s;
+	LineReader<> lr;
+	lr(ss, s);
+
+	cout << s << endl;
+
+  return 0;
+}

@@ -35,7 +35,7 @@ class ValueArg : public Arg {
 
   /** Consumes indices from first alias to next - */
   virtual std::pair<size_t, size_t> read(int argc, char** argv) {
-    for (const auto i : get_appearances(argc, argv)) {
+    for (const int i : get_appearances(argc, argv)) {
       if (i == (argc - 1) || argv[i + 1][0] == '-') {
         error(parse_error_);
         return std::make_pair(i, i);
@@ -50,6 +50,7 @@ class ValueArg : public Arg {
       } else {
         val_ = temp;
       }
+      set_provided();
       return std::make_pair(i, i + 1);
     }
 
@@ -76,6 +77,7 @@ class ValueArg : public Arg {
 
   /** Resets arg default value */
   ValueArg& default_val(const T& t) {
+    set_has_default();
     val_ = t;
     return *this;
   }
@@ -83,6 +85,12 @@ class ValueArg : public Arg {
   /** Resets parse error message */
   ValueArg& parse_error(const std::string& pe) {
     parse_error_ = pe;
+    return *this;
+  }
+
+  /** Resets the required value. */
+  ValueArg& required(const bool val = true) {
+    Arg::required(val);
     return *this;
   }
 

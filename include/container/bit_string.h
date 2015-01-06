@@ -30,6 +30,9 @@ namespace cpputil {
 template <typename T>
 class BitString {
  public:
+
+  /* This class iterates through the indexes of the set bits in a bit string.
+   * This is the epitomy of stuff you'll find in hacker's delight. */
   class const_set_bit_index_iterator {
     friend class BitString;
 
@@ -40,15 +43,34 @@ class BitString {
     }
     /** Increment. */
     const_set_bit_index_iterator& operator++() {
+
+      /* Round-down the current bit to the next lowest 64 bits.  This means
+         the index contains the starting bit of the current 64-bit chunk. */
       BitManip<uint64_t>::unset_rightmost(index_, 6);
+
+      /* The unset_rightmost clears the lowest bit in the whole bitstring;
+         if it returns 0, this means we need to move up to the next 64-bit
+         chunk; otherwise, we stay in the same chunk */
       if (BitManip<uint64_t>::unset_rightmost(current_) == 0) {
+
+        /* Iterate through the 64-bit chunks to find the next non-zero one */
         const auto old_itr = itr_;
         for (++itr_; itr_ != end_ && *itr_ == 0; ++itr_);
-        index_ += 64 * (itr_ - old_itr);
-        current_ = *itr_;
+        if(itr_ != end_) {
+          /* found it; recompute the index */
+          current_ = *itr_;
+          index_ += 64 * (itr_ - old_itr) + BitManip<uint64_t>::ntz(current_);
+          assert(index_ < num_bits_);
+        } else {
+          /* we're at the end */
+          index_ = num_bits_;
+        }
+      } else {
+        /* Compute the index of the next bit, using the starting index of the
+         * chunk computed earlier. */
+        index_ += BitManip<uint64_t>::ntz(current_);
+        assert(index_ < num_bits_);
       }
-      index_ += BitManip<uint64_t>::ntz(current_);
-      index_ = std::min(num_bits_, index_);
       return *this;
     }
     /** Equality. */
@@ -65,16 +87,31 @@ class BitString {
     const_set_bit_index_iterator(typename T::const_iterator i, typename T::const_iterator begin,
                                  typename T::const_iterator end, size_t num_bits) :
       end_(end), num_bits_(num_bits) {
+      /* Iterate through 64-bit chunks to find the next lowest index */
       for (itr_ = i; itr_ != end_ && *itr_ == 0; ++itr_);
-      current_ = *itr_;
-      index_ = 64 * (itr_ - begin) + BitManip<uint64_t>::ntz(current_);
-      index_ = std::min(num_bits_, index_);
+      if(itr_ != end_) {
+        /* found it; find the index of the lowest bit in the 64-bit chunk */
+        current_ = *itr_;
+        index_ = 64 * (itr_ - begin) + BitManip<uint64_t>::ntz(current_);
+        assert(index_ < num_bits_);
+      } else {
+        /* there are no set bits at all */
+        index_ = num_bits_;
+      }
     }
 
+    /* This is the index of the currently set bit */
     size_t index_;
+
+    /* These iterate over the 64-bit chunks in the bitstring */
     typename T::const_iterator itr_;
     typename T::const_iterator end_;
+
+    /* The total number of bits available */
     size_t num_bits_;
+
+    /* This is the index of the object of type T (generally a uint64_t) the
+     * current bit is stored in. */
     uint64_t current_;
   };
 
@@ -473,7 +510,7 @@ class BitString {
 
   /** Bit-wise and. */
   BitString& operator&=(const BitString& rhs) {
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 4 <= contents_.size(); i += 4) {
@@ -509,7 +546,7 @@ class BitString {
 
   /** Bit-wise or. */
   BitString& operator|=(const BitString& rhs) {
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 4 <= contents_.size() ; i += 4) {
@@ -545,7 +582,7 @@ class BitString {
 
   /** Bit-wise xor. */
   BitString& operator^=(const BitString& rhs) {
-    auto i = 0;
+    size_t i = 0;
 
 #if defined(__AVX2__) && defined(__AVX__)
     for (; i + 4 <= contents_.size() ; i += 4) {
@@ -591,6 +628,10 @@ class BitString {
 
   /** Underlying data. */
   void* data() {
+    return contents_.data();
+  }
+  /** Underlying data. */
+  const void* data() const {
     return contents_.data();
   }
 

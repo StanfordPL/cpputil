@@ -18,7 +18,8 @@
 namespace cpputil {
 
 template <char Dec = true, size_t HexGroup = 8,
-          char Open = '{', char Close = '}', char Quote = '"', char Etc = '.'>
+          char Open = '{', char Close = '}', char Quote = '"', char Etc = '.',
+					char Eol = '\n'>
 struct TextStyle {
   static constexpr bool dec() {
     return Dec;
@@ -43,6 +44,10 @@ struct TextStyle {
   static constexpr char etc() {
     return Etc;
   }
+
+	static constexpr char eol() {
+		return Eol;
+	}
 };
 
 } // namespace cpputil
