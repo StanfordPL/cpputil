@@ -46,7 +46,7 @@ class FolderArg : public Arg {
   virtual std::pair<size_t, size_t> read(int argc, char** argv) {
     for (const int i : get_appearances(argc, argv)) {
       if (i == (argc - 1) || argv[i + 1][0] == '-') {
-        error(parse_error_ + " No argument provided!");
+        error("No argument provided!");
         return std::make_pair(i, i);
       }
 
@@ -74,11 +74,7 @@ class FolderArg : public Arg {
 
           if (failed(ifs)) {
 						const auto msg = fail_msg(ifs);
-						if (msg == "") {
-							error(parse_error_ + " (" + dirp->d_name + ") No reason given!");
-						} else {
-							error(parse_error_ + " (" + dirp->d_name + ") " + msg);
-						}
+						error(std::string(dirp->d_name) + " -- " + (msg == "" ? parse_error_ : msg));
             return std::make_pair(i, i);
           } else {
             val_.push_back(temp);
@@ -177,7 +173,7 @@ class FolderArg : public Arg {
   FolderArg(const std::string& opt) :
     Arg {opt} {
     usage("<value>");
-    parse_error("Unable to parse value: ");
+    parse_error("Unspecified parse error!");
     file_error("Unable to open one of the files!");
     folder_error("Unable to open drectory!");
   }
