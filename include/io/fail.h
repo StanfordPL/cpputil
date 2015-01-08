@@ -20,16 +20,16 @@
 
 namespace cpputil {
 
-int __fail_msg_idx() {
+inline int __fail_msg_idx() {
 	static const int idx = std::ios::xalloc();
 	return idx;
 }
 
-bool failed(std::istream& is) {
+inline bool failed(std::istream& is) {
 	return is.fail();
 }
 
-std::ostringstream& fail(std::istream& is) {
+inline std::ostringstream& fail(std::istream& is) {
 	auto& p = is.pword(__fail_msg_idx());
 	if (p == nullptr) {
 		p = (void*) new std::ostringstream();
@@ -40,7 +40,7 @@ std::ostringstream& fail(std::istream& is) {
 	return *ss;
 }
 
-std::string fail_msg(std::istream& is) {
+inline std::string fail_msg(std::istream& is) {
 	auto& p = is.pword(__fail_msg_idx());
 	if (p == nullptr) {
 		p = (void*) new std::ostringstream();
@@ -50,11 +50,11 @@ std::string fail_msg(std::istream& is) {
 	return ss->str();
 }
 
-bool failed(std::ostream& os) {
+inline bool failed(std::ostream& os) {
 	return os.fail();
 }
 
-std::ostringstream& fail(std::ostream& os) {
+inline std::ostringstream& fail(std::ostream& os) {
 	auto& p = os.pword(__fail_msg_idx());
 	if (p == nullptr) {
 		p = (void*) new std::ostringstream();
@@ -65,7 +65,7 @@ std::ostringstream& fail(std::ostream& os) {
 	return *ss;
 }
 
-std::string fail_msg(std::ostream& os) {
+inline std::string fail_msg(std::ostream& os) {
 	auto& p = os.pword(__fail_msg_idx());
 	if (p == nullptr) {
 		p = (void*) new std::ostringstream();
