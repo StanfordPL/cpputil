@@ -26,6 +26,7 @@
 #include <cstdio>
 
 #include "include/command_line/arg.h"
+#include "include/io/fail.h"
 #include "include/serialize/text_reader.h"
 #include "include/serialize/text_writer.h"
 
@@ -45,7 +46,7 @@ class FolderArg : public Arg {
   virtual std::pair<size_t, size_t> read(int argc, char** argv) {
     for (const int i : get_appearances(argc, argv)) {
       if (i == (argc - 1) || argv[i + 1][0] == '-') {
-        error(parse_error_);
+        error(parse_error_ + " No argument provided!");
         return std::make_pair(i, i);
       }
 
@@ -53,7 +54,6 @@ class FolderArg : public Arg {
       // http://www.cplusplus.com/forum/beginner/10292/
       DIR *dp = opendir(argv[i+1]);
       if(dp == NULL) {
-        perror("could not open directory");
         error(folder_error_);        
       }
 
@@ -72,11 +72,13 @@ class FolderArg : public Arg {
           T temp = T();
           R()(ifs, temp);
 
-          if (ifs.fail()) {
-            std::string err = "Unable to parse the file '";
-            err += dirp->d_name;
-            err += "'!";
-            error(err);
+          if (failed(ifs)) {
+						const auto msg = fail_msg(ifs);
+						if (msg == "") {
+							error(parse_error_ + " (" + dirp->d_name + ") No reason given!");
+						} else {
+							error(parse_error_ + " (" + dirp->d_name + ") " + msg);
+						}
             return std::make_pair(i, i);
           } else {
             val_.push_back(temp);
@@ -175,7 +177,7 @@ class FolderArg : public Arg {
   FolderArg(const std::string& opt) :
     Arg {opt} {
     usage("<value>");
-    parse_error("Unable to parse value!");
+    parse_error("Unable to parse value: ");
     file_error("Unable to open one of the files!");
     folder_error("Unable to open drectory!");
   }

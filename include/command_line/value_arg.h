@@ -18,6 +18,7 @@
 #include <string>
 
 #include "include/command_line/arg.h"
+#include "include/io/fail.h"
 #include "include/serialize/text_reader.h"
 #include "include/serialize/text_writer.h"
 
@@ -37,7 +38,7 @@ class ValueArg : public Arg {
   virtual std::pair<size_t, size_t> read(int argc, char** argv) {
     for (const int i : get_appearances(argc, argv)) {
       if (i == (argc - 1) || argv[i + 1][0] == '-') {
-        error(parse_error_);
+        error(parse_error_ + " No argument provided!");
         return std::make_pair(i, i);
       }
 
@@ -45,8 +46,13 @@ class ValueArg : public Arg {
       T temp = T();
       R()(iss, temp);
 
-      if (iss.fail()) {
-        error(parse_error_);
+      if (failed(iss)) {
+				const auto msg = fail_msg(iss);
+				if (msg == "") {
+					error(parse_error_ + " No reason given!");
+				} else {
+					error(parse_error_ + " " + msg);
+				}
       } else {
         val_ = temp;
       }
@@ -82,7 +88,7 @@ class ValueArg : public Arg {
     return *this;
   }
 
-  /** Resets parse error message */
+  /** Resets the parse error message */
   ValueArg& parse_error(const std::string& pe) {
     parse_error_ = pe;
     return *this;
@@ -119,7 +125,7 @@ class ValueArg : public Arg {
   ValueArg(const std::string& opt) :
     Arg {opt} {
     usage("<value>");
-    parse_error("Unable to parse value!");
+    parse_error("Unable to parse value:");
   }
 };
 
