@@ -38,7 +38,7 @@ class ValueArg : public Arg {
   virtual std::pair<size_t, size_t> read(int argc, char** argv) {
     for (const int i : get_appearances(argc, argv)) {
       if (i == (argc - 1) || argv[i + 1][0] == '-') {
-        error(parse_error_ + " No argument provided!");
+        error("No argument provided!");
         return std::make_pair(i, i);
       }
 
@@ -48,11 +48,7 @@ class ValueArg : public Arg {
 
       if (failed(iss)) {
 				const auto msg = fail_msg(iss);
-				if (msg == "") {
-					error(parse_error_ + " No reason given!");
-				} else {
-					error(parse_error_ + " " + msg);
-				}
+				error(msg == "" ? parse_error_ : msg);
       } else {
         val_ = temp;
       }
@@ -125,7 +121,7 @@ class ValueArg : public Arg {
   ValueArg(const std::string& opt) :
     Arg {opt} {
     usage("<value>");
-    parse_error("Unable to parse value:");
+    parse_error("Unspecified parse error!");
   }
 };
 
