@@ -39,6 +39,10 @@ class CppUtilMap : public Map {
       return itr_->first;
     }
 
+    const typename map_type::key_type* operator->() const {
+      return &(itr_->first);
+    }
+
     bool operator==(const const_key_iterator& rhs) const {
       return itr_ == rhs.itr_;
     }
@@ -66,6 +70,10 @@ class CppUtilMap : public Map {
       return itr_->second;
     }
 
+    typename map_type::mapped_type* operator->() const {
+      return &(itr_->second);
+    }
+
     bool operator==(const value_iterator& rhs) const {
       return itr_ == rhs.itr_;
     }
@@ -91,6 +99,10 @@ class CppUtilMap : public Map {
 
     const typename map_type::mapped_type& operator*() const {
       return itr_->second;
+    }
+
+    const typename map_type::mapped_type* operator->() const {
+      return &(itr_->second);
     }
 
     bool operator==(const const_value_iterator& rhs) const {
