@@ -286,6 +286,14 @@ class CommandLineConfig {
         os << std::endl;
         os << "# " << *((*a)->alias_begin()) << " ";
         (*a)->usage(os);
+        if ((*a)->has_default()) {
+          std::ostringstream ss;
+          (*a)->debug(ss);
+          auto default_val = ss.str();
+          if (default_val.find("\n") == std::string::npos) {
+            os << std::endl << "# Default: " << default_val;
+          }
+        }
         os << std::endl;
         os << std::endl;
       }
