@@ -51,7 +51,7 @@ class CommandLineConfig {
         return *(a1->alias_begin()) < *(a2->alias_begin());
       });
     }
-    Args::read(argc, argv);
+    Args::read(argc, argv, "--config");
 
     if (help) {
       std::cout << std::endl;
@@ -59,15 +59,6 @@ class CommandLineConfig {
       std::cout << std::endl;
       write_help(std::cout, show_defaults_in_Help);
       exit(0);
-    }
-
-    if (read_config.value() != "") {
-      std::ifstream ifs(read_config.value());
-      if (!ifs.is_open()) {
-        std::cerr << "Unable to read config file!" << std::endl;
-        exit(1);
-      }
-      Args::read(ifs);
     }
 
     if (Args::error() || Args::duplicate() || Args::unrecognized() || Args::anonymous()) {
