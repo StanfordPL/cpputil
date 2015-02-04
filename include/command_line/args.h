@@ -21,6 +21,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include "include/command_line/arg.h"
 #include "include/command_line/arg_group.h"
@@ -162,12 +163,18 @@ class Args {
   }
 
   /** Read arguments in standard argc/argv format */
-  static void read(int argc, char** argv) {
+  static void read(int argc, char** argv, const std::string config_param = "") {
     auto& parse = Singleton<Parse>::get();
     parse.errors.clear();
     parse.duplicates.clear();
     parse.unrecognized.clear();
     parse.anonymous.clear();
+
+    // resolve config files
+    std::vector<char*> result;
+    inline_config_files(argc, argv, result, config_param);
+    argc = result.size();
+    argv = result.data();
 
     auto& ar = Singleton<ArgRegistry>::get();
     std::vector<bool> used(argc);
@@ -200,40 +207,65 @@ class Args {
     }
   }
 
-  /** Read arguments from an istream */
-  static void read(std::istream& is) {
-    std::vector<char*> argv;
-    argv.push_back(strdup("<ignore>"));
+private:
+
+  /** Process the arguments from a file */
+  static void process_config_file(const std::string file, std::vector<char*>& result,
+                                  const std::string config_param) {
+    std::ifstream is(file);
+    if (!is.is_open()) {
+      std::cerr << "Unable to read config file '" << file << "'!" << std::endl;
+      exit(1);
+    }
 
     std::stringstream ss;
     ss << is.rdbuf();
     ifilterstream<LineComment<'#'>> fs(ss);
 
     std::string s;
+    bool next_is_config = false;
     while (fs >> s) {
       if (s.front() == '"') {
-				if (s.back() == '"') {
-					s = s.substr(1, s.length()-2);
-				} else {
-					s = s.substr(1);
+        if (s.back() == '"') {
+          s = s.substr(1, s.length()-2);
+        } else {
+          s = s.substr(1);
 
-					std::string s2;
-					while (fs >> s2 && s2.back() != '"') {
-						s = s + " " + s2;
-					}
-					if (fs.good()) {
-						s = s + " " + s2.substr(0, s2.length()-1);
-					}
-				}
+          std::string s2;
+          while (fs >> s2 && s2.back() != '"') {
+            s = s + " " + s2;
+          }
+          if (fs.good()) {
+            s = s + " " + s2.substr(0, s2.length()-1);
+          }
+        }
       }
 
-      argv.push_back(strdup(s.c_str()));
+      // recursively process config files if necessary
+      if (next_is_config) {
+        next_is_config = false;
+        process_config_file(s, result, config_param);
+      } else if (s == config_param) {
+        next_is_config = true;
+      } else {
+        result.push_back(strdup(s.c_str()));
+      }
     }
+  }
 
-    read(argv.size(), argv.data());
-
-    for (auto s : argv) {
-      free(s);
+  /** Go through all arguments and inline any config files (recursively) that may be encountered. */
+  static void inline_config_files(int argc, char** argv, std::vector<char*>& result,
+                                  const std::string config_param) {
+    bool next_is_config = false;
+    for (int i = 0; i < argc; i++) {
+      if (next_is_config) {
+        next_is_config = false;
+        process_config_file(argv[i], result, config_param);
+      } else if (strcmp(argv[i], config_param.c_str()) == 0) {
+        next_is_config = true;
+      } else {
+        result.push_back(strdup(argv[i]));
+      }
     }
   }
 };
