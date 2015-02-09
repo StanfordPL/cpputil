@@ -55,6 +55,7 @@ class FolderArg : public Arg {
       DIR *dp = opendir(argv[i+1]);
       if(dp == NULL) {
         error(folder_error_);        
+				return std::make_pair(i, i+1);
       }
 
       struct dirent *dirp;
@@ -75,7 +76,7 @@ class FolderArg : public Arg {
           if (failed(ifs)) {
 						const auto msg = fail_msg(ifs);
 						error(std::string(dirp->d_name) + " -- " + (msg == "" ? parse_error_ : msg));
-            return std::make_pair(i, i);
+            return std::make_pair(i, i+1);
           } else {
             val_.push_back(temp);
           }
