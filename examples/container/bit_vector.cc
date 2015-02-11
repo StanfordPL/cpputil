@@ -56,5 +56,11 @@ int main() {
   }
   cout << endl;
 
+	b3.copy(b2);
+  for (auto i = b3.fixed_byte_begin(), ie = b3.fixed_byte_end(); i != ie; ++i) {
+    cout << hex << setw(2) << setfill(' ') << (int) *i << " ";
+  }
+  cout << endl;
+
   return 0;
 }

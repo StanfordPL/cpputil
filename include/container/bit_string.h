@@ -508,6 +508,28 @@ class BitString {
     return (double*) contents_.data() + num_float_doubles();
   }
 
+	/** Bit-wise block copy */
+	BitString& copy(const BitString& rhs) {
+    size_t i = 0;
+
+#if defined(__AVX2__) && defined(__AVX__)
+    for (; i + 4 <= contents_.size(); i += 4) {
+      auto x = _mm256_load_si256((__m256i*) &rhs.contents_[i]);
+      _mm256_store_si256((__m256i*) &contents_[i], x);
+    }
+#elif defined(__AVX__)
+    for (; i + 2 <= contents_.size(); i += 2) {
+      auto x = _mm_load_si128((__m128i*) &rhs.contents_[i]);
+      _mm_store_si128((__m128i*)&contents_[i], x);
+    }
+#endif
+    for (; i < contents_.size(); ++i) {
+      contents_[i] = rhs.contents_[i];
+    }
+
+    return *this;
+	}
+
   /** Bit-wise and. */
   BitString& operator&=(const BitString& rhs) {
     size_t i = 0;
