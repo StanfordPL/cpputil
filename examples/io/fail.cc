@@ -28,6 +28,12 @@ int main() {
 		clog << "Shouldn't see this" << endl;
 	}
 
+	stringstream ss;
+	fail(ss) << "An iostream is broken";
+	if (failed(ss)) {
+		clog << "Should see this: " << fail_msg(ss) << endl;
+	}
+
   return 0;
 }
 
