@@ -75,6 +75,31 @@ inline std::string fail_msg(std::ostream& os) {
 	return ss->str();
 }
 
+inline bool failed(std::iostream& ios) {
+	return ios.fail();
+}
+
+inline std::ostringstream& fail(std::iostream& ios) {
+	auto& p = ios.pword(__fail_msg_idx());
+	if (p == nullptr) {
+		p = (void*) new std::ostringstream();
+	}
+	auto ss = static_cast<std::ostringstream*>(p);
+
+	ios.setstate(std::ios::failbit);
+	return *ss;
+}
+
+inline std::string fail_msg(std::iostream& ios) {
+	auto& p = ios.pword(__fail_msg_idx());
+	if (p == nullptr) {
+		p = (void*) new std::ostringstream();
+	}
+	const auto& ss = static_cast<std::ostringstream*>(p);
+
+	return ss->str();
+}
+
 } // namespace cpputil
 
 #endif
