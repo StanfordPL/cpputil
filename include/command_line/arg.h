@@ -146,8 +146,8 @@ class Arg {
     std::string alt = "";
 
     assert(a.length() != 0 && "Cannot register arg with no name!");
-    assert(a.length() != 1 || a != "-" && "Cannot register arg with no name!");
-    assert(a.length() != 2 || a != "--" && "Cannot register arg with no name!");
+    assert((a.length() != 1 || a != "-") && "Cannot register arg with no name!");
+    assert((a.length() != 2 || a != "--") && "Cannot register arg with no name!");
 
     if (a.length() == 1) {
       alt = std::string("-") + a;
