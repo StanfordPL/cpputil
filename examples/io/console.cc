@@ -12,35 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CPPUTIL_INCLUDE_IO_ABORT_H
-#define CPPUTIL_INCLUDE_IO_ABORT_H
+#include <iostream>
 
-#include <cassert>
-#include <cstdlib>
+#include "include/io/console.h"
 
-namespace cpputil {
+using namespace cpputil;
+using namespace std;
 
-class Abort {
- public:
-  Abort() : code_(0) { }
+int main() {
+	Console::msg() << "Hello" << endl;
+	Console::warn() << "World" << endl;
+	Console::error() << "It's over" << endl;
 
-	Abort& code(int c) {
-		code_ = c;
-		return *this;
-	}
+  return 0;
+}
 
-  void operator()(std::streambuf* sb, char c) {
-		sb->sputc(c);
-		if (c == '\n') {
-			assert(false);
-			exit(code_);
-		}
-	}
 
- private:
-	int code_;
-};
-
-} // namespace cpputil
-
-#endif
