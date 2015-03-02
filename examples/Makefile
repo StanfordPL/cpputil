@@ -27,6 +27,7 @@ EX  = command_line/command_line \
 			debug/stl_print \
 			io/abort \
 			io/column \
+			io/console \
 			io/fail \
 			io/filterstream \
 			io/indent \
