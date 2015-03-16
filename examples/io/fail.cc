@@ -28,6 +28,17 @@ int main() {
 		clog << "Shouldn't see this" << endl;
 	}
 
+  if (warned(cerr)) {
+    clog << "Shouldn't see this" << endl;
+  }
+  warn(cerr) << "cerr is sort of okay";
+  if (warned(cout)) {
+    clog << "Shouldn't see this" << endl;
+  }
+  if (warned(cerr)) {
+    clog << "Should see this: " << warn_msg(cerr) << endl;
+  }
+
 	stringstream ss;
 	fail(ss) << "An iostream is broken";
 	if (failed(ss)) {

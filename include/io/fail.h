@@ -25,11 +25,28 @@ inline int __fail_msg_idx() {
 	return idx;
 }
 
-inline bool failed(std::istream& is) {
+inline int __warn_bit_idx() {
+	static const int idx = std::ios::xalloc();
+	return idx;
+}
+
+inline int __warn_msg_idx() {
+	static const int idx = std::ios::xalloc();
+	return idx;
+}
+
+template <typename S>
+inline bool failed(S& is) {
 	return is.fail();
 }
 
-inline std::ostringstream& fail(std::istream& is) {
+template <typename S>
+inline bool warned(S& is) {
+  return is.iword(__warn_bit_idx()) != 0;
+}
+
+template <typename S>
+inline std::ostringstream& fail(S& is) {
 	auto& p = is.pword(__fail_msg_idx());
 	if (p == nullptr) {
 		p = (void*) new std::ostringstream();
@@ -40,7 +57,20 @@ inline std::ostringstream& fail(std::istream& is) {
 	return *ss;
 }
 
-inline std::string fail_msg(std::istream& is) {
+template <typename S>
+inline std::ostringstream& warn(S& is) {
+	auto& p = is.pword(__warn_msg_idx());
+	if (p == nullptr) {
+		p = (void*) new std::ostringstream();
+	}
+	auto ss = static_cast<std::ostringstream*>(p);
+
+  is.iword(__warn_bit_idx()) = 1;
+	return *ss;
+}
+
+template <typename S>
+inline std::string fail_msg(S& is) {
 	auto& p = is.pword(__fail_msg_idx());
 	if (p == nullptr) {
 		p = (void*) new std::ostringstream();
@@ -50,48 +80,9 @@ inline std::string fail_msg(std::istream& is) {
 	return ss->str();
 }
 
-inline bool failed(std::ostream& os) {
-	return os.fail();
-}
-
-inline std::ostringstream& fail(std::ostream& os) {
-	auto& p = os.pword(__fail_msg_idx());
-	if (p == nullptr) {
-		p = (void*) new std::ostringstream();
-	}
-	auto ss = static_cast<std::ostringstream*>(p);
-
-	os.setstate(std::ios::failbit);
-	return *ss;
-}
-
-inline std::string fail_msg(std::ostream& os) {
-	auto& p = os.pword(__fail_msg_idx());
-	if (p == nullptr) {
-		p = (void*) new std::ostringstream();
-	}
-	const auto& ss = static_cast<std::ostringstream*>(p);
-
-	return ss->str();
-}
-
-inline bool failed(std::iostream& ios) {
-	return ios.fail();
-}
-
-inline std::ostringstream& fail(std::iostream& ios) {
-	auto& p = ios.pword(__fail_msg_idx());
-	if (p == nullptr) {
-		p = (void*) new std::ostringstream();
-	}
-	auto ss = static_cast<std::ostringstream*>(p);
-
-	ios.setstate(std::ios::failbit);
-	return *ss;
-}
-
-inline std::string fail_msg(std::iostream& ios) {
-	auto& p = ios.pword(__fail_msg_idx());
+template <typename S>
+inline std::string warn_msg(S& is) {
+	auto& p = is.pword(__warn_msg_idx());
 	if (p == nullptr) {
 		p = (void*) new std::ostringstream();
 	}
