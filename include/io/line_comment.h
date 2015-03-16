@@ -35,7 +35,7 @@ class LineComment {
         return 1;
 
       default:
-        if (!ignoring_) {
+        if (!ignoring_ || c == EOF) {
           buffer[0] = c;
           return 1;
         } else {
