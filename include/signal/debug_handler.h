@@ -31,11 +31,15 @@ namespace cpputil {
 class DebugHandler {
  public:
   static void install_sigsegv() {
+#ifdef DEBUG_SIGNAL_HANDLER
     install(SIGSEGV, sigsegv);
+#endif
   }
 
   static void install_sigill() {
+#ifdef DEBUG_SIGNAL_HANDLER
     install(SIGILL, sigill);
+#endif
   }
 
  private:
