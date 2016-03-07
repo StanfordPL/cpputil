@@ -39,7 +39,7 @@ class CommandLineConfig {
                  .description("Print this message and quit");
     auto& debug = FlagArg::create("debug_args")
                   .description("Print program arguments and quit");
-    auto& read_config = ValueArg<std::string>::create("config")
+    ValueArg<std::string>::create("config")
                         .usage("<path/to/file.conf>")
                         .description("Read program args from a configuration file");
     auto& write_config = ValueArg<std::string>::create("example_config")
