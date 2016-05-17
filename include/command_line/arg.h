@@ -101,6 +101,11 @@ class Arg {
     return has_default_;
   }
 
+  /** Indicate that this argument has been set now. */
+  void set_provided() {
+    is_provided_ = true;
+  }
+
   /** Prints the value of an arg */
   virtual void debug(std::ostream& os) const = 0;
 
@@ -190,11 +195,6 @@ class Arg {
   /** Reset whether this argument has a default. */
   void set_has_default(const bool val = true) {
     has_default_ = val;
-  }
-
-  /** Indicate that this argument has been set now. */
-  void set_provided() {
-    is_provided_ = true;
   }
 
  private:
