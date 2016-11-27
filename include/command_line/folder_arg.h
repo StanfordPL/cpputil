@@ -177,7 +177,7 @@ class FolderArg : public Arg {
     usage("<value>");
     parse_error("Unable to parse value!");
     file_error("Unable to open one of the files!");
-    folder_error("Unable to open drectory!");
+    folder_error("Unable to open directory!");
   }
 };
 
