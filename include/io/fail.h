@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <ctype.h>
 
 namespace cpputil {
 
@@ -90,6 +91,22 @@ inline std::string warn_msg(S& is) {
 
 	return ss->str();
 }
+
+template <typename S>
+inline void fail_if_not(S& is, char c) {
+  if(is.fail()) // already failed, don't show bad error message
+    return;
+  char d = is.get();
+  if(c != d) {
+    if(isprint(c) && isprint(d))
+      fail(is) << "Expected character '" << c << "' but got '" << d << "'." << std::endl;
+    else
+      fail(is) << "Expected character " << std::showbase << std::hex 
+               << (int)c << " but got " << (int)d << "." << std::endl;
+  }
+}
+
+
 
 } // namespace cpputil
 
